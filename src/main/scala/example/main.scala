@@ -5,7 +5,7 @@ object Main {
     println("This should cause a Merge-Conflict")
     
     //
-    // Hello im a Problem
+    // This should not work
     //
   }
 }
