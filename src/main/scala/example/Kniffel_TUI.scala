@@ -10,10 +10,12 @@ object KniffelApp {
   def displayDiceValues(diceValues: List[String]): Unit = {
     val horizontalLine = "+" + List.fill(diceValues.length)("---").mkString("+") + "+"
     val diceIconsLine = "|" + diceValues.map(value => s" $value ").mkString("|") + "|"
+    val numCounter = " " + diceValues.indices.map(index => s" ${index + 1} ").mkString(" ") + " "
 
     println(horizontalLine)
     println(diceIconsLine)
     println(horizontalLine)
+    println(numCounter)
   }
 
   def main(args: Array[String]): Unit = {
