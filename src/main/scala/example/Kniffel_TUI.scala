@@ -1,5 +1,5 @@
-import scala.util.Random
 import scala.io.StdIn
+import scala.util.Random
 
 object KniffelApp {
   // Method to roll a single dice and return its icon as a string
@@ -19,9 +19,12 @@ object KniffelApp {
     println(numCounter)
   }
 
-  // Method to keep selected dice and return them
-  def keepDice(diceValues: List[String], keepIndices: List[Int]): List[String] = {
-    keepIndices.map(index => diceValues(index - 1))
+  // Method to keep selected dice and return them, also rerolling the rest
+  def keepDice(diceValues: List[String], keepIndices: List[Int]): (List[String], List[String]) = {
+    val (keptDice, _) = diceValues.zipWithIndex.partition { case (_, index) => keepIndices.contains(index + 1) }
+    val newDice = diceValues.diff(keptDice.map(_._1))
+    val rerolledDice = List.fill(newDice.length)(rollDice())
+    (keptDice.map(_._1), keptDice.map(_._1) ++ rerolledDice)
   }
 
   def main(args: Array[String]): Unit = {
@@ -35,7 +38,8 @@ object KniffelApp {
     val keepIndices = input.split(" ").map(_.toInt).toList
 
     // Keep the selected dice and display them
-    val keptDice = keepDice(diceValues, keepIndices)
+    val (keptDice, finalDiceValues) = keepDice(diceValues, keepIndices)
     displayDiceValues(keptDice)
+    displayDiceValues(finalDiceValues)
   }
 }
