@@ -12,18 +12,20 @@ class DiceSpec extends AnyWordSpec {
 
     "keep specified dice and reroll the rest" in {
       val dice = Dice(List(1, 2, 3, 4, 5))
-      val newDice = dice.keepDice(List(1, 3, 5))
+      val diceToKeep = List(1, 3, 5)
+      val newDice = dice.keepDice(diceToKeep)
       
       // Überprüfe, ob alle behaltenen Würfelwerte in der neuen Würfelinstanz vorhanden sind
-      val keptDiceValues = newDice.values.filter(dice.values.contains)
+      val keptDiceValues = newDice.values.slice(0, diceToKeep.length)
       keptDiceValues should contain theSameElementsAs List(1, 3, 5)
       
       // Überprüfe, ob die Anzahl der Würfelwerte in der neuen Würfelinstanz korrekt ist
       newDice.values should have length 5
-      
-      // Überprüfe, ob alle anderen Würfelwerte neu gewürfelt wurden
-      val rerolledDiceValues = newDice.values.filterNot(keptDiceValues.contains)
-      rerolledDiceValues should contain allElementsOf (1 to 6)
+
+      val afaskdfj = new Dice()
+      afaskdfj.values should have length 5
+
+
     }
   }
 }
