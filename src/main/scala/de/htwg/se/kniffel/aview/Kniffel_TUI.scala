@@ -1,6 +1,8 @@
+package de.htwg.se.kniffel.aview
+
 import scala.io.StdIn
 import scala.util.Random
-import example.Dice
+import de.htwg.se.kniffel.model.Dice
 
 object KniffelApp {
 

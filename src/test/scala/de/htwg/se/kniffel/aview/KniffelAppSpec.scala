@@ -1,3 +1,5 @@
+package de.htwg.se.kniffel.aview
+
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers._
 import scala.io.StdIn
