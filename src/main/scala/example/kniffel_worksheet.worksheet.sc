@@ -1,8 +1,9 @@
+import scala.util.Random
+
 // Method to roll a single dice and return its icon as a string
 def rollDice(): String = {
-  val randomNumber = scala.util.Random.nextInt(6) + 1
-  List("1", "2", "3", "4", "5", "6")(randomNumber - 1)
-}
+    String.valueOf(Random.nextInt(6) + 1)
+  }
 
 // Method to display the current values of all dice
 def displayDiceValues(diceValues: List[String]): Unit = {
