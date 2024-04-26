@@ -15,15 +15,15 @@ class DiceSpec extends AnyWordSpec {
       val diceToKeep = List(1, 3, 5)
       val newDice = dice.keepDice(diceToKeep)
       
-      // Überprüfe, ob alle behaltenen Würfelwerte in der neuen Würfelinstanz vorhanden sind
+      // Check if all kept dice values are present in the new dice instance
       val keptDiceValues = newDice.values.slice(0, diceToKeep.length)
       keptDiceValues should contain theSameElementsAs List(1, 3, 5)
       
-      // Überprüfe, ob die Anzahl der Würfelwerte in der neuen Würfelinstanz korrekt ist
+      // Check if the number of dice values in the new dice instance is correct
       newDice.values should have length 5
 
-      val afaskdfj = new Dice()
-      afaskdfj.values should have length 5
+      val initialDice = new Dice()
+      initialDice.values should have length 5
 
 
     }
