@@ -1,6 +1,7 @@
 package de.htwg.se.kniffel.model
 
 import scala.util.Random
+import de.htwg.se.kniffel.model.Dice.rollDice
 
 case class Dice(values: List[Int]) {
 
@@ -9,13 +10,12 @@ case class Dice(values: List[Int]) {
     this(List.fill(5)(Dice.rollDice())) // Use the companion object's method
   }
 
-  // Method to reroll the dice, keeping some and rolling new ones for others
-  def keepDice(keepIndices: List[Int]): Dice = {
+def keepDice(keepIndices: List[Int]): Dice = {
     val (keptDice, _) = values.zipWithIndex.partition { case (_, index) =>
-      keepIndices.contains(index)
+      keepIndices.contains(index + 1)
     }
-    val newDiceCount = values.length - keptDice.map(_._1).length
-    val rerolledDice = List.fill(newDiceCount)(Dice.rollDice()) // Use the companion object's method
+    val newDice = values.diff(keptDice.map(_._1))
+    val rerolledDice = List.fill(newDice.length)(rollDice())
     Dice(keptDice.map(_._1) ++ rerolledDice)
   }
 }
