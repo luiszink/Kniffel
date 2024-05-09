@@ -11,5 +11,6 @@ object KniffelApp {
     val controller: Controller = new Controller()
     val tui: TUI = new TUI(controller)
     tui.run()
+    //Test
   }
 }
