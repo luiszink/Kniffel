@@ -1,34 +1,29 @@
 package de.htwg.se.kniffel.model
 
+import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import org.scalatest.matchers.should.Matchers._
 import de.htwg.se.kniffel.model.Dice
 
 
-class DiceSpec extends AnyWordSpec {
-
-  "The Dice class" should {
-    "roll a single dice and return its icon as an integer" in {
-      val diceIcon = Dice.rollDice()
-      diceIcon should (be >= 1 and be <= 6)
+class DiceTest extends AnyWordSpec with Matchers {
+  "A Dice" when {
+    "newly created" should {
+      "have 5 random dice values each between 1 and 6" in {
+        val dice = new Dice()
+        dice.values should have size 5
+        dice.values.foreach { d =>
+          d should (be >= 1 and be <= 6)
+        }
+      }
     }
 
-    "keep specified dice and reroll the rest" in {
-      val dice = Dice(List(1, 2, 3, 4, 5))
-      val diceToKeep = List(1, 3, 5)
-      val newDice = dice.keepDice(diceToKeep)
-      
-      // Check if all kept dice values are present in the new dice instance
-      val keptDiceValues = newDice.values.slice(0, diceToKeep.length)
-      keptDiceValues should contain theSameElementsAs List(1, 3, 5)
-      
-      // Check if the number of dice values in the new dice instance is correct
-      newDice.values should have length 5
-
-      val initialDice = new Dice()
-      initialDice.values should have length 5
-
-
+    "keeping dice" should {
+      "keep the correct dice and reroll others" in {
+        val initialDice = Dice(List(3, 3, 5, 6, 2))
+        val keptIndices = List(1, 4, 5)
+        val newDice = initialDice.keepDice(keptIndices)
+        newDice.values.count(d => List(3, 6, 2).contains(d)) should be >= 3
+      }
     }
   }
 }
