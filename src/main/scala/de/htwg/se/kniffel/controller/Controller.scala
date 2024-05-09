@@ -14,6 +14,4 @@ class Controller extends Observable {
     repetitions = repetitions -1
     notifyObservers
   }
-
-
 }
