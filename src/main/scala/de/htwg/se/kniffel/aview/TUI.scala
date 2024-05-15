@@ -1,32 +1,12 @@
 package de.htwg.se.kniffel.aview
 
 import scala.io.StdIn
-import scala.util.Random
-import de.htwg.se.kniffel.model.Dice
 import de.htwg.se.kniffel.util.Observer
 import de.htwg.se.kniffel.controller.Controller
+import de.htwg.se.kniffel.model.Player
 
 class TUI(controller: Controller) extends Observer {
-
-  // add to subscribers
   controller.add(this)
-
-  override def update: Unit = {
-     println(printGame())
-  }
-
-  def printGame() = {
-    val diceValues: List[Int] = controller.getDice
-    val horizontalLine =
-      "+" + List.fill(diceValues.length)("---").mkString("+") + "+"
-    val diceIconsLine =
-      "|" + diceValues.map(value => s" $value ").mkString("|") + "|"
-    val numCounter = " " + diceValues.indices
-      .map(index => s" ${index + 1} ")
-      .mkString(" ") + " "
-
-    s"$horizontalLine\n$diceIconsLine\n$horizontalLine\n$numCounter"
-  }
 
   def input(): Option[List[Int]] = {
     // Start the game and display the final dice values
@@ -36,23 +16,77 @@ class TUI(controller: Controller) extends Observer {
     val input = StdIn.readLine()
 
     if (input.toLowerCase == "f") {
-      println("Ending the game...")
+      updateScore()
+      controller.nextPlayer()
       None
     } else {
       Option(input.split(" ").map(_.toInt).toList)
     }
   }
+
+  def printDice() = {
+    val diceValues: List[Int] = controller.getDice
+    val horizontalLine =
+      "+" + List.fill(diceValues.length)("---").mkString("+") + "+"
+    val diceIconsLine =
+      "|" + diceValues.map(value => s" $value ").mkString("|") + "|"
+    val numCounter = " " + diceValues.indices
+      .map(index => s" ${index + 1} ")
+      .mkString(" ") + " "
+
+    s"Current Player: ${controller.getCurrentPlayer}\n$horizontalLine\n$diceIconsLine\n$horizontalLine\n$numCounter"
+  }
+
+  def printScoreCard() = {
+    val currentPlayer = controller.getCurrentPlayer
+    val scoreCard = currentPlayer.scoreCard.categories.map {case (category, score) => s"$category: ${score.getOrElse("_")}"}.mkString("\n")
+    s"Current Player: ${currentPlayer.name}\n\nScoreCard:\n$scoreCard"
+  }
+
+  def printGame() = {
+    s"\n\n\n${printScoreCard()}\n\n${printDice()}"
+  }
+
+  def addPlayers(): Unit = {
+    println("Enter player names (comma-separated):")
+    val input = StdIn.readLine()
+    val names = input.split(",").map(_.trim)
+    names.foreach(controller.addPlayer)
+  }
+
+  def updateScore(): Unit = {
+    println("Enter category and score (e.g., Ones 5):")
+    val input = StdIn.readLine().split(" ")
+    if (input.length == 2) {
+      val category = input(0)
+      val score = input(1).toInt
+      controller.updateScore(category, score)
+    } else {
+      println("Invalid input. Please enter in the format: category score")
+    }
+  }
+
   var running = true
   
   def run() = {
-    println(printGame())
+    addPlayers()
+    println(printDice())
     while (running) {
       input() match {
-        case Some(value) => {
-          controller.keepDice(value)
-        }
-        case None => running = false
+        case Some(value) => controller.keepDice(value)
+        case None => updateScore()
       }
     }
   }
+
+  override def update(message: String): Unit = {
+    message match {
+      case "diceKept" => println(printDice())
+      case "updateScore" => println(printScoreCard())
+      case "playerAdded" => println("")
+      case "noRepetitions" => updateScore()
+      case _ => println(printGame())
+    }
+  }
+
 }
