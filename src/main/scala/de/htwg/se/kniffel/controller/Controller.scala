@@ -16,7 +16,14 @@ class Controller extends Observable {
   def keepDice(input: List[Int]) = {
     dice = dice.keepDice(input)
     repetitions = repetitions - 1
-    notifyObservers("diceKept")
+    repetitions match {
+      case 0 => 
+        notifyObservers("printDice")
+        notifyObservers("updateScore")
+        nextPlayer()
+        repetitions = 2
+      case n if n > 0 => notifyObservers("printDice")
+  }
   }
 
   def addPlayer(name: String) = {
@@ -31,7 +38,7 @@ class Controller extends Observable {
     currentPlayerIndex = (currentPlayerIndex + 1) % players.length
     repetitions = 2  // Reset the number of repetitions for the new player
     dice = new Dice()
-    notifyObservers("nextPlayer")
+    notifyObservers("")
   }
 
   def updateScore(category: String): Unit = {
@@ -57,7 +64,7 @@ class Controller extends Observable {
     currentPlayer.scoreCard.categories.get(category) match {
       case None =>
         currentPlayer.scoreCard.categories += (category -> Some(calculatedScore))
-        notifyObservers("updateScore")
+        notifyObservers("printScoreCard")
       case _ => 
         println(calculatedScore)
         println(category)// Do nothing if the category is already filled or doesn't exist

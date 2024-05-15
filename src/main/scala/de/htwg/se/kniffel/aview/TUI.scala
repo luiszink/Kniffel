@@ -55,7 +55,7 @@ class TUI(controller: Controller) extends Observer {
   }
 
   def updateScore(): Unit = {
-    println("Enter category and score (e.g., Ones):")
+    println("Enter category and score (e.g., One, Fullhouse...:")
     val input = StdIn.readLine()
     controller.updateScore(input)
   }
@@ -69,18 +69,17 @@ class TUI(controller: Controller) extends Observer {
     while (running) {
       input() match {
         case Some(value) => controller.keepDice(value)
-        case None => println(":/")
+        case None => controller.nextPlayer()
       }
     }
   }
 
   override def update(message: String): Unit = {
     message match {
-      case "diceKept" => println(printDice())
-      case "keep" => println(printDice())
-      case "updateScore" => println(printScoreCard())
+      case "printDice" => println(printDice())
+      case "printScoreCard" => println(printScoreCard())
       case "playerAdded" => println("")
-      case "noRepetitions" => updateScore()
+      case "updateScore" => updateScore()
       case _ => println(printGame())
     }
   }
