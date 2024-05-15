@@ -55,16 +55,11 @@ class TUI(controller: Controller) extends Observer {
   }
 
   def updateScore(): Unit = {
-    println("Enter category and score (e.g., Ones 5):")
-    val input = StdIn.readLine().split(" ")
-    if (input.length == 2) {
-      val category = input(0)
-      val score = input(1).toInt
-      controller.updateScore(category, score)
-    } else {
-      println("Invalid input. Please enter in the format: category score")
-    }
+    println("Enter category and score (e.g., Ones):")
+    val input = StdIn.readLine()
+    controller.updateScore(input)
   }
+
 
   var running = true
   
@@ -74,7 +69,7 @@ class TUI(controller: Controller) extends Observer {
     while (running) {
       input() match {
         case Some(value) => controller.keepDice(value)
-        case None => updateScore()
+        case None => println(":/")
       }
     }
   }
@@ -82,6 +77,7 @@ class TUI(controller: Controller) extends Observer {
   override def update(message: String): Unit = {
     message match {
       case "diceKept" => println(printDice())
+      case "keep" => println(printDice())
       case "updateScore" => println(printScoreCard())
       case "playerAdded" => println("")
       case "noRepetitions" => updateScore()
