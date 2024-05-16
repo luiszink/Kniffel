@@ -70,7 +70,4 @@ class Controller extends Observable {
         println(category)// Do nothing if the category is already filled or doesn't exist
     }
   }
-
-
-
 }
