@@ -90,7 +90,8 @@ class TUI(controller: Controller) extends Observer {
     while (running) {
       input() match {
         case Some(value) => controller.keepDice(value)
-        case None => controller.nextPlayer()
+        case None => 
+          input()
       }
     }
   }
