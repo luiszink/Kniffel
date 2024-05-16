@@ -9,19 +9,34 @@ class TUI(controller: Controller) extends Observer {
   controller.add(this)
 
   def input(): Option[List[Int]] = {
-    // Start the game and display the final dice values
-    println(
-      s"Enter the indices of the dice you want to keep (e.g., 1 3 5), or type 'f' to end (${controller.repetitions} remaining):"
-    )
-    val input = StdIn.readLine()
+    var remainingAttempts = 2 // Maximale Anzahl von Wiederholungsversuchen
+    
+    // Retry Strategy Pattern
+    while (remainingAttempts > 0) {
+      println(
+        s"Enter the indices of the dice you want to keep (e.g., 1 3 5), or type 'f' to end (${controller.repetitions} remaining):"
+      )
+      val input = StdIn.readLine()
 
-    if (input.toLowerCase == "f") {
-      updateScore()
-      controller.nextPlayer()
-      None
-    } else {
-      Option(input.split(" ").map(_.toInt).toList)
+      if (input.toLowerCase == "f") {
+        updateScore()
+        controller.nextPlayer()
+        return None
+      } else {
+        // Attempt to parse user input into a list of integers
+        try {
+          val diceToKeep = input.split(" ").map(_.toInt).toList
+          return Some(diceToKeep)
+          // Decrement remaining attempts
+          remainingAttempts -= 1          
+        } catch {
+          case e: NumberFormatException =>
+            println("Invalid input! Please enter valid indices.")
+        }
+      }
     }
+    println("Maximum number of attempts reached. Ending the game...")
+    None
   }
 
   def printDice() = {
@@ -57,9 +72,15 @@ class TUI(controller: Controller) extends Observer {
   def updateScore(): Unit = {
     println("Enter category and score (e.g., One, Fullhouse...:")
     val input = StdIn.readLine()
-    controller.updateScore(input)
+    try{
+      controller.updateScore(input)
+    }
+    catch{
+      case e: IllegalArgumentException =>
+        println("Not a catagory! Please try again.")
+        updateScore()
+    }
   }
-
 
   var running = true
   
