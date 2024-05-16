@@ -49,28 +49,24 @@ class Controller extends Observable {
       case "three" => Threes
       case "four" => Fours
       case "five" => Fives
-      case "sixe" => Sixes
-      case "threetime" => ThreeTimes
-      case "fourtime" => FourTimes
+      case "six" => Sixes
+      case "threeofakind" => ThreeTimes
+      case "fourofakind" => FourTimes
       case "fullhouse" => FullHouse
       case "smallstraight" => SmallStraight
       case "largestraight" => LargeStraight
       case "chance" => Chance
       case "kniffel" => Kniffel
-      // has to be change to get another imput try
       case _ => throw new IllegalArgumentException("Invalid category.")
     }
-    val calculatedScore = ScoreCalculator.calculateScore(getDice, strategy) // Hier verwenden wir ScoreCalculator.calculateScore
-    currentPlayer.scoreCard.categories.get(category) match {
-      case None =>
-        currentPlayer.scoreCard.categories += (category -> Some(calculatedScore))
+    val calculatedScore = ScoreCalculator.calculateScore(getDice, strategy)
+    currentPlayer.scoreCard.categories.get(category.toLowerCase) match {
+      case Some(None) =>
+        currentPlayer.scoreCard.categories.update(category.toLowerCase, Some(calculatedScore))
         notifyObservers("printScoreCard")
-      case _ => 
-        println(calculatedScore)
-        println(category)// Do nothing if the category is already filled or doesn't exist
+      case _ =>
+        println(s"Category $category is already filled or does not exist.")
+        notifyObservers("updateScore")
     }
   }
-
-
-
 }

@@ -1,22 +1,21 @@
 package de.htwg.se.kniffel.model
 
-import scala.io.StdIn
-import scala.collection.mutable.SortedMap
+import scala.collection.mutable.LinkedHashMap
 
 case class ScoreCard() {
-  var categories: SortedMap[String, Option[Int]] = SortedMap(
-    "One" -> None,
-    "Two" -> None,
-    "Three" -> None,
-    "Four" -> None,
-    "Five" -> None,
-    "Sixe" -> None,
-    "ThreeOfAKind" -> None,
-    "FourOfAKind" -> None,
-    "FullHouse" -> None,
-    "SmallStraight" -> None,
-    "LargeStraight" -> None,
-    "Yahtzee" -> None,
-    "Chance" -> None
+  var categories: LinkedHashMap[String, Option[Int]] = LinkedHashMap(
+    "one" -> None,
+    "two" -> None,
+    "three" -> None,
+    "four" -> None,
+    "five" -> None,
+    "six" -> None,
+    "threeofakind" -> None,
+    "fourofakind" -> None,
+    "fullhouse" -> None,
+    "smallstraight" -> None,
+    "largestraight" -> None,
+    "yahtzee" -> None,
+    "chance" -> None
   )
 }
