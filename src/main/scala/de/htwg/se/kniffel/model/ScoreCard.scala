@@ -18,7 +18,7 @@ case class ScoreCard() {
     "yahtzee" -> None,
     "chance" -> None
   )
-  def totalScore: Int = {
+ /* def totalScore: Int = {
     categories.values.flatten.sum
-  }
+ } */
 }
