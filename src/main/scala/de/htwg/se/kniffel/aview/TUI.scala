@@ -31,6 +31,8 @@ class TUI(controller: Controller) extends Observer {
             return Some(diceToKeep)
           case Failure(_: NumberFormatException) =>
             println("Invalid input! Please enter valid indices.")
+          case Failure(_)=>
+            println("Invalid input! Please enter valid indices.")
         }
         // Decrement remaining attempts
         remainingAttempts -= 1
@@ -63,6 +65,20 @@ class TUI(controller: Controller) extends Observer {
     s"\n\n\n${printScoreCard()}\n\n${printDice()}"
   }
 
+  def multiKniffel(): Unit = {
+    println("Are multiple Kniffel allowed? (y/n)")
+    val input = StdIn.readLine().toLowerCase()
+    input match {
+      case "y" =>
+        controller.setScoreUpdater("y")
+      case "n" =>
+        controller.setScoreUpdater("n")
+      case _ =>
+        println("Invalid input! Please enter 'y' for yes or 'n' for no.")
+        multiKniffel() // Rekursiver Aufruf, um eine gültige Eingabe zu erhalten
+    }
+  }
+
   def addPlayers(): Unit = {
     println("Enter player names (comma-separated):")
     val input = StdIn.readLine()
@@ -85,6 +101,7 @@ class TUI(controller: Controller) extends Observer {
   var running = true
   
   def run() = {
+    multiKniffel()
     addPlayers()
     println(printDice())
     while (running) {
