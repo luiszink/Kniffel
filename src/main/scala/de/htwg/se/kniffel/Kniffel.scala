@@ -14,3 +14,4 @@ object KniffelApp {
     // Test
   }
 }
+
