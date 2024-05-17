@@ -19,7 +19,7 @@ jobs:
        distribution: 'adopt'
        cache: 'sbt'
    - name: Run tests
-       run: sbt "test-only * -- -l *aview* -l *util* -l *Kniffel.scala*"
+     run: sbt "test-only * -- -l *aview* -l *util* -l *Kniffel.scala"
    #- name: Run tests
     # run: sbt test
  run_tests:
