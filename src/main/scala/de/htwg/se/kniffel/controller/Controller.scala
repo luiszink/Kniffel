@@ -12,7 +12,7 @@ class Controller extends Observable {
   private var dice: Dice = new Dice()
   private var players: List[Player] = List()
   private var currentPlayerIndex: Int = 0
-  private var scoreUpdater: ScoreUpdater = _
+  private var scoreUpdater: ScoreUpdater = new StandardScoreUpdater
 
   def getDice = dice.values
 

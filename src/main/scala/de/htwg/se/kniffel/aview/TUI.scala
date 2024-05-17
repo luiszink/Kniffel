@@ -1,6 +1,8 @@
 package de.htwg.se.kniffel.aview
 
 import scala.io.StdIn
+import scala.util.{Try, Success, Failure}
+
 import de.htwg.se.kniffel.util.Observer
 import de.htwg.se.kniffel.controller.Controller
 import de.htwg.se.kniffel.model.Player
@@ -24,15 +26,14 @@ class TUI(controller: Controller) extends Observer {
         return None
       } else {
         // Attempt to parse user input into a list of integers
-        try {
-          val diceToKeep = input.split(" ").map(_.toInt).toList
-          return Some(diceToKeep)
-          // Decrement remaining attempts
-          remainingAttempts -= 1          
-        } catch {
-          case e: NumberFormatException =>
+        Try(input.split(" ").map(_.toInt).toList) match {
+          case Success(diceToKeep) =>
+            return Some(diceToKeep)
+          case Failure(_: NumberFormatException) =>
             println("Invalid input! Please enter valid indices.")
         }
+        // Decrement remaining attempts
+        remainingAttempts -= 1
       }
     }
     println("Maximum number of attempts reached. Ending the game...")
@@ -69,29 +70,14 @@ class TUI(controller: Controller) extends Observer {
     names.foreach(controller.addPlayer)
   }
 
-  def multiKniffel(): Unit = {
-    println("Are multiple Kniffel allowed? (y/n)")
-    val input = StdIn.readLine().toLowerCase()
-    input match {
-      case "y" =>
-        controller.setScoreUpdater("y")
-      case "n" =>
-        controller.setScoreUpdater("n")
-      case _ =>
-        println("Invalid input! Please enter 'y' for yes or 'n' for no.")
-        multiKniffel() // Rekursiver Aufruf, um eine gültige Eingabe zu erhalten
-    }
-  }
-
   def updateScore(): Unit = {
-    println("Enter category and score (e.g., One, Fullhouse...:")
+    println("Enter category and score (e.g., One, Fullhouse...):")
     val input = StdIn.readLine()
-    try{
-      controller.updateScore(input)
-    }
-    catch{
-      case e: IllegalArgumentException =>
-        println("Not a catagory! Please try again.")
+
+    Try(controller.updateScore(input)) match {
+      case Success(_) => // Nichts weiter tun, wenn erfolgreich
+      case Failure(e: IllegalArgumentException) =>
+        println("Not a category! Please try again.")
         updateScore()
     }
   }
@@ -99,14 +85,12 @@ class TUI(controller: Controller) extends Observer {
   var running = true
   
   def run() = {
-    multiKniffel()
     addPlayers()
     println(printDice())
     while (running) {
       input() match {
         case Some(value) => controller.keepDice(value)
-        case None => 
-          input()
+        case None => controller.nextPlayer()
       }
     }
   }
@@ -120,5 +104,4 @@ class TUI(controller: Controller) extends Observer {
       case _ => println(printGame())
     }
   }
-
 }
