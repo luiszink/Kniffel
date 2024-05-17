@@ -26,8 +26,8 @@ jobs:
           sbt coverageReport
       - name: Exclude folders from coverage report
         run: |
-          sed -i '/aview/d' target/scala-2.13/scoverage-report/scoverage.xml
-          sed -i '/util/d' target/scala-2.13/scoverage-report/scoverage.xml
-          sed -i '/Kniffel.scala/d' target/scala-2.13/scoverage-report/scoverage.xml
+          sed -i '/aview/d' target/scala-3.4.1/scoverage-report/scoverage.xml
+          sed -i '/util/d' target/scala-3.4.1/scoverage-report/scoverage.xml
+          sed -i '/Kniffel.scala/d' target/scala-3.4.1/scoverage-report/scoverage.xml
       - name: Upload coverage to Coveralls
         run: sbt coveralls
