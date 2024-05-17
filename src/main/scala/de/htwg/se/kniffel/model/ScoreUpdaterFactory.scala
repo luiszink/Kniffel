@@ -6,7 +6,7 @@ object ScoreUpdaterFactory {
     userInput.toLowerCase match {
       case "y" => new StandardScoreUpdater()
       case "n" => new SpecialScoreUpdater()
-      case _ => throw new IllegalArgumentException("Invalid input for ScoreUpdater type.")
+      case _ => throw new IllegalArgumentException("Invalid input for ScoreUpdater type.") //try implementieren
     }
   }
 }
