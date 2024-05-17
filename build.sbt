@@ -10,4 +10,4 @@ lazy val root = project
     libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.14",
     libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.14" % "test",
     libraryDependencies += "org.scalafx" %% "scalafx" % "21.0.0-R32",
-  )
+    )

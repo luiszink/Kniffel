@@ -1,5 +1,6 @@
 package de.htwg.se.kniffel.model
 
+// Strategy Pattern
 trait ScoringStrategy {
   def calculateScore(dice: List[Int]): Int
 }
