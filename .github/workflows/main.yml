@@ -1,7 +1,7 @@
 name: Scala CI
 on:
  push:
-   branches: [ main, develope]
+   branches: [ main, develope, feature-luis]
  pull_request:
    branches: [ main ]
 jobs:
