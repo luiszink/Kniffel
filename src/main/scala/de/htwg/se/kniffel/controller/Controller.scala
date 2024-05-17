@@ -1,8 +1,10 @@
+// Controller.scala
 package de.htwg.se.kniffel.controller
 
 import de.htwg.se.kniffel.util.Observable
-import de.htwg.se.kniffel.model.{Dice, Player, ScoreCard, ScoreCalculator, ScoringStrategy}
-import de.htwg.se.kniffel.model.{Ones, Twos, Threes, Fours, Fives, Sixes, ThreeTimes, FourTimes, FullHouse, SmallStraight, LargeStraight, Chance, Kniffel}
+import de.htwg.se.kniffel.model._
+//import de.htwg.se.kniffel.model.{Dice, Player, ScoreCard, ScoreCalculator, ScoringStrategy, ScoreUpdaterFactory}
+//import de.htwg.se.kniffel.model.{Ones, Twos, Threes, Fours, Fives, Sixes, ThreeTimes, FourTimes, FullHouse, SmallStraight, LargeStraight, Chance, Kniffel}
 
 class Controller extends Observable {
   var repetitions = 2
@@ -10,6 +12,7 @@ class Controller extends Observable {
   private var dice: Dice = new Dice()
   private var players: List[Player] = List()
   private var currentPlayerIndex: Int = 0
+  private var scoreUpdater: ScoreUpdater = _
 
   def getDice = dice.values
 
@@ -23,7 +26,7 @@ class Controller extends Observable {
         nextPlayer()
         repetitions = 2
       case n if n > 0 => notifyObservers("printDice")
-  }
+    }
   }
 
   def addPlayer(name: String) = {
@@ -41,32 +44,15 @@ class Controller extends Observable {
     notifyObservers("")
   }
 
+  def setScoreUpdater(userInput: String): Unit = {
+    scoreUpdater = ScoreUpdaterFactory.createScoreUpdater(userInput)
+  }
+
   def updateScore(category: String): Unit = {
-    val currentPlayer = getCurrentPlayer
-    val strategy: ScoringStrategy = category.toLowerCase match {
-      case "one" => Ones
-      case "two" => Twos
-      case "three" => Threes
-      case "four" => Fours
-      case "five" => Fives
-      case "six" => Sixes
-      case "threeofakind" => ThreeTimes
-      case "fourofakind" => FourTimes
-      case "fullhouse" => FullHouse
-      case "smallstraight" => SmallStraight
-      case "largestraight" => LargeStraight
-      case "chance" => Chance
-      case "kniffel" => Kniffel
-      case _ => throw new IllegalArgumentException("Invalid category.")
-    }
-    val calculatedScore = ScoreCalculator.calculateScore(getDice, strategy)
-    currentPlayer.scoreCard.categories.get(category.toLowerCase) match {
-      case Some(None) =>
-        currentPlayer.scoreCard.categories.update(category.toLowerCase, Some(calculatedScore))
-        notifyObservers("printScoreCard")
-      case _ =>
-        println(s"Category $category is already filled or does not exist.")
-        notifyObservers("updateScore")
-    }
+    val player = getCurrentPlayer
+    val dice = getDice
+    scoreUpdater.updateScore(player, category, dice)
+    notifyObservers("printScoreCard")
   }
 }
+

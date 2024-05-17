@@ -69,6 +69,20 @@ class TUI(controller: Controller) extends Observer {
     names.foreach(controller.addPlayer)
   }
 
+  def multiKniffel(): Unit = {
+    println("Are multiple Kniffel allowed? (y/n)")
+    val input = StdIn.readLine().toLowerCase()
+    input match {
+      case "y" =>
+        controller.setScoreUpdater("y")
+      case "n" =>
+        controller.setScoreUpdater("n")
+      case _ =>
+        println("Invalid input! Please enter 'y' for yes or 'n' for no.")
+        multiKniffel() // Rekursiver Aufruf, um eine gültige Eingabe zu erhalten
+    }
+  }
+
   def updateScore(): Unit = {
     println("Enter category and score (e.g., One, Fullhouse...:")
     val input = StdIn.readLine()
@@ -85,12 +99,14 @@ class TUI(controller: Controller) extends Observer {
   var running = true
   
   def run() = {
+    multiKniffel()
     addPlayers()
     println(printDice())
     while (running) {
       input() match {
         case Some(value) => controller.keepDice(value)
-        case None => controller.nextPlayer()
+        case None => 
+          input()
       }
     }
   }
