@@ -3,19 +3,20 @@ package de.htwg.se.kniffel.controller
 
 import de.htwg.se.kniffel.util.Observable
 import de.htwg.se.kniffel.model._
-//import de.htwg.se.kniffel.model.{Dice, Player, ScoreCard, ScoreCalculator, ScoringStrategy, ScoreUpdaterFactory}
-//import de.htwg.se.kniffel.model.{Ones, Twos, Threes, Fours, Fives, Sixes, ThreeTimes, FourTimes, FullHouse, SmallStraight, LargeStraight, Chance, Kniffel}
 
 class Controller extends Observable {
   var repetitions = 2
-  // Model
   private var dice: Dice = new Dice()
   private var players: List[Player] = List()
   private var currentPlayerIndex: Int = 0
   private var scoreUpdater: ScoreUpdater = new StandardScoreUpdater
+  private var currentState: State = new RollingState()  // Initialer Zustand
 
   def getDice = dice.values
+  // muss für die GUI geändert werden
+  def getCurrentState = currentState.toString
 
+  // decide witch dice to keep an change state to update the Scorecard
   def keepDice(input: List[Int]) = {
     dice = dice.keepDice(input)
     repetitions = repetitions - 1
@@ -23,7 +24,8 @@ class Controller extends Observable {
       case 0 => 
         notifyObservers("printDice")
         notifyObservers("updateScore")
-        nextPlayer()
+        println(repetitions)
+        setState(new ScoringState())
         repetitions = 2
       case n if n > 0 => notifyObservers("printDice")
     }
@@ -41,18 +43,29 @@ class Controller extends Observable {
     currentPlayerIndex = (currentPlayerIndex + 1) % players.length
     repetitions = 2  // Reset the number of repetitions for the new player
     dice = new Dice()
+    setState(new RollingState())
     notifyObservers("")
   }
 
+  // is used to decide how many Kniffel are possible
   def setScoreUpdater(userInput: String): Unit = {
     scoreUpdater = ScoreUpdaterFactory.createScoreUpdater(userInput)
   }
 
+  //is used to update the scorecard
   def updateScore(category: String): Unit = {
     val player = getCurrentPlayer
     val dice = getDice
     scoreUpdater.updateScore(player, category, dice)
+    setState(new RollingState())
     notifyObservers("printScoreCard")
   }
-}
 
+  def setState(state: State): Unit = {
+    currentState = state
+  }
+  // using the input of the player to update scorecard or keep Dices
+  def handleInput(input: String): Unit = {
+    currentState.handleInput(input, this)
+  }
+}

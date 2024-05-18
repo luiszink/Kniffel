@@ -1,83 +1,14 @@
+// TUI.scala
 package de.htwg.se.kniffel.aview
 
 import scala.io.StdIn
+import de.htwg.se.kniffel.controller.Controller
+import de.htwg.se.kniffel.util.Observer
 import scala.util.{Try, Success, Failure}
 
-import de.htwg.se.kniffel.util.Observer
-import de.htwg.se.kniffel.controller.Controller
-import de.htwg.se.kniffel.model.Player
 
 class TUI(controller: Controller) extends Observer {
   controller.add(this)
-
-  def input(): Option[List[Int]] = {
-    var remainingAttempts = 2 // Maximale Anzahl von Wiederholungsversuchen
-    
-    // Retry Strategy Pattern
-    while (remainingAttempts > 0) {
-      println(
-        s"Enter the indices of the dice you want to keep (e.g., 1 3 5), or type 'f' to end (${controller.repetitions} remaining):"
-      )
-      val input = StdIn.readLine()
-
-      if (input.toLowerCase == "f") {
-        updateScore()
-        controller.nextPlayer()
-        return None
-      } else {
-        // Attempt to parse user input into a list of integers
-        Try(input.split(" ").map(_.toInt).toList) match {
-          case Success(diceToKeep) =>
-            return Some(diceToKeep)
-          case Failure(_: NumberFormatException) =>
-            println("Invalid input! Please enter valid indices.")
-          case Failure(_)=>
-            println("Invalid input! Please enter valid indices.")
-        }
-        // Decrement remaining attempts
-        remainingAttempts -= 1
-      }
-    }
-    println("Maximum number of attempts reached. Ending the game...")
-    None
-  }
-
-  def printDice() = {
-    val diceValues: List[Int] = controller.getDice
-    val horizontalLine =
-      "+" + List.fill(diceValues.length)("---").mkString("+") + "+"
-    val diceIconsLine =
-      "|" + diceValues.map(value => s" $value ").mkString("|") + "|"
-    val numCounter = " " + diceValues.indices
-      .map(index => s" ${index + 1} ")
-      .mkString(" ") + " "
-
-    s"Current Player: ${controller.getCurrentPlayer}\n$horizontalLine\n$diceIconsLine\n$horizontalLine\n$numCounter"
-  }
-
-  def printScoreCard() = {
-    val currentPlayer = controller.getCurrentPlayer
-    val scoreCard = currentPlayer.scoreCard.categories.map {case (category, score) => s"$category: ${score.getOrElse("_")}"}.mkString("\n")
-    s"Current Player: ${currentPlayer.name}\n\nScoreCard:\n$scoreCard"
-  }
-
-  def printGame() = {
-    s"\n\n\n${printScoreCard()}\n\n${printDice()}"
-  }
-
-  def multiKniffel(): Unit = {
-    println("Are multiple Kniffel allowed? (y/n)")
-    val input = StdIn.readLine().toLowerCase()
-    input match {
-      case "y" =>
-        controller.setScoreUpdater("y")
-      case "n" =>
-        controller.setScoreUpdater("n")
-      case _ =>
-        println("Invalid input! Please enter 'y' for yes or 'n' for no.")
-        multiKniffel() // Rekursiver Aufruf, um eine gültige Eingabe zu erhalten
-    }
-  }
 
   def addPlayers(): Unit = {
     println("Enter player names (comma-separated):")
@@ -86,28 +17,18 @@ class TUI(controller: Controller) extends Observer {
     names.foreach(controller.addPlayer)
   }
 
-  def updateScore(): Unit = {
-    println("Enter category and score (e.g., One, Fullhouse...):")
-    val input = StdIn.readLine()
-
-    Try(controller.updateScore(input)) match {
-      case Success(_) => // Nichts weiter tun, wenn erfolgreich
-      case Failure(e: IllegalArgumentException) =>
-        println("Not a category! Please try again.")
-        updateScore()
-    }
-  }
-
-  var running = true
-  
   def run() = {
-    multiKniffel()
     addPlayers()
     println(printDice())
-    while (running) {
-      input() match {
-        case Some(value) => controller.keepDice(value)
-        case None => println("")
+    var running = true
+     while (running) {
+      // maybe a try catch
+      controller.getCurrentState match {
+        case "new ScoringState" => printGame()
+        case _ =>
+          println(s"Enter the indices of the dice you want to keep (e.g., 1 3 5), or Enter category (e.g., One, Fullhouse...) (${controller.repetitions} remaining):")
+          val input = StdIn.readLine()
+          controller.handleInput(input)
       }
     }
   }
@@ -120,5 +41,41 @@ class TUI(controller: Controller) extends Observer {
       case "updateScore" => updateScore()
       case _ => println(printGame())
     }
+  }
+
+  def printDice() = {
+    val diceValues: List[Int] = controller.getDice
+    val horizontalLine = "+" + List.fill(diceValues.length)("---").mkString("+") + "+"
+    val diceIconsLine = "|" + diceValues.map(value => s" $value ").mkString("|") + "|"
+    val numCounter = " " + diceValues.indices.map(index => s" ${index + 1} ").mkString(" ") + " "
+
+    s"Current Player: ${controller.getCurrentPlayer}\n$horizontalLine\n$diceIconsLine\n$horizontalLine\n$numCounter"
+  }
+
+  def printScoreCard() = {
+    val currentPlayer = controller.getCurrentPlayer
+    val scoreCard = currentPlayer.scoreCard.categories.map {
+      case (category, score) => s"$category: ${score.getOrElse("_")}"
+    }.mkString("\n")
+    s"Current Player: ${currentPlayer.name}\n\nScoreCard:\n$scoreCard"
+  }
+
+  def printGame() = {
+    s"\n\n\n${printScoreCard()}\n\n${printDice()}"
+  }
+
+  def updateScore(): Unit = {
+    println("Enter category (e.g., One, Fullhouse...):")
+    val input = StdIn.readLine()
+    Try(controller.updateScore(input)) match {
+      case Success(_) => // Nichts weiter tun, wenn erfolgreich
+      case Failure(e: IllegalArgumentException) =>
+        println("Not a category! Please try again.")
+        updateScore()
+    }
+  }
+
+  def displayMessage(message: String): Unit = {
+    println(message)
   }
 }

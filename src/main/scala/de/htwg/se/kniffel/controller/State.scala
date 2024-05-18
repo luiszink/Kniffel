@@ -1,6 +1,4 @@
-package de.htwg.se.kniffel.controller
 
-// State.scala
 package de.htwg.se.kniffel.controller
 
 trait State {
@@ -9,8 +7,10 @@ trait State {
 
 class RollingState extends State {
   override def handleInput(input: String, controller: Controller): Unit = {
-    if (input.toLowerCase == "f") {
-      controller.updateScore()
+    val scoreCardCategories = controller.getCurrentPlayer.scoreCard.categories
+
+    if (scoreCardCategories.contains(input.toLowerCase)) {
+      controller.updateScore(input.toLowerCase)
       controller.nextPlayer()
     } else {
       val diceToKeep = input.split(" ").map(_.toInt).toList
@@ -18,7 +18,6 @@ class RollingState extends State {
     }
   }
 }
-
 
 class ScoringState extends State {
   override def handleInput(input: String, controller: Controller): Unit = {
