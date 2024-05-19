@@ -13,8 +13,7 @@ class Controller extends Observable {
   private var currentState: State = new RollingState()  // Initialer Zustand
 
   def getDice = dice.values
-  // muss für die GUI geändert werden
-  def getCurrentState = currentState.toString
+  def getCurrentState = currentState
 
   // decide witch dice to keep an change state to update the Scorecard
   def keepDice(input: List[Int]) = {
@@ -23,9 +22,7 @@ class Controller extends Observable {
     repetitions match {
       case 0 => 
         notifyObservers("printDice")
-        notifyObservers("updateScore")
-        println(repetitions)
-        setState(new ScoringState())
+        setState(new UpdateState())
         repetitions = 2
       case n if n > 0 => notifyObservers("printDice")
     }
@@ -44,7 +41,8 @@ class Controller extends Observable {
     repetitions = 2  // Reset the number of repetitions for the new player
     dice = new Dice()
     setState(new RollingState())
-    notifyObservers("")
+    notifyObservers("printScoreCard")
+    notifyObservers("printDice")
   }
 
   // is used to decide how many Kniffel are possible
@@ -58,6 +56,7 @@ class Controller extends Observable {
     val dice = getDice
     scoreUpdater.updateScore(player, category, dice)
     setState(new RollingState())
+    // print Scorecard after entered catagory
     notifyObservers("printScoreCard")
   }
 

@@ -21,15 +21,22 @@ class TUI(controller: Controller) extends Observer {
     addPlayers()
     println(printDice())
     var running = true
-     while (running) {
+    while (running) {
       // maybe a try catch
-      controller.getCurrentState match {
-        case "new ScoringState" => printGame()
+      controller.getCurrentState.name match {
+        case "updateState" => 
+          printScoreCard()
+          println("Enter category (e.g., One, Fullhouse...!):")
+          val input = StdIn.readLine()
+          controller.handleInput(input)
+          printDice()
+
         case _ =>
+          printDice()
           println(s"Enter the indices of the dice you want to keep (e.g., 1 3 5), or Enter category (e.g., One, Fullhouse...) (${controller.repetitions} remaining):")
           val input = StdIn.readLine()
           controller.handleInput(input)
-      }
+              }
     }
   }
 
@@ -39,7 +46,7 @@ class TUI(controller: Controller) extends Observer {
       case "printScoreCard" => println(printScoreCard())
       case "playerAdded" => println("")
       case "updateScore" => updateScore()
-      case _ => println(printGame())
+      case _ => println("wrong notifyObservers!!!!!!!!!!!!!!")
     }
   }
 
@@ -49,7 +56,7 @@ class TUI(controller: Controller) extends Observer {
     val diceIconsLine = "|" + diceValues.map(value => s" $value ").mkString("|") + "|"
     val numCounter = " " + diceValues.indices.map(index => s" ${index + 1} ").mkString(" ") + " "
 
-    s"Current Player: ${controller.getCurrentPlayer}\n$horizontalLine\n$diceIconsLine\n$horizontalLine\n$numCounter"
+    s"Current Player: ${controller.getCurrentPlayer}\n$horizontalLine\n$diceIconsLine\n$horizontalLine\n$numCounter\n"
   }
 
   def printScoreCard() = {
@@ -57,11 +64,7 @@ class TUI(controller: Controller) extends Observer {
     val scoreCard = currentPlayer.scoreCard.categories.map {
       case (category, score) => s"$category: ${score.getOrElse("_")}"
     }.mkString("\n")
-    s"Current Player: ${currentPlayer.name}\n\nScoreCard:\n$scoreCard"
-  }
-
-  def printGame() = {
-    s"\n\n\n${printScoreCard()}\n\n${printDice()}"
+    s"\nCurrent Player: ${currentPlayer.name}\nScoreCard:\n$scoreCard\n"
   }
 
   def updateScore(): Unit = {
