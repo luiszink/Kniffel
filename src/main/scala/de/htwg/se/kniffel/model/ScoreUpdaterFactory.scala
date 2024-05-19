@@ -1,6 +1,10 @@
 // ScoreUpdaterFactory.scala
 package de.htwg.se.kniffel.model
 
+trait ScoreUpdater {
+  def updateScore(player: Player, category: String, dice: List[Int]): Unit
+}
+
 object ScoreUpdaterFactory {
   def createScoreUpdater(userInput: String): ScoreUpdater = {
     userInput.toLowerCase match {
