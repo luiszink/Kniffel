@@ -40,6 +40,7 @@ class Controller extends Observable {
   def getCurrentPlayer: Player = players(currentPlayerIndex)
 
   def nextPlayer() = {
+    previousDice = this.dice
     currentPlayerIndex = (currentPlayerIndex + 1) % players.length
     repetitions = 2  // Reset the number of repetitions for the new player
     dice = new Dice()
@@ -55,7 +56,6 @@ class Controller extends Observable {
 
   // is used to update the scorecard
   def updateScore(category: String): Unit = {
-    previousDice = this.dice
     val player = getCurrentPlayer
     val dice = getDice
     undoManager.doStep(new UpdateScoreCommand(player, category, dice))
@@ -74,7 +74,6 @@ class Controller extends Observable {
       undoManager.undoStep
       if (previousDice != null) {
         dice = previousDice
-        previousDice = null
       }
       setState(new UpdateState())
       currentPlayerIndex match 
