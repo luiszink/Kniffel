@@ -7,6 +7,7 @@ import scala.util.{Try, Success, Failure}
 class Controller extends Observable {
   var repetitions = 2
   private var dice: Dice = new Dice()
+  private var previousDice: Dice = _
   private var players: List[Player] = List()
   private var currentPlayerIndex: Int = 0
   private var scoreUpdater: ScoreUpdater = new StandardScoreUpdater
@@ -14,6 +15,7 @@ class Controller extends Observable {
   private val undoManager = new UndoManager
 
   def getDice = dice.values
+  def getPreviousDice = previousDice.values
   def getCurrentState = currentState
 
   // decide which dice to keep and change state to update the Scorecard
@@ -53,6 +55,7 @@ class Controller extends Observable {
 
   // is used to update the scorecard
   def updateScore(category: String): Unit = {
+    previousDice = this.dice
     val player = getCurrentPlayer
     val dice = getDice
     undoManager.doStep(new UpdateScoreCommand(player, category, dice))
@@ -69,11 +72,16 @@ class Controller extends Observable {
   def handleInput(input: String): Unit = {
     if (input.toLowerCase == "undo") {
       undoManager.undoStep
+      if (previousDice != null) {
+        dice = previousDice
+        previousDice = null
+      }
       setState(new UpdateState())
       currentPlayerIndex match 
         case 0 => currentPlayerIndex = players.length-1
         case _ => currentPlayerIndex = (currentPlayerIndex - 1) % players.length
         notifyObservers("printScoreCard")
+        notifyObservers("printDiceUndo")
     } else {
       currentState.handleInput(input, this)
     }

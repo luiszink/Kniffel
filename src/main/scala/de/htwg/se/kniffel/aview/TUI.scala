@@ -40,10 +40,20 @@ class TUI(controller: Controller) extends Observer {
   override def update(message: String): Unit = {
     message match {
       case "printDice" => println(printDice())
+      case "printDiceUndo" => println(printDiceUndo())
       case "printScoreCard" => println(printScoreCard())
       case "playerAdded" => println("") 
       case _ => println("wrong notifyObservers!!!!!!!!!!!!!!")
     }
+  }
+
+  def printDiceUndo() = {
+    val diceValues: List[Int] = controller.getPreviousDice
+    val horizontalLine = "+" + List.fill(diceValues.length)("---").mkString("+") + "+"
+    val diceIconsLine = "|" + diceValues.map(value => s" $value ").mkString("|") + "|"
+    val numCounter = " " + diceValues.indices.map(index => s" ${index + 1} ").mkString(" ") + " "
+
+    s"Current Player: ${controller.getCurrentPlayer}\n$horizontalLine\n$diceIconsLine\n$horizontalLine\n$numCounter\n"
   }
 
   def printDice() = {
