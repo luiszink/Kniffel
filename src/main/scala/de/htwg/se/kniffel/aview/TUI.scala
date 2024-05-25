@@ -1,11 +1,9 @@
-// TUI.scala
 package de.htwg.se.kniffel.aview
 
 import scala.io.StdIn
 import de.htwg.se.kniffel.controller.Controller
 import de.htwg.se.kniffel.util.Observer
 import scala.util.{Try, Success, Failure}
-
 
 class TUI(controller: Controller) extends Observer {
   controller.add(this)
@@ -22,7 +20,6 @@ class TUI(controller: Controller) extends Observer {
     println(printDice())
     var running = true
     while (running) {
-      // maybe a try catch
       controller.getCurrentState.name match {
         case "updateState" => 
           printScoreCard()
@@ -33,10 +30,10 @@ class TUI(controller: Controller) extends Observer {
 
         case _ =>
           printDice()
-          println(s"Enter the indices of the dice you want to keep (e.g., 1 3 5), or Enter category (e.g., One, Fullhouse...) (${controller.repetitions} remaining):")
+          println(s"Enter the indices of the dice you want to keep (e.g., 1 3 5), or Enter category (e.g., One, Fullhouse...) (${controller.repetitions} remaining), or 'undo' to undo last score update:")
           val input = StdIn.readLine()
           controller.handleInput(input)
-              }
+      }
     }
   }
 
@@ -44,8 +41,7 @@ class TUI(controller: Controller) extends Observer {
     message match {
       case "printDice" => println(printDice())
       case "printScoreCard" => println(printScoreCard())
-      case "playerAdded" => println("")
-      case "updateScore" => updateScore()
+      case "playerAdded" => println("") 
       case _ => println("wrong notifyObservers!!!!!!!!!!!!!!")
     }
   }
@@ -67,6 +63,7 @@ class TUI(controller: Controller) extends Observer {
     s"\nCurrent Player: ${currentPlayer.name}\nScoreCard:\n$scoreCard\n"
   }
 
+  /*
   def updateScore(): Unit = {
     println("Enter category (e.g., One, Fullhouse...):")
     val input = StdIn.readLine()
@@ -77,6 +74,7 @@ class TUI(controller: Controller) extends Observer {
         updateScore()
     }
   }
+  */
 
   def displayMessage(message: String): Unit = {
     println(message)
