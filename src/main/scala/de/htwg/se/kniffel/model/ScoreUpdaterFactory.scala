@@ -8,9 +8,8 @@ trait ScoreUpdater {
 object ScoreUpdaterFactory {
   def createScoreUpdater(userInput: String): ScoreUpdater = {
     userInput.toLowerCase match {
-      case "y" => new StandardScoreUpdater()
-      case "n" => new SpecialScoreUpdater()
-      case _ => throw new IllegalArgumentException("Invalid input for ScoreUpdater type.") //try implementieren
+      case "y" => new MultiKniffelScoreUpdater()
+      case _ => new StandardScoreUpdater()
     }
   }
 }
@@ -44,8 +43,9 @@ class StandardScoreUpdater extends ScoreUpdater {
   }
 }
 
-class SpecialScoreUpdater extends ScoreUpdater {
+class MultiKniffelScoreUpdater extends ScoreUpdater {
   override def updateScore(player: Player, category: String, dice: List[Int]): Unit = {
+    // Logic for handling multiple Kniffel entries
     val currentPlayer = player
     val strategy: ScoringStrategy = category.toLowerCase match {
       case "one" => Ones
@@ -67,10 +67,14 @@ class SpecialScoreUpdater extends ScoreUpdater {
     currentPlayer.scoreCard.categories.get(category.toLowerCase) match {
       case Some(None) =>
         currentPlayer.scoreCard.categories.update(category.toLowerCase, Some(calculatedScore))
-        println("123")
       case _ =>
-        println(s"Category $category is already filled or does not exist.")
-        println("123")
+        if (category.toLowerCase == "kniffel" && currentPlayer.scoreCard.categories("kniffel").isDefined) {
+          // Allow multiple Kniffel entries
+          val currentScore = currentPlayer.scoreCard.categories("kniffel").getOrElse(0)
+          currentPlayer.scoreCard.categories.update("kniffel", Some(currentScore + calculatedScore))
+        } else {
+          println(s"Category $category is already filled or does not exist.")
+        }
     }
   }
 }

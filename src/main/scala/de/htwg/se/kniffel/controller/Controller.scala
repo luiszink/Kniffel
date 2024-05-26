@@ -17,6 +17,8 @@ class Controller extends Observable {
   def getDice = dice.values
   def getPreviousDice = previousDice.values
   def getCurrentState = currentState
+  def getCurrentPlayer: Player = players(currentPlayerIndex)
+
 
   // decide which dice to keep and change state to update the Scorecard
   def keepDice(input: List[Int]) = {
@@ -37,8 +39,6 @@ class Controller extends Observable {
     notifyObservers("playerAdded")
   }
 
-  def getCurrentPlayer: Player = players(currentPlayerIndex)
-
   def nextPlayer() = {
     previousDice = this.dice
     currentPlayerIndex = (currentPlayerIndex + 1) % players.length
@@ -58,9 +58,9 @@ class Controller extends Observable {
   def updateScore(category: String): Unit = {
     val player = getCurrentPlayer
     val dice = getDice
+    scoreUpdater.updateScore(player, category, dice)  // ScoreUpdater wird hier verwendet
     undoManager.doStep(new UpdateScoreCommand(player, category, dice))
     setState(new RollingState())
-    // print Scorecard after entering category
     notifyObservers("printScoreCard")
   }
 
