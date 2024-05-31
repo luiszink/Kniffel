@@ -73,7 +73,7 @@ class TUI(controller: Controller) extends Observer {
     s"\nCurrent Player: ${currentPlayer.name}\nScoreCard:\n$scoreCard\n"
   }
 
-  /*
+  
   def updateScore(): Unit = {
     println("Enter category (e.g., One, Fullhouse...):")
     val input = StdIn.readLine()
@@ -84,7 +84,7 @@ class TUI(controller: Controller) extends Observer {
         updateScore()
     }
   }
-  */
+  
 
   def displayMessage(message: String): Unit = {
     println(message)

@@ -17,6 +17,7 @@ class Controller extends Observable {
   def getDice = dice.values
   def getPreviousDice = previousDice.values
   def getCurrentState = currentState
+  def getScoreUpdaterType: String = scoreUpdater.getClass.getSimpleName
 
   // decide which dice to keep and change state to update the Scorecard
   def keepDice(input: List[Int]) = {
@@ -76,11 +77,13 @@ class Controller extends Observable {
         dice = previousDice
       }
       setState(new UpdateState())
-      currentPlayerIndex match 
-        case 0 => currentPlayerIndex = players.length-1
+      currentPlayerIndex match{ 
+        case 0 => currentPlayerIndex = players.length - 1
         case _ => currentPlayerIndex = (currentPlayerIndex - 1) % players.length
-        notifyObservers("printScoreCard")
-        notifyObservers("printDiceUndo")
+      }
+      notifyObservers("printScoreCard")
+      notifyObservers("printDiceUndo")
+      
     } else {
       currentState.handleInput(input, this)
     }

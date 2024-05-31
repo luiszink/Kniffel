@@ -15,7 +15,7 @@ case class ScoreCard() {
     "fullhouse" -> None,
     "smallstraight" -> None,
     "largestraight" -> None,
-    "yahtzee" -> None,
+    "kniffel" -> None,
     "chance" -> None
   )
  /* def totalScore: Int = {
