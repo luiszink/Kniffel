@@ -18,6 +18,7 @@ class Controller extends Observable {
   def getPreviousDice = previousDice.values
   def getCurrentState = currentState
   def getCurrentPlayer: Player = players(currentPlayerIndex)
+  def getPlayers: List[Player] = players
 
 
   // decide which dice to keep and change state to update the Scorecard
