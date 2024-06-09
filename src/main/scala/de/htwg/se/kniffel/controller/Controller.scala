@@ -85,8 +85,8 @@ class Controller extends Observable {
           dice = previousDice
         }
         setState(new UpdateState())
-        currentPlayerIndex match{ 
-          case 0 => currentPlayerIndex = players.length - 1
+        currentPlayerIndex match 
+          case 0 => currentPlayerIndex = players.length-1
           case _ => currentPlayerIndex = (currentPlayerIndex - 1) % players.length
           notifyObservers(KniffelEvent.PrintScoreCard)
           notifyObservers(KniffelEvent.PrintDiceUndo)
@@ -97,7 +97,6 @@ class Controller extends Observable {
       case Success(_) =>
       case Failure(_) => 
         notifyObservers(KniffelEvent.InvalidInput)
-    }
     }
   }
 }
