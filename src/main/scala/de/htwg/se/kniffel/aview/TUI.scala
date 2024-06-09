@@ -99,4 +99,21 @@ class TUI(controller: Controller) extends Observer {
     }.mkString("\n")
     s"\nCurrent Player: ${currentPlayer.name}\nScoreCard:\n$scoreCard\n"
   }
+
+  
+  def updateScore(): Unit = {
+    println("Enter category (e.g., One, Fullhouse...):")
+    val input = StdIn.readLine()
+    Try(controller.updateScore(input)) match {
+      case Success(_) => // Nichts weiter tun, wenn erfolgreich
+      case Failure(e: IllegalArgumentException) =>
+        println("Not a category! Please try again.")
+        updateScore()
+    }
+  }
+  
+
+  def displayMessage(message: String): Unit = {
+    println(message)
+  }
 }

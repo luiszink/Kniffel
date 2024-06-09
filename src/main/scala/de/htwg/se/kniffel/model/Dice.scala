@@ -20,6 +20,6 @@ case class Dice(values: List[Int]) {
 }
 
 object Dice {
-  // Method to roll a single die
+  // Method to roll a single dice
   def rollDice(): Int = Random.nextInt(6) + 1
 }

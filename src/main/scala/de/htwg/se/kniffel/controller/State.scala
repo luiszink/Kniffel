@@ -1,5 +1,6 @@
 
 package de.htwg.se.kniffel.controller
+// State Pattern
 
 trait State {
   def name: String
