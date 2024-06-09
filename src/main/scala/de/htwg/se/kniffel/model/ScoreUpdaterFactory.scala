@@ -1,6 +1,8 @@
 // ScoreUpdaterFactory.scala
 package de.htwg.se.kniffel.model
 
+import scala.util.Random
+
 trait ScoreUpdater {
   def updateScore(player: Player, category: String, dice: List[Int]): Unit
 }
@@ -8,8 +10,8 @@ trait ScoreUpdater {
 object ScoreUpdaterFactory {
   def createScoreUpdater(userInput: String): ScoreUpdater = {
     userInput.toLowerCase match {
-      case "y" => new StandardScoreUpdater()
-      case "n" => new MultiKniffelScoreUpdater()
+      case "n" => new StandardScoreUpdater()
+      case "y" => new MultiKniffelScoreUpdater()
       case _ => throw new IllegalArgumentException("Invalid input for ScoreUpdater type.") //try implementieren
     }
   }
@@ -34,9 +36,12 @@ class StandardScoreUpdater extends ScoreUpdater {
       case "kniffel" => Kniffel
     }
     val calculatedScore = ScoreCalculator.calculateScore(dice, strategy)
+
+    // it has to throw an error if the categorie is already filled
     currentPlayer.scoreCard.categories.get(category.toLowerCase) match {
       case Some(None) =>
         currentPlayer.scoreCard.categories.update(category.toLowerCase, Some(calculatedScore))
+      case _ => throw new IllegalArgumentException("Category already filled!")
     }
   }
 }
@@ -64,14 +69,13 @@ class MultiKniffelScoreUpdater extends ScoreUpdater {
     currentPlayer.scoreCard.categories.get(category.toLowerCase) match {
       case Some(None) =>
         currentPlayer.scoreCard.categories.update(category.toLowerCase, Some(calculatedScore))
-      case _ =>
-        if (category.toLowerCase == "kniffel" && currentPlayer.scoreCard.categories("kniffel").isDefined) {
-          // Allow multiple Kniffel entries
-          val currentScore = currentPlayer.scoreCard.categories("kniffel").getOrElse(0)
-          currentPlayer.scoreCard.categories.update("kniffel", Some(currentScore + calculatedScore))
-        } else {
-          println(s"Category $category is already filled or does not exist.")
-        }
+      case Some(Some(_)) if category.toLowerCase == "kniffel" =>
+        // Wenn die Kategorie "kniffel" bereits gefüllt ist, die 50 Punkte zufällig in eine andere leere Kategorie schreiben
+        val emptyCategories = currentPlayer.scoreCard.categories.filter(_._2.isEmpty).keys.toList
+        val emptyCategoriesExcluding = emptyCategories.filterNot(cat => cat == "bonus" || cat == "uppersectionscore" || cat == "totalscore")
+        val randomCategory = emptyCategoriesExcluding(Random.nextInt(emptyCategoriesExcluding.size))
+        currentPlayer.scoreCard.categories.update(randomCategory, Some(50))
+      case _ => throw new IllegalArgumentException("Category already filled!")
     }
   }
 }
