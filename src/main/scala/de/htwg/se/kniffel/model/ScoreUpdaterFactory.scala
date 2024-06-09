@@ -9,7 +9,7 @@ object ScoreUpdaterFactory {
   def createScoreUpdater(userInput: String): ScoreUpdater = {
     userInput.toLowerCase match {
       case "y" => new MultiKniffelScoreUpdater()
-      case _ => new StandardScoreUpdater()
+      case "n" => new StandardScoreUpdater()
     }
   }
 }
@@ -31,7 +31,6 @@ class StandardScoreUpdater extends ScoreUpdater {
       case "largestraight" => LargeStraight
       case "chance" => Chance
       case "kniffel" => Kniffel
-      case _ => throw new IllegalArgumentException("Invalid category.")
     }
     val calculatedScore = ScoreCalculator.calculateScore(dice, strategy)
     currentPlayer.scoreCard.categories.get(category.toLowerCase) match {
@@ -61,7 +60,6 @@ class MultiKniffelScoreUpdater extends ScoreUpdater {
       case "largestraight" => LargeStraight
       case "chance" => Chance
       case "kniffel" => Kniffel
-      case _ => throw new IllegalArgumentException("Invalid category.")
     }
     val calculatedScore = ScoreCalculator.calculateScore(dice, strategy)
     currentPlayer.scoreCard.categories.get(category.toLowerCase) match {

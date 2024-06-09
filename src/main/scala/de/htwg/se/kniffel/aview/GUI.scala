@@ -2,6 +2,7 @@ package de.htwg.se.kniffel.aview
 
 import de.htwg.se.kniffel.controller.Controller
 import de.htwg.se.kniffel.util.Observer
+import de.htwg.se.kniffel.util.KniffelEvent
 import scalafx.application.JFXApp3
 import scalafx.scene.Scene
 import scalafx.scene.layout.{Pane, VBox, HBox}
@@ -13,7 +14,6 @@ import scalafx.stage.Screen
 import scalafx.geometry.{Insets, Pos}
 import scala.compiletime.uninitialized
 import javafx.stage._
-
 
 class GUI(controller: Controller) extends JFXApp3 with Observer {
   controller.add(this)
@@ -36,10 +36,10 @@ class GUI(controller: Controller) extends JFXApp3 with Observer {
 
           tableView = new TableView[(String, String)]()
 
-          rollButton = new Button("Würfeln")
+          rollButton = new Button("Roll Dice")
           rollButton.onAction = _ => rollDice()
 
-          diceResultsLabel = new Label("Würfelergebnisse: ")
+          diceResultsLabel = new Label("Dice Results: ")
 
           diceCheckBoxes = (1 to 5).map { i =>
             new CheckBox(s"Dice $i")
@@ -71,11 +71,11 @@ class GUI(controller: Controller) extends JFXApp3 with Observer {
     }
   }
 
-  override def update(message: String): Unit = {
-    Platform.runLater(message match {
-      case "printScoreCard" => scorecard()
-      case "playerAdded"    => scorecard()
-      case "printDice"      => updateDiceResults()
+  override def update(event: KniffelEvent.Value): Unit = {
+    Platform.runLater(event match {
+      case KniffelEvent.PrintScoreCard => scorecard()
+      case KniffelEvent.PlayerAdded    => scorecard()
+      case KniffelEvent.PrintDice      => updateDiceResults()
       case _                => println("")
     })
   }
@@ -136,7 +136,7 @@ class GUI(controller: Controller) extends JFXApp3 with Observer {
 
   def updateDiceResults(): Unit = {
     val diceResults = controller.getDice
-    diceResultsLabel.text = s"Würfelergebnisse: ${diceResults.mkString(", ")}"
+    diceResultsLabel.text = s"Dice Results: ${diceResults.mkString(", ")}"
     diceCheckBoxes.zip(diceResults).foreach { case (checkBox, result) =>
       checkBox.text = s"Dice: $result"
     }

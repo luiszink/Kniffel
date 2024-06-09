@@ -2,6 +2,7 @@ package de.htwg.se.kniffel.controller
 
 import de.htwg.se.kniffel.model._
 import de.htwg.se.kniffel.util._
+import de.htwg.se.kniffel.util.KniffelEvent
 import scala.util.{Try, Success, Failure}
 
 class Controller extends Observable {
@@ -27,17 +28,17 @@ class Controller extends Observable {
     repetitions = repetitions - 1
     repetitions match {
       case 0 => 
-        notifyObservers("printDice")
+        notifyObservers(KniffelEvent.PrintDice)
         setState(new UpdateState())
         repetitions = 2
-      case n if n > 0 => notifyObservers("printDice")
+      case n if n > 0 => notifyObservers(KniffelEvent.PrintDice)
     }
   }
 
   def addPlayer(name: String) = {
     val player = Player(name)
     players = players :+ player
-    notifyObservers("playerAdded")
+    notifyObservers(KniffelEvent.PlayerAdded)
   }
 
   def nextPlayer() = {
@@ -46,8 +47,8 @@ class Controller extends Observable {
     repetitions = 2  // Reset the number of repetitions for the new player
     dice = new Dice()
     setState(new RollingState())
-    notifyObservers("printScoreCard")
-    notifyObservers("printDice")
+    notifyObservers(KniffelEvent.PrintScoreCard)
+    notifyObservers(KniffelEvent.PrintDice)
   }
 
   // is used to decide how many Kniffel are possible
@@ -59,16 +60,16 @@ class Controller extends Observable {
   def updateScore(category: String): Unit = {
     val player = getCurrentPlayer
     val dice = getDice
-    scoreUpdater.updateScore(player, category, dice)  // ScoreUpdater wird hier verwendet
+    scoreUpdater.updateScore(player, category, dice)
     undoManager.doStep(new UpdateScoreCommand(player, category, dice))
     setState(new RollingState())
-
-    if (player.scoreCard.isComplete) {
-      player.scoreCard.calculateTotalScore()
-      println(s"${player.name}'s total score: ${player.scoreCard.categories("totalScore").getOrElse(0)}")
+    player.scoreCard.isComplete match {
+      case true =>
+        player.scoreCard.calculateTotalScore()
+        println(s"${player.name}'s total score: ${player.scoreCard.categories("totalScore").getOrElse(0)}")
+      case false =>
     }
-    
-    notifyObservers("printScoreCard")
+    notifyObservers(KniffelEvent.PrintScoreCard)
   }
 
   def setState(state: State): Unit = {
@@ -77,6 +78,7 @@ class Controller extends Observable {
 
   // using the input of the player to update scorecard or keep Dices
   def handleInput(input: String): Unit = {
+  Try {
     if (input.toLowerCase == "undo") {
       undoManager.undoStep
       if (previousDice != null) {
@@ -86,10 +88,15 @@ class Controller extends Observable {
       currentPlayerIndex match 
         case 0 => currentPlayerIndex = players.length-1
         case _ => currentPlayerIndex = (currentPlayerIndex - 1) % players.length
-        notifyObservers("printScoreCard")
-        notifyObservers("printDiceUndo")
+        notifyObservers(KniffelEvent.PrintScoreCard)
+        notifyObservers(KniffelEvent.PrintDiceUndo)
     } else {
       currentState.handleInput(input, this)
     }
+  } match {
+    case Success(_) =>
+    case Failure(_) => 
+      notifyObservers(KniffelEvent.InvalidInput)
+  }
   }
 }
