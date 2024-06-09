@@ -62,6 +62,12 @@ class Controller extends Observable {
     scoreUpdater.updateScore(player, category, dice)  // ScoreUpdater wird hier verwendet
     undoManager.doStep(new UpdateScoreCommand(player, category, dice))
     setState(new RollingState())
+
+    if (player.scoreCard.isComplete) {
+      player.scoreCard.calculateTotalScore()
+      println(s"${player.name}'s total score: ${player.scoreCard.categories("totalScore").getOrElse(0)}")
+    }
+    
     notifyObservers("printScoreCard")
   }
 

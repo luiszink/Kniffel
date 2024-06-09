@@ -10,15 +10,36 @@ case class ScoreCard() {
     "four" -> None,
     "five" -> None,
     "six" -> None,
+    "bonus" -> None,
+    "upperSectionScore" -> None,
     "threeofakind" -> None,
     "fourofakind" -> None,
     "fullhouse" -> None,
     "smallstraight" -> None,
     "largestraight" -> None,
     "kniffel" -> None,
-    "chance" -> None
+    "chance" -> None,
+    "totalScore" -> None
   )
- /* def totalScore: Int = {
-    categories.values.flatten.sum
- } */
+
+  def isComplete: Boolean = categories.filterKeys(Set("one", "two", "three", "four", "five", "six",
+    "threeofakind", "fourofakind", "fullhouse", "smallstraight", "largestraight", "kniffel", "chance"))
+    .values.forall(_.isDefined)
+
+  def calculateUpperSectionScore(): Unit = {
+    val score = List("one", "two", "three", "four", "five", "six").flatMap(categories.get).flatten.sum
+    categories("upperSectionScore") = Some(score)
+  }
+
+  def calculateBonus(): Unit = {
+    calculateUpperSectionScore()
+    val bonus = if (categories("upperSectionScore").getOrElse(0) >= 63) 35 else 0
+    categories("bonus") = Some(bonus)
+  }
+
+  def calculateTotalScore(): Unit = {
+    calculateBonus()
+    val totalScore = categories.values.flatten.sum
+    categories("totalScore") = Some(totalScore)
+  }
 }
