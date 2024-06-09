@@ -37,8 +37,6 @@ class StandardScoreUpdater extends ScoreUpdater {
     currentPlayer.scoreCard.categories.get(category.toLowerCase) match {
       case Some(None) =>
         currentPlayer.scoreCard.categories.update(category.toLowerCase, Some(calculatedScore))
-      case _ =>
-        println(s"Category $category is already filled or does not exist.")
     }
   }
 }

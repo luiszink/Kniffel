@@ -12,7 +12,7 @@ class Controller extends Observable {
   private var players: List[Player] = List()
   private var currentPlayerIndex: Int = 0
   private var scoreUpdater: ScoreUpdater = new StandardScoreUpdater
-  private var currentState: State = new RollingState()  // Initialer Zustand
+  private var currentState: State = new RollingState()
   private val undoManager = new UndoManager
 
   def getDice = dice.values
