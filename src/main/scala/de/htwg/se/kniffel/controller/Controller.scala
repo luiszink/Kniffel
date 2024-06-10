@@ -37,8 +37,6 @@ class Controller extends Observable {
   def getCurrentPlayer: Player = players(currentPlayerIndex)
   def getPlayers: List[Player] = players
 
-
-  // decide which dice to keep and change state to update the Scorecard
   def keepDice(input: List[Int]) = {
     dice = dice.keepDice(input)
     repetitions = repetitions - 1
@@ -60,39 +58,35 @@ class Controller extends Observable {
   def nextPlayer() = {
     previousDice = this.dice
     currentPlayerIndex = (currentPlayerIndex + 1) % players.length
-    repetitions = 2  // Reset the number of repetitions for the new player
+    repetitions = 2
     dice = new Dice()
     setState(new RollingState())
     notifyObservers(KniffelEvent.PrintScoreCard)
     notifyObservers(KniffelEvent.PrintDice)
   }
 
-  // is used to decide how many Kniffel are possible
   def setScoreUpdater(userInput: String): Unit = {
     scoreUpdater = ScoreUpdaterFactory.createScoreUpdater(userInput)
   }
 
-  // is used to update the scorecard
   def updateScore(category: String): Unit = {
     val player = getCurrentPlayer
     val dice = getDice
     scoreUpdater.updateScore(player, category, dice)
     undoManager.doStep(new UpdateScoreCommand(player, category, dice))
-    setState(new RollingState())
     player.scoreCard.isComplete match {
       case true =>
         player.scoreCard.calculateTotalScore()
         println(s"${player.name}'s total score: ${player.scoreCard.categories("totalScore").getOrElse(0)}")
       case false =>
     }
-    notifyObservers(KniffelEvent.PrintScoreCard)
+    nextPlayer()
   }
 
   def setState(state: State): Unit = {
     currentState = state
   }
 
-  // using the input of the player to update scorecard or keep Dices
   def handleInput(input: String): Unit = {
     Try {
       if (input.toLowerCase == "undo") {

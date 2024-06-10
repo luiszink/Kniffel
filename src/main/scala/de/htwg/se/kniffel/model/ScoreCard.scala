@@ -19,6 +19,7 @@ case class ScoreCard() {
     "largestraight" -> None,
     "kniffel" -> None,
     "chance" -> None,
+    "lowerSectionScore" -> None,
     "totalScore" -> None
   )
 
@@ -31,6 +32,11 @@ case class ScoreCard() {
     categories("upperSectionScore") = Some(score)
   }
 
+  def calculateLowerSectionScore(): Unit = {
+    val score = List("threeofakind", "fourofakind", "fullhouse", "smallstraight", "largestraight", "kniffel", "chance").flatMap(categories.get).flatten.sum
+    categories("lowerSectionScore") = Some(score)
+  }
+
   def calculateBonus(): Unit = {
     calculateUpperSectionScore()
     val bonus = if (categories("upperSectionScore").getOrElse(0) >= 63) 35 else 0
@@ -38,8 +44,10 @@ case class ScoreCard() {
   }
 
   def calculateTotalScore(): Unit = {
+    calculateUpperSectionScore()
+    calculateLowerSectionScore()
     calculateBonus()
-    val totalScore = categories.values.flatten.sum
+    val totalScore = categories("upperSectionScore").getOrElse(0) + categories("bonus").getOrElse(0) + categories("lowerSectionScore").getOrElse(0)
     categories("totalScore") = Some(totalScore)
   }
 }

@@ -22,6 +22,17 @@ class GUI(controller: Controller) extends JFXApp3 with Observer {
   var rollButton: Button = uninitialized
   var diceResultsLabel: Label = uninitialized
   var diceCheckBoxes: Seq[CheckBox] = uninitialized
+  var updateCategoryButton: Button = uninitialized
+  var selectedCategory: String = ""
+
+  override def update(event: KniffelEvent.Value): Unit = {
+    Platform.runLater(event match {
+      case KniffelEvent.PrintScoreCard => scorecard()
+      case KniffelEvent.PlayerAdded    => scorecard()
+      case KniffelEvent.PrintDice      => updateDiceResults()
+      case _                           => println("")
+    })
+  }
 
   override def start(): Unit = {
     try {
@@ -35,9 +46,13 @@ class GUI(controller: Controller) extends JFXApp3 with Observer {
           val pane = new Pane()
 
           tableView = new TableView[(String, String)]()
+          tableView.onMouseClicked = _ => handleCategorySelection()
 
           rollButton = new Button("Roll Dice")
           rollButton.onAction = _ => rollDice()
+
+          updateCategoryButton = new Button("Update Category")
+          updateCategoryButton.onAction = _ => updateSelectedCategory()
 
           diceResultsLabel = new Label("Dice Results: ")
 
@@ -46,7 +61,7 @@ class GUI(controller: Controller) extends JFXApp3 with Observer {
           }
 
           val diceBox = new VBox(10) {
-            children = Seq(rollButton, diceResultsLabel) ++ diceCheckBoxes
+            children = Seq(rollButton, updateCategoryButton, diceResultsLabel) ++ diceCheckBoxes
             padding = Insets(20)
             alignment = Pos.Center
           }
@@ -71,13 +86,8 @@ class GUI(controller: Controller) extends JFXApp3 with Observer {
     }
   }
 
-  override def update(event: KniffelEvent.Value): Unit = {
-    Platform.runLater(event match {
-      case KniffelEvent.PrintScoreCard => scorecard()
-      case KniffelEvent.PlayerAdded    => scorecard()
-      case KniffelEvent.PrintDice      => updateDiceResults()
-      case _                => println("")
-    })
+  def handleCategorySelection(): Unit = {
+    selectedCategory = tableView.selectionModel().getSelectedItem()._1
   }
 
   def scorecard(): Unit = {
@@ -131,6 +141,13 @@ class GUI(controller: Controller) extends JFXApp3 with Observer {
     controller.keepDice(keptDiceIndices)
     if (controller.repetitions == 0) {
       rollButton.disable = true
+    }
+  }
+
+  def updateSelectedCategory(): Unit = {
+    if (selectedCategory.nonEmpty) {
+      controller.updateScore(selectedCategory)
+      selectedCategory = ""
     }
   }
 

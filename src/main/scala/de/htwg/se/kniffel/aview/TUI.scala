@@ -1,4 +1,4 @@
-  package de.htwg.se.kniffel.aview
+package de.htwg.se.kniffel.aview
 
 import scala.io.StdIn
 import de.htwg.se.kniffel.controller.Controller
@@ -26,7 +26,6 @@ class TUI(controller: Controller) extends Observer {
     }
   }
 
-
   def selectScoreUpdater(): Unit = {
     println("Do you want to allow multiple Kniffel? (y/n)")
     val input = StdIn.readLine()
@@ -47,13 +46,12 @@ class TUI(controller: Controller) extends Observer {
     var running = true
     while (running) {
       controller.getCurrentState.name match {
-        case "updateState" => 
+        case "UpdateState" => 
           printScoreCard()
           println("Enter category (e.g., One, Fullhouse...!):")
           val input = StdIn.readLine()
           controller.handleInput(input)
           printDice()
-
         case _ =>
           printDice()
           println(s"Enter the indices of the dice you want to keep (e.g., 1 3 5), or Enter category (e.g., One, Fullhouse...) (${controller.repetitions} remaining), or 'undo' to undo last score update:")
