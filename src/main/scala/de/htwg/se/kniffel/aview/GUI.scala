@@ -58,7 +58,9 @@ class GUI(controller: Controller) extends JFXApp3 with Observer {
   def playerNameScene(screenBounds: javafx.geometry.Rectangle2D): Scene = {
     new Scene(screenBounds.width, screenBounds.height) {
       val pane = new Pane()
-      playerNameFields = (1 to 4).map { i => new TextField { promptText = s"Player $i Name" } }
+      playerNameFields = (1 to 4).map { i =>
+        new TextField { promptText = s"Player $i Name" }
+      }
 
       val confirmButton = new Button("Confirm")
       confirmButton.onAction = _ => handlePlayerNames()
@@ -103,8 +105,9 @@ class GUI(controller: Controller) extends JFXApp3 with Observer {
 
       val diceBox = new VBox(10) {
         children = Seq(rollButton, updateCategoryButton, diceResultsLabel) ++
-          diceImageViews.zip(diceCheckBoxes).flatMap { case (imageView, checkBox) =>
-            Seq(imageView, checkBox)
+          diceImageViews.zip(diceCheckBoxes).flatMap {
+            case (imageView, checkBox) =>
+              Seq(imageView, checkBox)
           }
         padding = Insets(20)
         alignment = Pos.Center
@@ -120,6 +123,9 @@ class GUI(controller: Controller) extends JFXApp3 with Observer {
 
       pane.children = hbox
       content = pane
+
+      // Hier wird die Methode updateDiceResults() aufgerufen, um die Würfel zu aktualisieren
+      updateDiceResults()
     }
   }
 
@@ -169,11 +175,13 @@ class GUI(controller: Controller) extends JFXApp3 with Observer {
 
     val allCategories =
       controller.getPlayers.flatMap(_.scoreCard.categories.keys).distinct
-    val scoreCardEntries: ObservableBuffer[(String, String)] = ObservableBuffer(allCategories.map { category =>
-      category -> controller.getPlayers.head.scoreCard.categories
-        .getOrElse(category, "-")
-        .toString
-    }: _*)
+    val scoreCardEntries: ObservableBuffer[(String, String)] = ObservableBuffer(
+      allCategories.map { category =>
+        category -> controller.getPlayers.head.scoreCard.categories
+          .getOrElse(category, "-")
+          .toString
+      }: _*
+    )
 
     tableView.items = scoreCardEntries
   }
