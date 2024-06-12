@@ -12,6 +12,7 @@ import scalafx.collections.ObservableBuffer
 import scalafx.application.Platform
 import scalafx.stage.Screen
 import scalafx.geometry.{Insets, Pos}
+import scalafx.scene.image.{Image, ImageView}
 import scala.compiletime.uninitialized
 import javafx.stage._
 
@@ -21,6 +22,7 @@ class GUI(controller: Controller) extends JFXApp3 with Observer {
   var tableView: TableView[(String, String)] = uninitialized
   var rollButton: Button = uninitialized
   var diceResultsLabel: Label = uninitialized
+  var diceImageViews: Seq[ImageView] = uninitialized
   var diceCheckBoxes: Seq[CheckBox] = uninitialized
   var updateCategoryButton: Button = uninitialized
   var selectedCategory: String = ""
@@ -56,12 +58,22 @@ class GUI(controller: Controller) extends JFXApp3 with Observer {
 
           diceResultsLabel = new Label("Dice Results: ")
 
+          diceImageViews = (1 to 5).map { i =>
+            new ImageView {
+              fitHeight = 50
+              fitWidth = 50
+            }
+          }
+
           diceCheckBoxes = (1 to 5).map { i =>
-            new CheckBox(s"Dice $i")
+            new CheckBox(s"Keep Dice $i")
           }
 
           val diceBox = new VBox(10) {
-            children = Seq(rollButton, updateCategoryButton, diceResultsLabel) ++ diceCheckBoxes
+            children = Seq(rollButton, updateCategoryButton, diceResultsLabel) ++
+              diceImageViews.zip(diceCheckBoxes).flatMap { case (imageView, checkBox) =>
+                Seq(imageView, checkBox)
+              }
             padding = Insets(20)
             alignment = Pos.Center
           }
@@ -151,11 +163,15 @@ class GUI(controller: Controller) extends JFXApp3 with Observer {
     }
   }
 
+  def getDiceImagePath(diceValue: Int): String = {
+    s"file:///C:/Users/michi/OneDrive/Dokumente/HTWG/SoSe24/SE-Boger/Kniffel/src/main/resources/$diceValue.png"
+  }
+
   def updateDiceResults(): Unit = {
     val diceResults = controller.getDice
     diceResultsLabel.text = s"Dice Results: ${diceResults.mkString(", ")}"
-    diceCheckBoxes.zip(diceResults).foreach { case (checkBox, result) =>
-      checkBox.text = s"Dice: $result"
+    diceImageViews.zip(diceResults).foreach { case (imageView, result) =>
+      imageView.image = new Image(getDiceImagePath(result))
     }
   }
 }
