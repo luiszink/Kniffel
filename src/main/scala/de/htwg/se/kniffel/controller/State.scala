@@ -7,7 +7,6 @@ class RollingState extends StateInterface {
 
     if (scoreCardCategories.contains(input.toLowerCase)) {
       controller.updateScore(input.toLowerCase)
-      controller.nextPlayer()
     } else {
       val diceToKeep = input.split(" ").map(_.toInt).toList
       controller.keepDice(diceToKeep)
@@ -16,9 +15,8 @@ class RollingState extends StateInterface {
 }
 
 class UpdateState extends StateInterface {
-  override def name: String = "updateState"
+  override def name: String = "UpdateState"
   override def handleInput(input: String, controller: Controller): Unit = {
     controller.updateScore(input.toLowerCase)
-    controller.nextPlayer()
   }
 }

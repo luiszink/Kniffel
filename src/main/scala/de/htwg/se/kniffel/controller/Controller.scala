@@ -1,8 +1,25 @@
 package de.htwg.se.kniffel.controller
 
-import de.htwg.se.kniffel.model._
-import de.htwg.se.kniffel.util._
+import de.htwg.se.kniffel.model.Player
+import de.htwg.se.kniffel.model.ScoreUpdaterFactory
+import de.htwg.se.kniffel.model.StandardScoreUpdater
+import de.htwg.se.kniffel.model.Dice
+import de.htwg.se.kniffel.model.Threes
+import de.htwg.se.kniffel.model.Fours
+import de.htwg.se.kniffel.model.Fives
+import de.htwg.se.kniffel.model.Sixes
+import de.htwg.se.kniffel.model.ThreeTimes
+import de.htwg.se.kniffel.model.FourTimes
+import de.htwg.se.kniffel.model.FullHouse
+import de.htwg.se.kniffel.model.SmallStraight
+import de.htwg.se.kniffel.model.LargeStraight
+import de.htwg.se.kniffel.model.Chance
+import de.htwg.se.kniffel.model.Kniffel
+import de.htwg.se.kniffel.util.Observable
+import de.htwg.se.kniffel.util.UndoManager
+import de.htwg.se.kniffel.util.KniffelEvent
 import scala.util.{Try, Success, Failure}
+import de.htwg.se.kniffel.model.ScoreUpdater
 
 class Controller extends Observable with ControllerInterface {
   var repetitions = 2
@@ -26,10 +43,10 @@ class Controller extends Observable with ControllerInterface {
     repetitions -= 1
     repetitions match {
       case 0 => 
-        notifyObservers("printDice")
+        notifyObservers(KniffelEvent.PrintDice)
         setState(new UpdateState())
         repetitions = 2
-      case n if n > 0 => notifyObservers("printDice")
+      case n if n > 0 => notifyObservers(KniffelEvent.PrintDice)
     }
   }
 
@@ -37,19 +54,20 @@ class Controller extends Observable with ControllerInterface {
   def addPlayer(name: String): Unit = {
     val player: PlayerInterface = Player(name)
     players = players :+ player
-    notifyObservers("playerAdded")
+    notifyObservers(KniffelEvent.PlayerAdded)
   }
 
   // Switches to the next player
   def nextPlayer(): Unit = {
     previousDice = Some(dice)
     currentPlayerIndex = (currentPlayerIndex + 1) % players.length
-    repetitions = 2  // Reset the number of repetitions for the new player
+    repetitions = 2
     dice = new Dice()
     setState(new RollingState())
-    notifyObservers("printScoreCard")
-    notifyObservers("printDice")
+    notifyObservers(KniffelEvent.PrintScoreCard)
+    notifyObservers(KniffelEvent.PrintDice)
   }
+
 
   // Sets the ScoreUpdater based on user input
   def setScoreUpdater(userInput: String): Unit = {
@@ -59,11 +77,16 @@ class Controller extends Observable with ControllerInterface {
   // Updates the scorecard
   def updateScore(category: String): Unit = {
     val player = getCurrentPlayer
-    val diceValues = getDice
-    scoreUpdater.updateScore(player, category, diceValues)  // ScoreUpdater is used here
-    undoManager.doStep(new UpdateScoreCommand(player, category, diceValues))
-    setState(new RollingState())
-    notifyObservers("printScoreCard")
+    val dice = getDice
+    scoreUpdater.updateScore(player, category, dice)
+    undoManager.doStep(new UpdateScoreCommand(player, category, dice))
+    player.scoreCard.isComplete match {
+      case true =>
+        player.scoreCard.calculateTotalScore()
+        println(s"${player.name}'s total score: ${player.scoreCard.categories("totalScore").getOrElse(0)}")
+      case false =>
+    }
+    nextPlayer()
   }
 
   // Sets the current state
@@ -71,20 +94,27 @@ class Controller extends Observable with ControllerInterface {
     currentState = state
   }
 
-  // Handles the user input
+
   def handleInput(input: String): Unit = {
-    if (input.toLowerCase == "undo") {
-      undoManager.undoStep
-      previousDice match {
-        case Some(pdice) => dice = pdice
-        case None =>
+    Try {
+      if (input.toLowerCase == "undo") {
+        undoManager.undoStep
+        if (previousDice != null) {
+          dice = previousDice
+        }
+        setState(new UpdateState())
+        currentPlayerIndex match 
+          case 0 => currentPlayerIndex = players.length-1
+          case _ => currentPlayerIndex = (currentPlayerIndex - 1) % players.length
+          notifyObservers(KniffelEvent.PrintScoreCard)
+          notifyObservers(KniffelEvent.PrintDiceUndo)
+      } else {
+        currentState.handleInput(input, this)
       }
-      setState(new UpdateState())
-      currentPlayerIndex = if (currentPlayerIndex == 0) players.length - 1 else (currentPlayerIndex - 1) % players.length
-      notifyObservers("printScoreCard")
-      notifyObservers("printDiceUndo")
-    } else {
-      currentState.handleInput(input, this)
+    } match {
+      case Success(_) =>
+      case Failure(_) => 
+        notifyObservers(KniffelEvent.InvalidInput)
     }
   }
 }
