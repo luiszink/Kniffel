@@ -1,25 +1,8 @@
 package de.htwg.se.kniffel.controller
 
-import de.htwg.se.kniffel.model.Player
-import de.htwg.se.kniffel.model.ScoreUpdaterFactory
-import de.htwg.se.kniffel.model.StandardScoreUpdater
-import de.htwg.se.kniffel.model.Dice
-import de.htwg.se.kniffel.model.Threes
-import de.htwg.se.kniffel.model.Fours
-import de.htwg.se.kniffel.model.Fives
-import de.htwg.se.kniffel.model.Sixes
-import de.htwg.se.kniffel.model.ThreeTimes
-import de.htwg.se.kniffel.model.FourTimes
-import de.htwg.se.kniffel.model.FullHouse
-import de.htwg.se.kniffel.model.SmallStraight
-import de.htwg.se.kniffel.model.LargeStraight
-import de.htwg.se.kniffel.model.Chance
-import de.htwg.se.kniffel.model.Kniffel
-import de.htwg.se.kniffel.util.Observable
-import de.htwg.se.kniffel.util.UndoManager
-import de.htwg.se.kniffel.util.KniffelEvent
+import de.htwg.se.kniffel.model._
+import de.htwg.se.kniffel.util._
 import scala.util.{Try, Success, Failure}
-import de.htwg.se.kniffel.model.ScoreUpdater
 
 class Controller extends Observable with ControllerInterface {
   var repetitions = 2
@@ -66,8 +49,8 @@ class Controller extends Observable with ControllerInterface {
     setState(new RollingState())
     notifyObservers(KniffelEvent.PrintScoreCard)
     notifyObservers(KniffelEvent.PrintDice)
+    notifyObservers(KniffelEvent.NextPlayer) // Notify GUI to reset selected dice
   }
-
 
   // Sets the ScoreUpdater based on user input
   def setScoreUpdater(userInput: String): Unit = {
@@ -94,20 +77,21 @@ class Controller extends Observable with ControllerInterface {
     currentState = state
   }
 
-
   def handleInput(input: String): Unit = {
     Try {
       if (input.toLowerCase == "undo") {
         undoManager.undoStep
-        if (previousDice != null) {
-          dice = previousDice
+        previousDice match {
+          case Some(pdice) => dice = pdice
+          case None => // Do nothing
         }
         setState(new UpdateState())
-        currentPlayerIndex match 
-          case 0 => currentPlayerIndex = players.length-1
+        currentPlayerIndex match {
+          case 0 => currentPlayerIndex = players.length - 1
           case _ => currentPlayerIndex = (currentPlayerIndex - 1) % players.length
-          notifyObservers(KniffelEvent.PrintScoreCard)
-          notifyObservers(KniffelEvent.PrintDiceUndo)
+        }
+        notifyObservers(KniffelEvent.PrintScoreCard)
+        notifyObservers(KniffelEvent.PrintDiceUndo)
       } else {
         currentState.handleInput(input, this)
       }

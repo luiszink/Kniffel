@@ -1,5 +1,7 @@
 package de.htwg.se.kniffel.model
 
+import scala.util.Random
+
 class StandardScoreUpdater extends ScoreUpdater {
   override def updateScore(player: PlayerInterface, category: String, dice: List[Int]): Unit = {
     val currentPlayer = player
@@ -20,11 +22,11 @@ class StandardScoreUpdater extends ScoreUpdater {
       case _ => throw new IllegalArgumentException("Invalid category.")
     }
     val calculatedScore = ScoreCalculator.calculateScore(dice, strategy)
+    // it has to throw an error if the categorie is already filled
     currentPlayer.scoreCard.categories.get(category.toLowerCase) match {
       case Some(None) =>
         currentPlayer.scoreCard.categories.update(category.toLowerCase, Some(calculatedScore))
-      case _ =>
-        println(s"Category $category is already filled or does not exist.")
+      case _ => throw new IllegalArgumentException("Category already filled!")
     }
   }
 }

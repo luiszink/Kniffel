@@ -2,7 +2,7 @@ package de.htwg.se.kniffel.model
 
 import scala.collection.mutable.LinkedHashMap
 
-case class ScoreCard() {
+case class ScoreCard() extends ScoreCardInterface {
   var categories: LinkedHashMap[String, Option[Int]] = LinkedHashMap(
     "one" -> None,
     "two" -> None,
