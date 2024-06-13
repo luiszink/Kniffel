@@ -1,12 +1,6 @@
-
 package de.htwg.se.kniffel.controller
 
-trait State {
-  def name: String
-  def handleInput(input: String, controller: Controller): Unit
-}
-
-class RollingState extends State {
+class RollingState extends StateInterface {
   override def name: String = "RollingState"
   override def handleInput(input: String, controller: Controller): Unit = {
     val scoreCardCategories = controller.getCurrentPlayer.scoreCard.categories
@@ -21,7 +15,7 @@ class RollingState extends State {
   }
 }
 
-class UpdateState extends State {
+class UpdateState extends StateInterface {
   override def name: String = "updateState"
   override def handleInput(input: String, controller: Controller): Unit = {
     controller.updateScore(input.toLowerCase)

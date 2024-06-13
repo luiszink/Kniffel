@@ -1,10 +1,9 @@
-// UpdateScoreCommand.scala
 package de.htwg.se.kniffel.controller
 
 import de.htwg.se.kniffel.model._
 import de.htwg.se.kniffel.util._
 
-class UpdateScoreCommand(player: Player, category: String, dice: List[Int]) extends Command {
+class UpdateScoreCommand(player: PlayerInterface, category: String, dice: List[Int]) extends Command {
 
   private var previousScore: Option[Int] = player.scoreCard.categories.getOrElse(category.toLowerCase, None)
   private var newScore: Option[Int] = None
