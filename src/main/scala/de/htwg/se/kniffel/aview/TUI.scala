@@ -1,11 +1,11 @@
   package de.htwg.se.kniffel.aview
 
   import scala.io.StdIn
-  import de.htwg.se.kniffel.controller.Controller
+  import de.htwg.se.kniffel.controller.{Controller, ControllerInterface}
   import de.htwg.se.kniffel.util.Observer
   import scala.util.{Try, Success, Failure}
 
-  class TUI(controller: Controller) extends Observer {
+  class TUI(controller: ControllerInterface) extends Observer {
     controller.add(this)
 
     def addPlayers(): Unit = {
