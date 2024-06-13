@@ -10,10 +10,9 @@ case class Dice(values: List[Int]) {
     this(List.fill(5)(Dice.rollDice())) // Use the companion object's method
   }
 
-def keepDice(keepIndices: List[Int]): Dice = {
+  def keepDice(keepIndices: List[Int]): Dice = {
     val (keptDice, _) = values.zipWithIndex.partition { case (_, index) =>
-      keepIndices.contains(index + 1)
-    }
+      keepIndices.contains(index + 1)}
     val newDice = values.diff(keptDice.map(_._1))
     val rerolledDice = List.fill(newDice.length)(rollDice())
     Dice(keptDice.map(_._1) ++ rerolledDice)
@@ -21,6 +20,6 @@ def keepDice(keepIndices: List[Int]): Dice = {
 }
 
 object Dice {
-  // Method to roll a single die
+  // Method to roll a single dice
   def rollDice(): Int = Random.nextInt(6) + 1
 }
