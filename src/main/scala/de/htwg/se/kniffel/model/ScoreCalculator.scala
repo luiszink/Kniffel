@@ -1,10 +1,5 @@
 package de.htwg.se.kniffel.model
 
-// Strategy Pattern
-trait ScoringStrategy {
-  def calculateScore(dice: List[Int]): Int
-}
-
 object Ones extends ScoringStrategy {
   override def calculateScore(dice: List[Int]): Int = dice.count(_ == 1) * 1
 }
