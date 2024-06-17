@@ -1,8 +1,9 @@
 package de.htwg.se.kniffel.model
 
 import scala.util.Random
+import de.htwg.se.kniffel.model.modelImpl._
 
-class MultiKniffelScoreUpdater extends ScoreUpdater {
+class MultiKniffelScoreUpdater extends ScoreUpdaterInterface {
   override def updateScore(player: PlayerInterface, category: String, dice: List[Int]): Unit = {
     // Logic for handling multiple Kniffel entries
     val currentPlayer = player

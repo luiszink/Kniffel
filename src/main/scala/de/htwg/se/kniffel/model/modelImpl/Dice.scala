@@ -1,6 +1,7 @@
-package de.htwg.se.kniffel.model
+package de.htwg.se.kniffel.model.modelImpl
 
 import scala.util.Random
+import de.htwg.se.kniffel.model._
 
 case class Dice(values: List[Int] = List.fill(5)(Dice.rollDice())) extends DiceInterface {
 

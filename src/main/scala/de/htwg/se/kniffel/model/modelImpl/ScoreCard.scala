@@ -1,6 +1,7 @@
-package de.htwg.se.kniffel.model
+package de.htwg.se.kniffel.model.modelImpl
 
 import scala.collection.mutable.LinkedHashMap
+import de.htwg.se.kniffel.model.ScoreCardInterface
 
 case class ScoreCard() extends ScoreCardInterface {
   var categories: LinkedHashMap[String, Option[Int]] = LinkedHashMap(

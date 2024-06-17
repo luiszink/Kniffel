@@ -1,8 +1,10 @@
-package de.htwg.se.kniffel.model
+package de.htwg.se.kniffel.model.scoreUpdaterImpl
 
 import scala.util.Random
+import de.htwg.se.kniffel.model._
+import de.htwg.se.kniffel.model.modelImpl._
 
-class StandardScoreUpdater extends ScoreUpdater {
+class StandardScoreUpdater extends ScoreUpdaterInterface {
   override def updateScore(player: PlayerInterface, category: String, dice: List[Int]): Unit = {
     val currentPlayer = player
     val strategy: ScoringStrategy = category.toLowerCase match {

@@ -1,7 +1,8 @@
 package de.htwg.se.kniffel.aview
 
 import scala.io.StdIn
-import de.htwg.se.kniffel.controller.{Controller, ControllerInterface}
+import de.htwg.se.kniffel.controller.{ControllerInterface}
+import de.htwg.se.kniffel.controller.controllerImpl.Controller
 import de.htwg.se.kniffel.util.{Observer, KniffelEvent}
 import scala.util.{Try, Success, Failure}
 

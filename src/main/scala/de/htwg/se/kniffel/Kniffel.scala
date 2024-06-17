@@ -1,7 +1,7 @@
 import scala.io.StdIn
 import scala.util.Random
-import de.htwg.se.kniffel.model.Dice
-import de.htwg.se.kniffel.controller.{Controller, ControllerInterface}
+import de.htwg.se.kniffel.controller.controllerImpl.Controller
+import de.htwg.se.kniffel.controller.ControllerInterface
 import scala.concurrent.{Future, Await}
 import de.htwg.se.kniffel.aview.GUI
 import de.htwg.se.kniffel.aview.TUI

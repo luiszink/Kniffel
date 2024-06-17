@@ -1,8 +1,12 @@
-package de.htwg.se.kniffel.controller
+package de.htwg.se.kniffel.controller.controllerImpl
 
 import de.htwg.se.kniffel.model._
+import de.htwg.se.kniffel.model.modelImpl.{Dice, Player}
+import de.htwg.se.kniffel.model.scoreUpdaterImpl.{StandardScoreUpdater}
 import de.htwg.se.kniffel.util._
+import de.htwg.se.kniffel.controller.{ControllerInterface, StateInterface}
 import scala.util.{Try, Success, Failure}
+import de.htwg.se.kniffel.controller.controllerImpl.{RollingState, UpdateState, UpdateScoreCommand}
 
 class Controller extends Observable with ControllerInterface {
   var repetitions = 2
@@ -10,7 +14,7 @@ class Controller extends Observable with ControllerInterface {
   private var previousDice: Option[DiceInterface] = None
   private var players: List[PlayerInterface] = List()
   private var currentPlayerIndex: Int = 0
-  private var scoreUpdater: ScoreUpdater = new StandardScoreUpdater
+  private var scoreUpdater: ScoreUpdaterInterface = new StandardScoreUpdater
   private var currentState: StateInterface = new RollingState()  // Initial state
   private val undoManager = new UndoManager
 

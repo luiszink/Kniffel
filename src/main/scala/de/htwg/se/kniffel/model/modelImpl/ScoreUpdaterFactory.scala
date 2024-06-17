@@ -1,7 +1,9 @@
-package de.htwg.se.kniffel.model
+package de.htwg.se.kniffel.model.modelImpl
+
+import de.htwg.se.kniffel.model.scoreUpdaterImpl._
 
 object ScoreUpdaterFactory {
-  def createScoreUpdater(userInput: String): ScoreUpdater = {
+  def createScoreUpdater(userInput: String): ScoreUpdaterInterface = {
     userInput.toLowerCase match {
       case "n" => new StandardScoreUpdater()
       case "y" => new MultiKniffelScoreUpdater()

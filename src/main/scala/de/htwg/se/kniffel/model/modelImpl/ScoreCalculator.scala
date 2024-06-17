@@ -1,4 +1,5 @@
-package de.htwg.se.kniffel.model
+package de.htwg.se.kniffel.model.modelImpl
+import de.htwg.se.kniffel.model.ScoringStrategy
 
 object Ones extends ScoringStrategy {
   override def calculateScore(dice: List[Int]): Int = dice.count(_ == 1) * 1

@@ -1,7 +1,8 @@
-package de.htwg.se.kniffel.controller
+package de.htwg.se.kniffel.controller.controllerImpl
 
 import de.htwg.se.kniffel.model._
 import de.htwg.se.kniffel.util._
+import de.htwg.se.kniffel.model.modelImpl._
 
 class UpdateScoreCommand(player: PlayerInterface, category: String, dice: List[Int]) extends Command {
 
