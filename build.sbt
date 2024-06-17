@@ -10,7 +10,8 @@ lazy val root = project
     libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.14",
     libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.14" % "test",
     libraryDependencies += "org.scalafx" %% "scalafx" % "21.0.0-R32",
-    
+    libraryDependencies += "com.google.inject" % "guice" % "3.0"
+
     libraryDependencies ++= {
     // Determine OS version of JavaFX binaries
     lazy val osName = System.getProperty("os.name") match {
@@ -21,5 +22,5 @@ lazy val root = project
     }
     Seq("base", "controls", "fxml", "graphics", "media", "swing", "web")
       .map(m => "org.openjfx" % s"javafx-$m" % "16" classifier osName)
-  }
-    )
+    }
+  )
