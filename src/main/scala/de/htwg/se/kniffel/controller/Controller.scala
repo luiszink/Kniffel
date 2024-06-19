@@ -6,7 +6,7 @@ import scala.util.{Try, Success, Failure}
 
 class Controller extends Observable with ControllerInterface {
   var repetitions = 2
-  private var dice: DiceInterface = new Dice()
+  private var dice: DiceInterface = Dice(List.fill(5)(Dice.rollDice()))
   private var previousDice: Option[DiceInterface] = None
   private var players: List[PlayerInterface] = List()
   private var currentPlayerIndex: Int = 0
@@ -20,6 +20,9 @@ class Controller extends Observable with ControllerInterface {
   def getCurrentPlayer: PlayerInterface = players(currentPlayerIndex)
   def getPlayers: List[PlayerInterface] = players
 
+  def rollDice(): Unit = {
+    dice = Dice(List.fill(5)(Dice.rollDice()))
+  }
   // Decides which dice to keep and changes state to update the Scorecard
   def keepDice(input: List[Int]): Unit = {
     dice = dice.keepDice(input)
@@ -45,7 +48,7 @@ class Controller extends Observable with ControllerInterface {
     previousDice = Some(dice)
     currentPlayerIndex = (currentPlayerIndex + 1) % players.length
     repetitions = 2
-    dice = new Dice()
+    dice = new Dice(List.fill(5)(Dice.rollDice()))
     setState(new RollingState())
     notifyObservers(KniffelEvent.PrintScoreCard)
     notifyObservers(KniffelEvent.PrintDice)
