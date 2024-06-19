@@ -1,3 +1,5 @@
+package de.htwg.se.kniffel
+
 import scala.io.StdIn
 import scala.util.Random
 import de.htwg.se.kniffel.model.Dice
