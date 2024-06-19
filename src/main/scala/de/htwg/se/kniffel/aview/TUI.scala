@@ -4,9 +4,10 @@ import scala.io.StdIn
 import de.htwg.se.kniffel.controller.{Controller, ControllerInterface}
 import de.htwg.se.kniffel.util.{Observer, KniffelEvent}
 import scala.util.{Try, Success, Failure}
+import de.htwg.se.kniffel.util.{Observer, KniffelEvent}
+import com.google.inject.Inject
 
-class TUI(controller: ControllerInterface) extends Observer {
-  controller.add(this)
+class TUI @Inject() (controller: ControllerInterface) extends Observer {
 
 
   def addPlayers(): Unit = {

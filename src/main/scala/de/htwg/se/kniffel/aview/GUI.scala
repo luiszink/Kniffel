@@ -1,6 +1,6 @@
 package de.htwg.se.kniffel.aview
 
-import de.htwg.se.kniffel.controller.{ControllerInterface}
+import de.htwg.se.kniffel.controller.ControllerInterface
 import de.htwg.se.kniffel.util.{Observer, KniffelEvent}
 import scalafx.application.JFXApp3
 import scalafx.scene.Scene
@@ -16,8 +16,9 @@ import scala.compiletime.uninitialized
 import scalafx.Includes.jfxRectangle2D2sfx
 import scalafx.scene.control.TextField
 import java.nio.file.Paths
+import com.google.inject.Inject
 
-class GUI(controller: ControllerInterface) extends JFXApp3 with Observer {
+class GUI @Inject() (controller: ControllerInterface) extends JFXApp3 with Observer {
   controller.add(this)
 
   var tableView: TableView[(String, String)] = uninitialized
