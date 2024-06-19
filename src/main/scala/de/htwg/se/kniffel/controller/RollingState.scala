@@ -1,6 +1,7 @@
 package de.htwg.se.kniffel.controller
+import com.google.inject.Inject
 
-class RollingState extends StateInterface {
+class RollingState @Inject() extends StateInterface {
   override def name: String = "RollingState"
   override def handleInput(input: String, controller: Controller): Unit = {
     val scoreCardCategories = controller.getCurrentPlayer.scoreCard.categories

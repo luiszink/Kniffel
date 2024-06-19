@@ -1,8 +1,9 @@
 package de.htwg.se.kniffel.model
 
+import com.google.inject.Inject
 import scala.collection.mutable.LinkedHashMap
 
-case class ScoreCard() extends ScoreCardInterface {
+class ScoreCard @Inject() extends ScoreCardInterface {
   var categories: LinkedHashMap[String, Option[Int]] = LinkedHashMap(
     "one" -> None,
     "two" -> None,
