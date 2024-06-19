@@ -16,6 +16,6 @@ object Dice {
   def rollDice(): Int = Random.nextInt(6) + 1
 }
 
-class DiceProvider extends Provider[Dice] {
+class DiceProvider @Inject extends Provider[Dice] {
   override def get(): Dice = new Dice(List.fill(5)(Dice.rollDice()))
 }

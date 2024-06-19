@@ -1,6 +1,8 @@
 package de.htwg.se.kniffel.util
 
-class UndoManager extends UndoManagerInterface {
+import com.google.inject.Inject
+
+class UndoManager @Inject() extends UndoManagerInterface {
   private var undoStack: List[Command] = Nil
   private var redoStack: List[Command] = Nil
 
