@@ -1,13 +1,15 @@
-package de.htwg.se.kniffel.model
+package de.htwg.se.kniffel.model.scoreUpdaterImpl
 
 import scala.util.Random
-import de.htwg.se.kniffel.model.modelImpl._
+import com.google.inject.Inject
+import de.htwg.se.kniffel.model._
+import de.htwg.se.kniffel.model.modelImpl._ 
 
-class MultiKniffelScoreUpdater extends ScoreUpdaterInterface {
+class MultiKniffelScoreUpdater @Inject() extends ScoreUpdaterInterface {
   override def updateScore(player: PlayerInterface, category: String, dice: List[Int]): Unit = {
     // Logic for handling multiple Kniffel entries
     val currentPlayer = player
-    val strategy: ScoringStrategy = category.toLowerCase match {
+    val strategy: ScoringStrategyInterface = category.toLowerCase match {
       case "one" => Ones
       case "two" => Twos
       case "three" => Threes

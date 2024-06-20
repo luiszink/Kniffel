@@ -10,7 +10,7 @@ class UpdateScoreCommand(player: PlayerInterface, category: String, dice: List[I
   private var newScore: Option[Int] = None
 
   override def doStep: Unit = {
-    val strategy: ScoringStrategy = category.toLowerCase match {
+    val strategy: ScoringStrategyInterface = category.toLowerCase match {
       case "one" => Ones
       case "two" => Twos
       case "three" => Threes

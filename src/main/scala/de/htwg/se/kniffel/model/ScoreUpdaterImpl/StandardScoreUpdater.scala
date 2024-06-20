@@ -1,13 +1,15 @@
 package de.htwg.se.kniffel.model.scoreUpdaterImpl
 
 import scala.util.Random
+import com.google.inject.Inject
 import de.htwg.se.kniffel.model._
-import de.htwg.se.kniffel.model.modelImpl._
+import de.htwg.se.kniffel.model.modelImpl._ 
 
-class StandardScoreUpdater extends ScoreUpdaterInterface {
+
+class StandardScoreUpdater @Inject() extends ScoreUpdaterInterface {
   override def updateScore(player: PlayerInterface, category: String, dice: List[Int]): Unit = {
     val currentPlayer = player
-    val strategy: ScoringStrategy = category.toLowerCase match {
+    val strategy: ScoringStrategyInterface = category.toLowerCase match {
       case "one" => Ones
       case "two" => Twos
       case "three" => Threes

@@ -1,8 +1,9 @@
 package de.htwg.se.kniffel.controller.controllerImpl
 
-import de.htwg.se.kniffel.controller.{ControllerInterface, StateInterface}
+import com.google.inject.Inject
+import de.htwg.se.kniffel.controller.{StateInterface, ControllerInterface}
 
-class RollingState extends StateInterface {
+class RollingState @Inject() extends StateInterface {
   override def name: String = "RollingState"
   override def handleInput(input: String, controller: ControllerInterface): Unit = {
     val scoreCardCategories = controller.getCurrentPlayer.scoreCard.categories
@@ -13,12 +14,5 @@ class RollingState extends StateInterface {
       val diceToKeep = input.split(" ").map(_.toInt).toList
       controller.keepDice(diceToKeep)
     }
-  }
-}
-
-class UpdateState extends StateInterface {
-  override def name: String = "UpdateState"
-  override def handleInput(input: String, controller: ControllerInterface): Unit = {
-    controller.updateScore(input.toLowerCase)
   }
 }
