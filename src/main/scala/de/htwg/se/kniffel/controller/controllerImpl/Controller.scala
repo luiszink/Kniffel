@@ -1,33 +1,19 @@
-package de.htwg.se.kniffel.controller
+package de.htwg.se.kniffel.controller.controllerImpl
 
-import de.htwg.se.kniffel.model.Player
-import de.htwg.se.kniffel.model.ScoreUpdaterFactory
-import de.htwg.se.kniffel.model.StandardScoreUpdater
-import de.htwg.se.kniffel.model.Dice
-import de.htwg.se.kniffel.model.Threes
-import de.htwg.se.kniffel.model.Fours
-import de.htwg.se.kniffel.model.Fives
-import de.htwg.se.kniffel.model.Sixes
-import de.htwg.se.kniffel.model.ThreeTimes
-import de.htwg.se.kniffel.model.FourTimes
-import de.htwg.se.kniffel.model.FullHouse
-import de.htwg.se.kniffel.model.SmallStraight
-import de.htwg.se.kniffel.model.LargeStraight
-import de.htwg.se.kniffel.model.Chance
-import de.htwg.se.kniffel.model.Kniffel
-import de.htwg.se.kniffel.util.Observable
-import de.htwg.se.kniffel.util.UndoManager
-import de.htwg.se.kniffel.util.KniffelEvent
+import de.htwg.se.kniffel.model._
+import de.htwg.se.kniffel.controller.{StateInterface, ControllerInterface}
+import de.htwg.se.kniffel.util._
 import scala.util.{Try, Success, Failure}
-import de.htwg.se.kniffel.model.ScoreUpdater
+import de.htwg.se.kniffel.model.scoreUpdaterImpl._
+import de.htwg.se.kniffel.model.modelImpl._
 
 class Controller extends Observable with ControllerInterface {
   var repetitions = 2
-  private var dice: DiceInterface = new Dice()
+  private var dice: DiceInterface = Dice(List.fill(5)(Dice.rollDice()))
   private var previousDice: Option[DiceInterface] = None
   private var players: List[PlayerInterface] = List()
   private var currentPlayerIndex: Int = 0
-  private var scoreUpdater: ScoreUpdater = new StandardScoreUpdater
+  private var scoreUpdater: ScoreUpdaterInterface = new StandardScoreUpdater
   private var currentState: StateInterface = new RollingState()  // Initial state
   private val undoManager = new UndoManager
 
@@ -37,7 +23,10 @@ class Controller extends Observable with ControllerInterface {
   def getCurrentPlayer: PlayerInterface = players(currentPlayerIndex)
   def getPlayers: List[PlayerInterface] = players
 
-  // Decides which dice to keep and changes state to update the Scorecard
+  def rollDice(): Unit = {
+    dice = Dice(List.fill(5)(Dice.rollDice()))
+  }
+
   def keepDice(input: List[Int]): Unit = {
     dice = dice.keepDice(input)
     repetitions -= 1
@@ -50,31 +39,27 @@ class Controller extends Observable with ControllerInterface {
     }
   }
 
-  // Adds a new player
   def addPlayer(name: String): Unit = {
     val player: PlayerInterface = Player(name)
     players = players :+ player
     notifyObservers(KniffelEvent.PlayerAdded)
   }
 
-  // Switches to the next player
   def nextPlayer(): Unit = {
     previousDice = Some(dice)
     currentPlayerIndex = (currentPlayerIndex + 1) % players.length
     repetitions = 2
-    dice = new Dice()
+    dice = new Dice(List.fill(5)(Dice.rollDice()))
     setState(new RollingState())
     notifyObservers(KniffelEvent.PrintScoreCard)
     notifyObservers(KniffelEvent.PrintDice)
+    notifyObservers(KniffelEvent.NextPlayer) // Notify GUI to reset selected dice
   }
 
-
-  // Sets the ScoreUpdater based on user input
   def setScoreUpdater(userInput: String): Unit = {
     scoreUpdater = ScoreUpdaterFactory.createScoreUpdater(userInput)
   }
 
-  // Updates the scorecard
   def updateScore(category: String): Unit = {
     val player = getCurrentPlayer
     val dice = getDice
@@ -89,25 +74,25 @@ class Controller extends Observable with ControllerInterface {
     nextPlayer()
   }
 
-  // Sets the current state
   def setState(state: StateInterface): Unit = {
     currentState = state
   }
-
 
   def handleInput(input: String): Unit = {
     Try {
       if (input.toLowerCase == "undo") {
         undoManager.undoStep
-        if (previousDice != null) {
-          dice = previousDice
+        previousDice match {
+          case Some(pdice) => dice = pdice
+          case None => // Do nothing
         }
         setState(new UpdateState())
-        currentPlayerIndex match 
-          case 0 => currentPlayerIndex = players.length-1
+        currentPlayerIndex match {
+          case 0 => currentPlayerIndex = players.length - 1
           case _ => currentPlayerIndex = (currentPlayerIndex - 1) % players.length
-          notifyObservers(KniffelEvent.PrintScoreCard)
-          notifyObservers(KniffelEvent.PrintDiceUndo)
+        }
+        notifyObservers(KniffelEvent.PrintScoreCard)
+        notifyObservers(KniffelEvent.PrintDiceUndo)
       } else {
         currentState.handleInput(input, this)
       }

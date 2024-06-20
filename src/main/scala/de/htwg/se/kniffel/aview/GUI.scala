@@ -1,12 +1,11 @@
 package de.htwg.se.kniffel.aview
 
-import de.htwg.se.kniffel.controller.Controller
-import de.htwg.se.kniffel.util.Observer
-import de.htwg.se.kniffel.util.KniffelEvent
+import de.htwg.se.kniffel.controller.ControllerInterface
+import de.htwg.se.kniffel.util.{Observer, KniffelEvent}
 import scalafx.application.JFXApp3
 import scalafx.scene.Scene
-import scalafx.scene.layout.{Pane, VBox, HBox}
-import scalafx.scene.control.{TableView, TableColumn, Button, Label, CheckBox}
+import scalafx.scene.layout.{Pane, VBox, HBox, StackPane}
+import scalafx.scene.control.{TableView, TableColumn, Button, Label}
 import scalafx.beans.property.StringProperty
 import scalafx.collections.ObservableBuffer
 import scalafx.application.Platform
@@ -15,26 +14,28 @@ import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.image.{Image, ImageView}
 import scala.compiletime.uninitialized
 import scalafx.Includes.jfxRectangle2D2sfx
-import javafx.stage._
 import scalafx.scene.control.TextField
+import java.nio.file.Paths
+import com.google.inject.Inject
 
-class GUI(controller: Controller) extends JFXApp3 with Observer {
+class GUI @Inject() (controller: ControllerInterface) extends JFXApp3 with Observer {
   controller.add(this)
 
   var tableView: TableView[(String, String)] = uninitialized
   var rollButton: Button = uninitialized
   var diceResultsLabel: Label = uninitialized
   var diceImageViews: Seq[ImageView] = uninitialized
-  var diceCheckBoxes: Seq[CheckBox] = uninitialized
   var updateCategoryButton: Button = uninitialized
   var selectedCategory: String = ""
   var playerNameFields: Seq[TextField] = uninitialized
+  var selectedDiceIndices: Set[Int] = Set()
 
   override def update(event: KniffelEvent.Value): Unit = {
     Platform.runLater(event match {
       case KniffelEvent.PrintScoreCard => scorecard()
       case KniffelEvent.PlayerAdded    => scorecard()
       case KniffelEvent.PrintDice      => updateDiceResults()
+      case KniffelEvent.NextPlayer     => resetSelectedDice()
       case _                           => println("")
     })
   }
@@ -57,16 +58,14 @@ class GUI(controller: Controller) extends JFXApp3 with Observer {
 
   def playerNameScene(screenBounds: javafx.geometry.Rectangle2D): Scene = {
     new Scene(screenBounds.width, screenBounds.height) {
-      val pane = new Pane()
-      playerNameFields = (1 to 4).map { i =>
-        new TextField { promptText = s"Player $i Name" }
-      }
+      val pane = new StackPane()
+      playerNameFields = createPlayerNameFields(4)
 
       val confirmButton = new Button("Confirm")
       confirmButton.onAction = _ => handlePlayerNames()
 
       val vbox = new VBox(10) {
-        children = playerNameFields :+ confirmButton
+        children = playerNameFields ++ Seq(confirmButton)
         padding = Insets(20)
         alignment = Pos.Center
       }
@@ -79,7 +78,7 @@ class GUI(controller: Controller) extends JFXApp3 with Observer {
   def mainGameScene(screenBounds: javafx.geometry.Rectangle2D): Scene = {
     new Scene(screenBounds.width, screenBounds.height) {
 
-      val pane = new Pane()
+      val pane = new StackPane()
 
       tableView = new TableView[(String, String)]()
       tableView.onMouseClicked = _ => handleCategorySelection()
@@ -92,23 +91,10 @@ class GUI(controller: Controller) extends JFXApp3 with Observer {
 
       diceResultsLabel = new Label("Dice Results: ")
 
-      diceImageViews = (1 to 5).map { i =>
-        new ImageView {
-          fitHeight = 50
-          fitWidth = 50
-        }
-      }
-
-      diceCheckBoxes = (1 to 5).map { i =>
-        new CheckBox(s"Keep Dice $i")
-      }
+      diceImageViews = createDiceImageViews(5)
 
       val diceBox = new VBox(10) {
-        children = Seq(rollButton, updateCategoryButton, diceResultsLabel) ++
-          diceImageViews.zip(diceCheckBoxes).flatMap {
-            case (imageView, checkBox) =>
-              Seq(imageView, checkBox)
-          }
+        children = Seq(rollButton, updateCategoryButton, diceResultsLabel) ++ diceImageViews
         padding = Insets(20)
         alignment = Pos.Center
       }
@@ -118,14 +104,33 @@ class GUI(controller: Controller) extends JFXApp3 with Observer {
         padding = Insets(20)
         alignment = Pos.Center
       }
-      hbox.layoutX = 50
-      hbox.layoutY <== (pane.height - hbox.height) / 2
 
-      pane.children = hbox
+      val outerVBox = new VBox(20) {
+        children = Seq(hbox)
+        alignment = Pos.Center
+      }
+
+      pane.children = outerVBox
       content = pane
 
       // Hier wird die Methode updateDiceResults() aufgerufen, um die Würfel zu aktualisieren
       updateDiceResults()
+    }
+  }
+
+  def createPlayerNameFields(count: Int): Seq[TextField] = {
+    (1 to count).map { i =>
+      new TextField { promptText = s"Player $i Name" }
+    }
+  }
+
+  def createDiceImageViews(count: Int): Seq[ImageView] = {
+    (1 to count).map { i =>
+      new ImageView {
+        fitHeight = 50
+        fitWidth = 50
+        onMouseClicked = _ => toggleDiceSelection(i)
+      }
     }
   }
 
@@ -187,9 +192,7 @@ class GUI(controller: Controller) extends JFXApp3 with Observer {
   }
 
   def rollDice(): Unit = {
-    val keptDiceIndices = diceCheckBoxes.zipWithIndex.collect {
-      case (checkBox, index) if checkBox.selected.value => index + 1
-    }.toList
+    val keptDiceIndices = selectedDiceIndices.toList
     controller.keepDice(keptDiceIndices)
     if (controller.repetitions == 0) {
       rollButton.disable = true
@@ -203,15 +206,40 @@ class GUI(controller: Controller) extends JFXApp3 with Observer {
     }
   }
 
+  def toggleDiceSelection(index: Int): Unit = {
+    if (selectedDiceIndices.contains(index)) {
+      selectedDiceIndices -= index
+    } else {
+      selectedDiceIndices += index
+    }
+    updateDiceResults()
+  }
+
+  def resetSelectedDice(): Unit = {
+    selectedDiceIndices = Set()
+    updateDiceResults()
+  }
+
   def getDiceImagePath(diceValue: Int): String = {
-    s"file:///C:/Users/michi/OneDrive/Dokumente/HTWG/SoSe24/SE-Boger/Kniffel/src/main/resources/$diceValue.png"
+    val currentPath = Paths.get(".").toAbsolutePath.normalize().toString
+    s"file:///$currentPath/src/main/resources/$diceValue.png"
   }
 
   def updateDiceResults(): Unit = {
     val diceResults = controller.getDice
     diceResultsLabel.text = s"Dice Results: ${diceResults.mkString(", ")}"
-    diceImageViews.zip(diceResults).foreach { case (imageView, result) =>
+    diceImageViews.zipWithIndex.foreach { case (imageView, index) =>
+      val result = diceResults(index)
       imageView.image = new Image(getDiceImagePath(result))
+      if (selectedDiceIndices.contains(index + 1)) {
+        imageView.fitHeight = 60
+        imageView.fitWidth = 60
+        imageView.style = "-fx-effect: dropshadow(three-pass-box, rgba(0, 255, 0, 0.8), 10, 0, 0, 0);"
+      } else {
+        imageView.fitHeight = 50
+        imageView.fitWidth = 50
+        imageView.style = ""
+      }
     }
   }
 }

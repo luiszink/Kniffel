@@ -1,5 +1,5 @@
 package de.htwg.se.kniffel.model
 
-trait ScoringStrategy {
+trait ScoringStrategyInterface {
   def calculateScore(dice: List[Int]): Int
 }

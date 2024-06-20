@@ -1,12 +1,13 @@
 package de.htwg.se.kniffel.aview
 
 import scala.io.StdIn
-import de.htwg.se.kniffel.controller.{Controller, ControllerInterface}
-import de.htwg.se.kniffel.util.Observer
+import de.htwg.se.kniffel.controller.ControllerInterface
+import de.htwg.se.kniffel.util.{Observer, KniffelEvent}
 import scala.util.{Try, Success, Failure}
+import de.htwg.se.kniffel.util.{Observer, KniffelEvent}
+import com.google.inject.Inject
 
-class TUI(controller: ControllerInterface) extends Observer {
-  controller.add(this)
+class TUI @Inject() (controller: ControllerInterface) extends Observer {
 
 
   def addPlayers(): Unit = {
@@ -68,7 +69,7 @@ class TUI(controller: ControllerInterface) extends Observer {
       case KniffelEvent.PrintScoreCard  => println(printScoreCard())
       case KniffelEvent.PlayerAdded     => println("") 
       case KniffelEvent.InvalidInput    => println("Invalid input! Please try again.")
-      case _                            => println("Wrong Kniffel event!")
+      case _                            => println("")
     }
   }
 
