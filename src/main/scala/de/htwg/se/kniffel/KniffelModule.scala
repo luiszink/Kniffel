@@ -18,7 +18,7 @@ class KniffelModule extends AbstractModule {
     bind(classOf[StateInterface]).annotatedWith(Names.named("RollingState")).to(classOf[RollingState])
     bind(classOf[StateInterface]).annotatedWith(Names.named("UpdateState")).to(classOf[UpdateState])
     bind(classOf[DiceInterface]).to(classOf[Dice])
-    // Entfernen Sie die doppelte Bindung von DiceInterface
+    bind(classOf[ControllerInterface]).to(classOf[Controller])
     // bind(classOf[DiceInterface]).toProvider(classOf[DiceProvider])
     bind(classOf[PlayerInterface]).to(classOf[Player])
     bind(classOf[ScoreCardInterface]).to(classOf[ScoreCard])
@@ -27,7 +27,6 @@ class KniffelModule extends AbstractModule {
     bind(classOf[UndoManagerInterface]).to(classOf[UndoManager])
     bind(classOf[GUI]).toInstance(new GUI(new Controller)) // Beispiel-Injektion
     bind(classOf[TUI]).toInstance(new TUI(new Controller)) // Beispiel-Injektion
-    // Fügen Sie eine Bindung für List[Int] hinzu, falls Dice dies benötigt
     bind(new TypeLiteral[List[Int]]() {}).toInstance(List.empty[Int])
   }
 }

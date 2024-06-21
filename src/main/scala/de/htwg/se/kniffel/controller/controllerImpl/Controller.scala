@@ -6,8 +6,9 @@ import de.htwg.se.kniffel.util._
 import scala.util.{Try, Success, Failure}
 import de.htwg.se.kniffel.model.scoreUpdaterImpl._
 import de.htwg.se.kniffel.model.modelImpl._
+import com.google.inject.{Inject, Provider}
 
-class Controller extends Observable with ControllerInterface {
+class Controller @Inject() extends Observable with ControllerInterface {  
   var repetitions = 2
   private var dice: DiceInterface = Dice(List.fill(5)(Dice.rollDice()))
   private var previousDice: Option[DiceInterface] = None
