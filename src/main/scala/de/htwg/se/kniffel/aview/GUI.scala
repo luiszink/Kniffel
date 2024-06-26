@@ -4,7 +4,7 @@ import de.htwg.se.kniffel.controller.ControllerInterface
 import de.htwg.se.kniffel.util.{Observer, KniffelEvent}
 import scalafx.application.JFXApp3
 import scalafx.scene.Scene
-import scalafx.scene.layout.{Pane, VBox, HBox, StackPane}
+import scalafx.scene.layout.{Pane, VBox, HBox, StackPane, Background, BackgroundImage, BackgroundRepeat, BackgroundPosition, BackgroundSize}
 import scalafx.scene.control.{TableView, TableColumn, Button, Label}
 import scalafx.beans.property.StringProperty
 import scalafx.collections.ObservableBuffer
@@ -51,6 +51,10 @@ class GUI @Inject() (controller: ControllerInterface)
       stage = new JFXApp3.PrimaryStage {
         title = "Kniffel"
         resizable = true
+        width = 900
+        height = 600
+        x = (screenBounds.width - 900) / 2
+        y = (screenBounds.height - 600) / 2
         scene = playerNameScene(screenBounds)
       }
 
@@ -63,6 +67,17 @@ class GUI @Inject() (controller: ControllerInterface)
   def playerNameScene(screenBounds: javafx.geometry.Rectangle2D): Scene = {
     new Scene(screenBounds.width, screenBounds.height) {
       val pane = new StackPane()
+
+      // Background image
+      val backgroundImage = new BackgroundImage(
+        new Image("file:C:/Users/michi/OneDrive/Dokumente/HTWG/SoSe24/SE-Boger/Kniffel/src/main/resources/background.jpg"),
+        BackgroundRepeat.NoRepeat,
+        BackgroundRepeat.NoRepeat,
+        BackgroundPosition.Center,
+        new BackgroundSize(BackgroundSize.Auto, BackgroundSize.Auto, false, false, true, false)
+      )
+      pane.background = new Background(Array(backgroundImage))
+
       playerNameFields = createPlayerNameFields(4)
 
       val confirmButton = new Button("Confirm")
@@ -72,10 +87,42 @@ class GUI @Inject() (controller: ControllerInterface)
       multipleKniffelCheckBox = new CheckBox("Erlaube mehrere Kniffel")
       multipleKniffelCheckBox.selected = false
 
-      val vbox = new VBox(10) {
-        children =
-          playerNameFields ++ Seq(multipleKniffelCheckBox, confirmButton)
+      // Title Label
+      val titleLabel = new Label("Kniffel") {
+        style = "-fx-font-size: 24px; -fx-font-weight: bold;"
+      }
+
+      val titleBox = new HBox {
+        children = Seq(titleLabel)
+        alignment = Pos.Center
+        padding = Insets(40)
+      }
+
+      val playerNamesVBox = new VBox(10) {
+        children = playerNameFields
         padding = Insets(20)
+        alignment = Pos.Center
+      }
+
+      val optionsVBox = new VBox(10) {
+        children = Seq(multipleKniffelCheckBox)
+        padding = Insets(20)
+        alignment = Pos.CenterRight
+      }
+
+      val confirmButtonBox = new HBox {
+        children = Seq(confirmButton)
+        alignment = Pos.Center
+        padding = Insets(40)
+      }
+
+      val hbox = new HBox(50) {
+        children = Seq(playerNamesVBox, optionsVBox)
+        alignment = Pos.Center
+      }
+
+      val vbox = new VBox(30) {
+        children = Seq(titleBox, hbox, confirmButtonBox)
         alignment = Pos.Center
       }
 
