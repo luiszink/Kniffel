@@ -14,11 +14,14 @@ import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.image.{Image, ImageView}
 import scala.compiletime.uninitialized
 import scalafx.Includes.jfxRectangle2D2sfx
+import scalafx.scene.control.CheckBox
 import scalafx.scene.control.TextField
 import java.nio.file.Paths
 import com.google.inject.Inject
 
-class GUI @Inject() (controller: ControllerInterface) extends JFXApp3 with Observer {
+class GUI @Inject() (controller: ControllerInterface)
+    extends JFXApp3
+    with Observer {
   controller.add(this)
 
   var tableView: TableView[(String, String)] = uninitialized
@@ -29,6 +32,7 @@ class GUI @Inject() (controller: ControllerInterface) extends JFXApp3 with Obser
   var selectedCategory: String = ""
   var playerNameFields: Seq[TextField] = uninitialized
   var selectedDiceIndices: Set[Int] = Set()
+  var multipleKniffelCheckBox: CheckBox = uninitialized
 
   override def update(event: KniffelEvent.Value): Unit = {
     Platform.runLater(event match {
@@ -64,8 +68,13 @@ class GUI @Inject() (controller: ControllerInterface) extends JFXApp3 with Obser
       val confirmButton = new Button("Confirm")
       confirmButton.onAction = _ => handlePlayerNames()
 
+      // Checkbox für mehrere Kniffel
+      multipleKniffelCheckBox = new CheckBox("Erlaube mehrere Kniffel")
+      multipleKniffelCheckBox.selected = false
+
       val vbox = new VBox(10) {
-        children = playerNameFields ++ Seq(confirmButton)
+        children =
+          playerNameFields ++ Seq(multipleKniffelCheckBox, confirmButton)
         padding = Insets(20)
         alignment = Pos.Center
       }
@@ -94,7 +103,11 @@ class GUI @Inject() (controller: ControllerInterface) extends JFXApp3 with Obser
       diceImageViews = createDiceImageViews(5)
 
       val diceBox = new VBox(10) {
-        children = Seq(rollButton, updateCategoryButton, diceResultsLabel) ++ diceImageViews
+        children = Seq(
+          rollButton,
+          updateCategoryButton,
+          diceResultsLabel
+        ) ++ diceImageViews
         padding = Insets(20)
         alignment = Pos.Center
       }
@@ -137,6 +150,10 @@ class GUI @Inject() (controller: ControllerInterface) extends JFXApp3 with Obser
   def handlePlayerNames(): Unit = {
     val names = playerNameFields.map(_.text.value.trim).filter(_.nonEmpty)
     names.foreach(controller.addPlayer)
+    val multipleKniffelAllowed = multipleKniffelCheckBox.selected.value
+    val scoreUpdaterType = if (multipleKniffelAllowed) "y" else "n"
+    controller.setScoreUpdater(scoreUpdaterType)
+
     val screenBounds = Screen.primary.visualBounds
     stage.scene = mainGameScene(screenBounds)
   }
@@ -234,7 +251,8 @@ class GUI @Inject() (controller: ControllerInterface) extends JFXApp3 with Obser
       if (selectedDiceIndices.contains(index + 1)) {
         imageView.fitHeight = 60
         imageView.fitWidth = 60
-        imageView.style = "-fx-effect: dropshadow(three-pass-box, rgba(0, 255, 0, 0.8), 10, 0, 0, 0);"
+        imageView.style =
+          "-fx-effect: dropshadow(three-pass-box, rgba(0, 255, 0, 0.8), 10, 0, 0, 0);"
       } else {
         imageView.fitHeight = 50
         imageView.fitWidth = 50
