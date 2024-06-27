@@ -10,23 +10,29 @@ import de.htwg.se.kniffel.model.modelImpl.{Player, ScoreCard}
 import play.api.libs.json._
 
 import scala.io.Source
+import java.io.{File, PrintWriter}
 
 class FileIoJsonImpl extends FileIoInterface {
 
   override def load: List[PlayerInterface] = {
-    val source: String = Source.fromFile("players.json").getLines.mkString
-    val json: JsValue = Json.parse(source)
-    val players = (json \ "players").as[List[JsValue]]
-    players.map { playerJson =>
-      val name = (playerJson \ "name").as[String]
-      val scoreCard = (playerJson \ "scoreCard").as[ScoreCardInterface]
-      Player(name, scoreCard)
+    val file = new File("players.json")
+    if (file.exists) {
+      val source: String = Source.fromFile(file).getLines.mkString
+      val json: JsValue = Json.parse(source)
+      val players = (json \ "players").as[List[JsValue]]
+      players.map { playerJson =>
+        val name = (playerJson \ "name").as[String]
+        val scoreCard = (playerJson \ "scoreCard").as[ScoreCardInterface]
+        Player(name, scoreCard)
+      }
+    } else {
+      List()
     }
   }
 
   override def save(players: List[PlayerInterface]): Unit = {
-    import java.io._
-    val pw = new PrintWriter(new File("players.json"))
+    val file = new File("players.json")
+    val pw = new PrintWriter(file)
     pw.write(Json.prettyPrint(playersToJson(players)))
     pw.close
   }

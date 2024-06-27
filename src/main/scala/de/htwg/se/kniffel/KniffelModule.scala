@@ -1,6 +1,6 @@
 package de.htwg.se.kniffel
 
-import com.google.inject.AbstractModule
+import com.google.inject.{AbstractModule, Provider}
 import com.google.inject.name.Names
 import com.google.inject.TypeLiteral
 import de.htwg.se.kniffel.controller._
@@ -21,17 +21,25 @@ class KniffelModule extends AbstractModule {
     bind(classOf[StateInterface]).annotatedWith(Names.named("RollingState")).to(classOf[RollingState])
     bind(classOf[StateInterface]).annotatedWith(Names.named("UpdateState")).to(classOf[UpdateState])
     bind(classOf[DiceInterface]).to(classOf[Dice])
-    bind(classOf[ControllerInterface]).to(classOf[Controller])
-    // bind(classOf[DiceInterface]).toProvider(classOf[DiceProvider])
     bind(classOf[PlayerInterface]).to(classOf[Player])
     bind(classOf[ScoreCardInterface]).to(classOf[ScoreCard])
     bind(classOf[ScoreUpdaterInterface]).annotatedWith(Names.named("MultiKniffel")).to(classOf[MultiKniffelScoreUpdater])
     bind(classOf[ScoreUpdaterInterface]).annotatedWith(Names.named("Standard")).to(classOf[StandardScoreUpdater])
     bind(classOf[UndoManagerInterface]).to(classOf[UndoManager])
-    bind(classOf[GUI]).toInstance(new GUI(new Controller)) // Beispiel-Injektion
-    bind(classOf[TUI]).toInstance(new TUI(new Controller)) // Beispiel-Injektion
     bind(new TypeLiteral[List[Int]]() {}).toInstance(List.empty[Int])
     bind(classOf[FileIoInterface]).annotatedWith(Names.named("json")).to(classOf[FileIoJsonImpl])
     bind(classOf[FileIoInterface]).annotatedWith(Names.named("xml")).to(classOf[FileIoXmlImpl])
+
+    // Provide Controller with json and xml providers
+    val jsonProvider = new Provider[FileIoJsonImpl] {
+      override def get(): FileIoJsonImpl = new FileIoJsonImpl
+    }
+    val xmlProvider = new Provider[FileIoXmlImpl] {
+      override def get(): FileIoXmlImpl = new FileIoXmlImpl
+    }
+
+    bind(classOf[ControllerInterface]).toInstance(new Controller(jsonProvider, xmlProvider))
+    bind(classOf[GUI]).toInstance(new GUI(new Controller(jsonProvider, xmlProvider))) // Beispiel-Injektion
+    bind(classOf[TUI]).toInstance(new TUI(new Controller(jsonProvider, xmlProvider))) // Beispiel-Injektion
   }
 }

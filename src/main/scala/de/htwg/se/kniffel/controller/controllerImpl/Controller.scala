@@ -7,8 +7,8 @@ import scala.util.{Try, Success, Failure}
 import de.htwg.se.kniffel.model.scoreUpdaterImpl._
 import de.htwg.se.kniffel.model.modelImpl._
 import de.htwg.se.kniffel.model.fileIoComponents.FileIoInterface
-import de.htwg.se.kniffel.model.fileIoComponents.fileIoJsonImpl.FileIo
-import de.htwg.se.kniffel.model.fileIoComponents.fileIoXmlImpl.FileIo
+import de.htwg.se.kniffel.model.fileIoComponents.fileIoJsonImpl.FileIoJsonImpl
+import de.htwg.se.kniffel.model.fileIoComponents.fileIoXmlImpl.FileIoXmlImpl
 import com.google.inject.{Inject, Provider}
 
 class Controller @Inject() (

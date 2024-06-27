@@ -8,28 +8,34 @@ import de.htwg.se.kniffel.model.fileIoComponents.FileIoInterface
 import de.htwg.se.kniffel.model.{PlayerInterface, ScoreCardInterface}
 import de.htwg.se.kniffel.model.modelImpl.{Player, ScoreCard}
 import scala.xml._
+import java.io.{File, PrintWriter}
 
 class FileIoXmlImpl extends FileIoInterface {
 
   override def load: List[PlayerInterface] = {
-    val xml = XML.loadFile("players.xml")
-    (xml \ "player").map { playerNode =>
-      val name = (playerNode \ "name").text
-      val scoreCard = new ScoreCard(scala.collection.mutable.LinkedHashMap(
-        (playerNode \ "scoreCard" \ "category").map { categoryNode =>
-          (categoryNode \ "@name").text -> (categoryNode.text match {
-            case "" => None
-            case x => Some(x.toInt)
-          })
-        }.toSeq*
-      ))
-      Player(name, scoreCard)
-    }.toList
+    val file = new File("players.xml")
+    if (file.exists) {
+      val xml = XML.loadFile(file)
+      (xml \ "player").map { playerNode =>
+        val name = (playerNode \ "name").text
+        val scoreCard = new ScoreCard(scala.collection.mutable.LinkedHashMap(
+          (playerNode \ "scoreCard" \ "category").map { categoryNode =>
+            (categoryNode \ "@name").text -> (categoryNode.text match {
+              case "" => None
+              case x => Some(x.toInt)
+            })
+          }.toSeq*
+        ))
+        Player(name, scoreCard)
+      }.toList
+    } else {
+      List()
+    }
   }
 
   override def save(players: List[PlayerInterface]): Unit = {
-    import java.io._
-    val pw = new PrintWriter(new File("players.xml"))
+    val file = new File("players.xml")
+    val pw = new PrintWriter(file)
     val prettyPrinter = new PrettyPrinter(120, 4)
     val xml = prettyPrinter.format(playersToXml(players))
     pw.write(xml)
