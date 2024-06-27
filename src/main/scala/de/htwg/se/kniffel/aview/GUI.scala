@@ -4,7 +4,11 @@ import de.htwg.se.kniffel.controller.ControllerInterface
 import de.htwg.se.kniffel.util.{Observer, KniffelEvent}
 import scalafx.application.JFXApp3
 import scalafx.scene.Scene
+<<<<<<< HEAD
 import scalafx.scene.layout.{Pane, VBox, HBox, StackPane, Background, BackgroundImage, BackgroundRepeat, BackgroundPosition, BackgroundSize}
+=======
+import scalafx.scene.layout.{Pane, VBox, HBox, StackPane, Priority}
+>>>>>>> 06f8d563037671e5b660ef97153942749896b5a0
 import scalafx.scene.control.{TableView, TableColumn, Button, Label}
 import scalafx.beans.property.StringProperty
 import scalafx.collections.ObservableBuffer
@@ -18,6 +22,8 @@ import scalafx.scene.control.CheckBox
 import scalafx.scene.control.TextField
 import java.nio.file.Paths
 import com.google.inject.Inject
+import scalafx.scene.paint.Color
+import scalafx.scene.text.Font
 
 class GUI @Inject() (controller: ControllerInterface)
     extends JFXApp3
@@ -51,10 +57,17 @@ class GUI @Inject() (controller: ControllerInterface)
       stage = new JFXApp3.PrimaryStage {
         title = "Kniffel"
         resizable = true
+<<<<<<< HEAD
         width = 900
         height = 600
         x = (screenBounds.width - 900) / 2
         y = (screenBounds.height - 600) / 2
+=======
+        onCloseRequest = _ => {
+          controller.saveCurrentState() // Speichern des aktuellen Zustands
+          sys.exit(0)
+        }
+>>>>>>> 06f8d563037671e5b660ef97153942749896b5a0
         scene = playerNameScene(screenBounds)
       }
 
@@ -66,6 +79,7 @@ class GUI @Inject() (controller: ControllerInterface)
 
   def playerNameScene(screenBounds: javafx.geometry.Rectangle2D): Scene = {
     new Scene(screenBounds.width, screenBounds.height) {
+<<<<<<< HEAD
       val pane = new StackPane()
 
       // Background image
@@ -78,11 +92,25 @@ class GUI @Inject() (controller: ControllerInterface)
       )
       pane.background = new Background(Array(backgroundImage))
 
+=======
+      stylesheets.add("file:src/main/resources/style.css")
+
+      val pane = new StackPane() {
+        id = "main-pane"
+        style = "-fx-background-image: url('file:src/main/resources/background.png'); -fx-background-size: cover; -fx-background-position: center;"
+        prefWidth = screenBounds.width
+        prefHeight = screenBounds.height
+      }
+>>>>>>> 06f8d563037671e5b660ef97153942749896b5a0
       playerNameFields = createPlayerNameFields(4)
 
-      val confirmButton = new Button("Confirm")
+      val confirmButton = new Button("Confirm") {
+        id = "confirm-button"
+        tooltip = "Click to confirm player names"
+      }
       confirmButton.onAction = _ => handlePlayerNames()
 
+<<<<<<< HEAD
       // Checkbox für mehrere Kniffel
       multipleKniffelCheckBox = new CheckBox("Erlaube mehrere Kniffel")
       multipleKniffelCheckBox.selected = false
@@ -127,25 +155,66 @@ class GUI @Inject() (controller: ControllerInterface)
       }
 
       pane.children = vbox
+=======
+      multipleKniffelCheckBox = new CheckBox("Erlaube mehrere Kniffel") {
+        selected = false
+        id = "kniffel-checkbox"
+      }
+
+      val vbox = new VBox(10) {
+        id = "player-name-pane"
+        children = playerNameFields ++ Seq(multipleKniffelCheckBox, confirmButton)
+        padding = Insets(20)
+        alignment = Pos.Center
+        maxWidth = screenBounds.width / 2 // Set the max width to one third of the screen width
+      }
+
+      val hbox = new HBox {
+        children = Seq(vbox)
+        alignment = Pos.Center
+        maxHeight = screenBounds.height / 2
+      }
+
+      StackPane.setAlignment(hbox, Pos.Center)
+      pane.children = hbox
+>>>>>>> 06f8d563037671e5b660ef97153942749896b5a0
       content = pane
     }
   }
 
   def mainGameScene(screenBounds: javafx.geometry.Rectangle2D): Scene = {
     new Scene(screenBounds.width, screenBounds.height) {
+      stylesheets.add("file:src/main/resources/style.css")
 
-      val pane = new StackPane()
+      val pane = new StackPane() {
+        id = "main-pane"
+        style = "-fx-background-image: url('file:src/main/resources/background.png'); -fx-background-size: cover; -fx-background-position: center;"
+        prefWidth = screenBounds.width
+        prefHeight = screenBounds.height
+      }
 
-      tableView = new TableView[(String, String)]()
-      tableView.onMouseClicked = _ => handleCategorySelection()
+      tableView = new TableView[(String, String)]() {
+        id = "score-table"
+        onMouseClicked = _ => handleCategorySelection()
+        prefHeight = 400
+        prefWidth = 600
+      }
 
-      rollButton = new Button("Roll Dice")
+      rollButton = new Button("Roll Dice") {
+        id = "roll-button"
+        tooltip = "Click to roll the dice"
+      }
       rollButton.onAction = _ => rollDice()
 
-      updateCategoryButton = new Button("Update Category")
+      updateCategoryButton = new Button("Update Category") {
+        id = "update-category-button"
+        tooltip = "Click to update the selected category"
+      }
       updateCategoryButton.onAction = _ => updateSelectedCategory()
 
-      diceResultsLabel = new Label("Dice Results: ")
+      diceResultsLabel = new Label("Dice Results: ") {
+        id = "dice-results-label"
+      }
 
       diceImageViews = createDiceImageViews(5)
 
@@ -170,17 +239,20 @@ class GUI @Inject() (controller: ControllerInterface)
         alignment = Pos.Center
       }
 
+      StackPane.setAlignment(outerVBox, Pos.Center)
       pane.children = outerVBox
       content = pane
 
-      // Hier wird die Methode updateDiceResults() aufgerufen, um die Würfel zu aktualisieren
       updateDiceResults()
     }
   }
 
   def createPlayerNameFields(count: Int): Seq[TextField] = {
     (1 to count).map { i =>
-      new TextField { promptText = s"Player $i Name" }
+      new TextField {
+        promptText = s"Player $i Name"
+        id = s"player-$i-name-field"
+      }
     }
   }
 
@@ -190,6 +262,7 @@ class GUI @Inject() (controller: ControllerInterface)
         fitHeight = 50
         fitWidth = 50
         onMouseClicked = _ => toggleDiceSelection(i)
+        id = s"dice-image-$i"
       }
     }
   }
