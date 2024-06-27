@@ -110,7 +110,7 @@
 }
 
 #main-pane {
-    -fx-background-image: url("file:src/main/resources/background.png");
+    -fx-background-image: url("file:src/main/resources/background1.png");
     -fx-background-size: cover;
     -fx-background-position: center;
 }

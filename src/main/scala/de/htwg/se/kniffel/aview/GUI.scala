@@ -4,11 +4,7 @@ import de.htwg.se.kniffel.controller.ControllerInterface
 import de.htwg.se.kniffel.util.{Observer, KniffelEvent}
 import scalafx.application.JFXApp3
 import scalafx.scene.Scene
-<<<<<<< HEAD
-import scalafx.scene.layout.{Pane, VBox, HBox, StackPane, Background, BackgroundImage, BackgroundRepeat, BackgroundPosition, BackgroundSize}
-=======
 import scalafx.scene.layout.{Pane, VBox, HBox, StackPane, Priority}
->>>>>>> 06f8d563037671e5b660ef97153942749896b5a0
 import scalafx.scene.control.{TableView, TableColumn, Button, Label}
 import scalafx.beans.property.StringProperty
 import scalafx.collections.ObservableBuffer
@@ -24,6 +20,7 @@ import java.nio.file.Paths
 import com.google.inject.Inject
 import scalafx.scene.paint.Color
 import scalafx.scene.text.Font
+import scalafx.scene.layout.AnchorPane
 
 class GUI @Inject() (controller: ControllerInterface)
     extends JFXApp3
@@ -57,17 +54,10 @@ class GUI @Inject() (controller: ControllerInterface)
       stage = new JFXApp3.PrimaryStage {
         title = "Kniffel"
         resizable = true
-<<<<<<< HEAD
-        width = 900
-        height = 600
-        x = (screenBounds.width - 900) / 2
-        y = (screenBounds.height - 600) / 2
-=======
         onCloseRequest = _ => {
           controller.saveCurrentState() // Speichern des aktuellen Zustands
           sys.exit(0)
         }
->>>>>>> 06f8d563037671e5b660ef97153942749896b5a0
         scene = playerNameScene(screenBounds)
       }
 
@@ -79,38 +69,21 @@ class GUI @Inject() (controller: ControllerInterface)
 
   def playerNameScene(screenBounds: javafx.geometry.Rectangle2D): Scene = {
     new Scene(screenBounds.width, screenBounds.height) {
-<<<<<<< HEAD
-      val pane = new StackPane()
-
-      // Background image
-      val backgroundImage = new BackgroundImage(
-        new Image("file:C:/Users/michi/OneDrive/Dokumente/HTWG/SoSe24/SE-Boger/Kniffel/src/main/resources/background.jpg"),
-        BackgroundRepeat.NoRepeat,
-        BackgroundRepeat.NoRepeat,
-        BackgroundPosition.Center,
-        new BackgroundSize(BackgroundSize.Auto, BackgroundSize.Auto, false, false, true, false)
-      )
-      pane.background = new Background(Array(backgroundImage))
-
-=======
       stylesheets.add("file:src/main/resources/style.css")
 
       val pane = new StackPane() {
         id = "main-pane"
-        style = "-fx-background-image: url('file:src/main/resources/background.png'); -fx-background-size: cover; -fx-background-position: center;"
+        style =
+          "-fx-background-image: url('file:src/main/resources/background1.png'); -fx-background-size: cover; -fx-background-position: center;"
         prefWidth = screenBounds.width
         prefHeight = screenBounds.height
       }
->>>>>>> 06f8d563037671e5b660ef97153942749896b5a0
+
       playerNameFields = createPlayerNameFields(4)
 
-      val confirmButton = new Button("Confirm") {
-        id = "confirm-button"
-        tooltip = "Click to confirm player names"
-      }
+      val confirmButton = new Button("Confirm")
       confirmButton.onAction = _ => handlePlayerNames()
 
-<<<<<<< HEAD
       // Checkbox für mehrere Kniffel
       multipleKniffelCheckBox = new CheckBox("Erlaube mehrere Kniffel")
       multipleKniffelCheckBox.selected = false
@@ -123,7 +96,7 @@ class GUI @Inject() (controller: ControllerInterface)
       val titleBox = new HBox {
         children = Seq(titleLabel)
         alignment = Pos.Center
-        padding = Insets(40)
+        padding = Insets(20)
       }
 
       val playerNamesVBox = new VBox(10) {
@@ -135,13 +108,13 @@ class GUI @Inject() (controller: ControllerInterface)
       val optionsVBox = new VBox(10) {
         children = Seq(multipleKniffelCheckBox)
         padding = Insets(20)
-        alignment = Pos.CenterRight
+        alignment = Pos.Center
       }
 
       val confirmButtonBox = new HBox {
         children = Seq(confirmButton)
         alignment = Pos.Center
-        padding = Insets(40)
+        padding = Insets(20)
       }
 
       val hbox = new HBox(50) {
@@ -155,29 +128,6 @@ class GUI @Inject() (controller: ControllerInterface)
       }
 
       pane.children = vbox
-=======
-      multipleKniffelCheckBox = new CheckBox("Erlaube mehrere Kniffel") {
-        selected = false
-        id = "kniffel-checkbox"
-      }
-
-      val vbox = new VBox(10) {
-        id = "player-name-pane"
-        children = playerNameFields ++ Seq(multipleKniffelCheckBox, confirmButton)
-        padding = Insets(20)
-        alignment = Pos.Center
-        maxWidth = screenBounds.width / 2 // Set the max width to one third of the screen width
-      }
-
-      val hbox = new HBox {
-        children = Seq(vbox)
-        alignment = Pos.Center
-        maxHeight = screenBounds.height / 2
-      }
-
-      StackPane.setAlignment(hbox, Pos.Center)
-      pane.children = hbox
->>>>>>> 06f8d563037671e5b660ef97153942749896b5a0
       content = pane
     }
   }
@@ -188,7 +138,8 @@ class GUI @Inject() (controller: ControllerInterface)
 
       val pane = new StackPane() {
         id = "main-pane"
-        style = "-fx-background-image: url('file:src/main/resources/background.png'); -fx-background-size: cover; -fx-background-position: center;"
+        style =
+          "-fx-background-image: url('file:src/main/resources/background1.png'); -fx-background-size: cover; -fx-background-position: center;"
         prefWidth = screenBounds.width
         prefHeight = screenBounds.height
       }
