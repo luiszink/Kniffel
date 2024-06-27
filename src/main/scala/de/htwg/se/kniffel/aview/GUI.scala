@@ -52,7 +52,11 @@ class GUI @Inject() (controller: ControllerInterface)
 
       stage = new JFXApp3.PrimaryStage {
         title = "Kniffel"
-        resizable = false
+        resizable = true
+        onCloseRequest = _ => {
+          controller.saveCurrentState() // Speichern des aktuellen Zustands
+          sys.exit(0)
+        }
         scene = playerNameScene(screenBounds)
       }
 

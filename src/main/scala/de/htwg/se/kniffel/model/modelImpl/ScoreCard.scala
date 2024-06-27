@@ -4,26 +4,25 @@ import com.google.inject.Inject
 import scala.collection.mutable.LinkedHashMap
 import de.htwg.se.kniffel.model.ScoreCardInterface
 
-class ScoreCard @Inject() extends ScoreCardInterface {
-  var categories: LinkedHashMap[String, Option[Int]] = LinkedHashMap(
-    "one" -> None,
-    "two" -> None,
-    "three" -> None,
-    "four" -> None,
-    "five" -> None,
-    "six" -> None,
-    "bonus" -> None,
-    "upperSectionScore" -> None,
-    "threeofakind" -> None,
-    "fourofakind" -> None,
-    "fullhouse" -> None,
-    "smallstraight" -> None,
-    "largestraight" -> None,
-    "kniffel" -> None,
-    "chance" -> None,
-    "lowerSectionScore" -> None,
-    "totalScore" -> None
-  )
+class ScoreCard @Inject() (var categories: LinkedHashMap[String, Option[Int]] = LinkedHashMap(
+  "one" -> None,
+  "two" -> None,
+  "three" -> None,
+  "four" -> None,
+  "five" -> None,
+  "six" -> None,
+  "bonus" -> None,
+  "upperSectionScore" -> None,
+  "threeofakind" -> None,
+  "fourofakind" -> None,
+  "fullhouse" -> None,
+  "smallstraight" -> None,
+  "largestraight" -> None,
+  "kniffel" -> None,
+  "chance" -> None,
+  "lowerSectionScore" -> None,
+  "totalScore" -> None
+)) extends ScoreCardInterface {
 
   def isComplete: Boolean = categories.filterKeys(Set("one", "two", "three", "four", "five", "six",
     "threeofakind", "fourofakind", "fullhouse", "smallstraight", "largestraight", "kniffel", "chance"))
