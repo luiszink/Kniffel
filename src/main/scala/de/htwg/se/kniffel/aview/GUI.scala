@@ -4,7 +4,8 @@ import de.htwg.se.kniffel.controller.ControllerInterface
 import de.htwg.se.kniffel.util.{Observer, KniffelEvent}
 import scalafx.application.JFXApp3
 import scalafx.scene.Scene
-import scalafx.scene.layout.{Pane, VBox, HBox, StackPane, Priority}
+import scalafx.scene.layout.{Pane, VBox, HBox, StackPane, Priority, BorderPane}
+import scalafx.scene.control.{TableView, TableColumn, Button, Label, Menu, MenuBar, MenuItem}
 import scalafx.scene.control.{TableView, TableColumn, Button, Label}
 import scalafx.beans.property.StringProperty
 import scalafx.collections.ObservableBuffer
@@ -136,7 +137,7 @@ class GUI @Inject() (controller: ControllerInterface)
     new Scene(screenBounds.width, screenBounds.height) {
       stylesheets.add("file:src/main/resources/style.css")
 
-      val pane = new StackPane() {
+      val pane = new BorderPane() {
         id = "main-pane"
         style =
           "-fx-background-image: url('file:src/main/resources/background1.png'); -fx-background-size: cover; -fx-background-position: center;"
@@ -150,6 +151,21 @@ class GUI @Inject() (controller: ControllerInterface)
         prefHeight = 400
         prefWidth = 600
       }
+
+      // Menüleiste mit den drei Strichen und Dropdown-Menü
+      val menuBar = new MenuBar()
+      val menu = new Menu("≡")
+      val undoMenuItem = new MenuItem("Undo")
+      val exitMenuItem = new MenuItem("Exit")
+      menu.items.addAll(undoMenuItem, exitMenuItem)
+      menuBar.menus.add(menu)
+
+      // Event-Handler für Menüeinträge
+      undoMenuItem.onAction = _ => {
+        controller.handleInput("undo")
+        updateDiceResults() // Aktualisiere die Anzeige nach dem Undo
+      }
+      exitMenuItem.onAction = _ => Platform.exit()
 
       rollButton = new Button("Roll Dice") {
         id = "roll-button"
@@ -190,8 +206,8 @@ class GUI @Inject() (controller: ControllerInterface)
         alignment = Pos.Center
       }
 
-      StackPane.setAlignment(outerVBox, Pos.Center)
-      pane.children = outerVBox
+      pane.top = menuBar
+      pane.center = outerVBox
       content = pane
 
       updateDiceResults()
