@@ -6,9 +6,16 @@ import de.htwg.se.kniffel.util._
 import scala.util.{Try, Success, Failure}
 import de.htwg.se.kniffel.model.scoreUpdaterImpl._
 import de.htwg.se.kniffel.model.modelImpl._
+import de.htwg.se.kniffel.model.fileIoComponents.FileIoInterface
+import de.htwg.se.kniffel.model.fileIoComponents.fileIoJsonImpl.FileIo
+import de.htwg.se.kniffel.model.fileIoComponents.fileIoXmlImpl.FileIo
 import com.google.inject.{Inject, Provider}
 
-class Controller @Inject() extends Observable with ControllerInterface {  
+class Controller @Inject() (
+  jsonProvider: Provider[FileIoJsonImpl],
+  xmlProvider: Provider[FileIoXmlImpl]
+) extends Observable with ControllerInterface {
+
   var repetitions = 2
   private var dice: DiceInterface = Dice(List.fill(5)(Dice.rollDice()))
   private var previousDice: Option[DiceInterface] = None
@@ -17,6 +24,9 @@ class Controller @Inject() extends Observable with ControllerInterface {
   private var scoreUpdater: ScoreUpdaterInterface = new StandardScoreUpdater
   private var currentState: StateInterface = new RollingState()  // Initial state
   private val undoManager = new UndoManager
+
+  private val fileIoJson: FileIoInterface = jsonProvider.get()
+  private val fileIoXml: FileIoInterface = xmlProvider.get()
 
   def getDice: List[Int] = dice.values
   def getPreviousDice: List[Int] = previousDice.map(_.values).getOrElse(List())
@@ -32,7 +42,7 @@ class Controller @Inject() extends Observable with ControllerInterface {
     dice = dice.keepDice(input)
     repetitions -= 1
     repetitions match {
-      case 0 => 
+      case 0 =>
         notifyObservers(KniffelEvent.PrintDice)
         setState(new UpdateState())
         repetitions = 2
@@ -43,6 +53,7 @@ class Controller @Inject() extends Observable with ControllerInterface {
   def addPlayer(name: String): Unit = {
     val player: PlayerInterface = Player(name)
     players = players :+ player
+    saveCurrentState() // Speichern des aktuellen Zustands
     notifyObservers(KniffelEvent.PlayerAdded)
   }
 
@@ -72,6 +83,7 @@ class Controller @Inject() extends Observable with ControllerInterface {
         println(s"${player.name}'s total score: ${player.scoreCard.categories("totalScore").getOrElse(0)}")
       case false =>
     }
+    saveCurrentState() // Speichern des aktuellen Zustands
     nextPlayer()
   }
 
@@ -99,8 +111,14 @@ class Controller @Inject() extends Observable with ControllerInterface {
       }
     } match {
       case Success(_) =>
-      case Failure(_) => 
+      case Failure(_) =>
         notifyObservers(KniffelEvent.InvalidInput)
     }
+  }
+
+  // Methode zum Speichern des aktuellen Zustands
+  def saveCurrentState(): Unit = {
+    fileIoJson.save(players)
+    fileIoXml.save(players)
   }
 }

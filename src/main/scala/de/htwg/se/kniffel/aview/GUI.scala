@@ -47,6 +47,10 @@ class GUI @Inject() (controller: ControllerInterface) extends JFXApp3 with Obser
       stage = new JFXApp3.PrimaryStage {
         title = "Kniffel"
         resizable = true
+        onCloseRequest = _ => {
+          controller.saveCurrentState() // Speichern des aktuellen Zustands
+          sys.exit(0)
+        }
         scene = playerNameScene(screenBounds)
       }
 

@@ -12,6 +12,9 @@ import de.htwg.se.kniffel.model.modelImpl._
 import de.htwg.se.kniffel.model.scoreUpdaterImpl._
 import de.htwg.se.kniffel.aview.{GUI, TUI}
 import scala.collection.immutable.List
+import de.htwg.se.kniffel.model.fileIoComponents.fileIoXmlImpl.FileIoXmlImpl
+import de.htwg.se.kniffel.model.fileIoComponents.fileIoJsonImpl.FileIoJsonImpl
+import de.htwg.se.kniffel.model.fileIoComponents.FileIoInterface
 
 class KniffelModule extends AbstractModule {
   override def configure(): Unit = {
@@ -28,5 +31,7 @@ class KniffelModule extends AbstractModule {
     bind(classOf[GUI]).toInstance(new GUI(new Controller)) // Beispiel-Injektion
     bind(classOf[TUI]).toInstance(new TUI(new Controller)) // Beispiel-Injektion
     bind(new TypeLiteral[List[Int]]() {}).toInstance(List.empty[Int])
+    bind(classOf[FileIoInterface]).annotatedWith(Names.named("json")).to(classOf[FileIoJsonImpl])
+    bind(classOf[FileIoInterface]).annotatedWith(Names.named("xml")).to(classOf[FileIoXmlImpl])
   }
 }

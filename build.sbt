@@ -7,12 +7,16 @@ lazy val root = project
     name := "kniffel",
     version := "0.1.0-SNAPSHOT",
     scalaVersion := scala3Version,
-    libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.14",
-    libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.14" % "test",
-    libraryDependencies += "org.scalafx" %% "scalafx" % "21.0.0-R32",
-    libraryDependencies += "org.scala-lang.modules" %% "scala-swing" % "3.0.0",
-    libraryDependencies += "net.codingwell" %% "scala-guice" % "7.0.0",
-    libraryDependencies += "com.google.inject" % "guice" % "5.0.1",
+    libraryDependencies ++= Seq(
+      "org.scalactic" %% "scalactic" % "3.2.14",
+      "org.scalatest" %% "scalatest" % "3.2.14" % "test",
+      "org.scalafx" %% "scalafx" % "21.0.0-R32",
+      "org.scala-lang.modules" %% "scala-swing" % "3.0.0",
+      "net.codingwell" %% "scala-guice" % "7.0.0",
+      "com.google.inject" % "guice" % "5.0.1",
+      "org.scala-lang.modules" %% "scala-xml" % "2.0.0",
+      "com.typesafe.play" %% "play-json" % "2.10.0-RC5"
+    ),
 
     libraryDependencies ++= {
       // Determine OS version of JavaFX binaries

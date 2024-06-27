@@ -17,4 +17,5 @@ trait ControllerInterface extends Observable {
   def updateScore(category: String): Unit
   def setState(state: StateInterface): Unit
   def handleInput(input: String): Unit
+  def saveCurrentState(): Unit
 }
