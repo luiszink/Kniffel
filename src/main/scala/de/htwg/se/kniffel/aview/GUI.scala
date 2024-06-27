@@ -4,7 +4,7 @@ import de.htwg.se.kniffel.controller.ControllerInterface
 import de.htwg.se.kniffel.util.{Observer, KniffelEvent}
 import scalafx.application.JFXApp3
 import scalafx.scene.Scene
-import scalafx.scene.layout.{Pane, VBox, HBox, StackPane}
+import scalafx.scene.layout.{Pane, VBox, HBox, StackPane, Priority}
 import scalafx.scene.control.{TableView, TableColumn, Button, Label}
 import scalafx.beans.property.StringProperty
 import scalafx.collections.ObservableBuffer
@@ -65,8 +65,12 @@ class GUI @Inject() (controller: ControllerInterface)
   def playerNameScene(screenBounds: javafx.geometry.Rectangle2D): Scene = {
     new Scene(screenBounds.width, screenBounds.height) {
       stylesheets.add("file:src/main/resources/style.css")
+
       val pane = new StackPane() {
         id = "main-pane"
+        style = "-fx-background-image: url('file:src/main/resources/background.png'); -fx-background-size: cover; -fx-background-position: center;"
+        prefWidth = screenBounds.width
+        prefHeight = screenBounds.height
       }
       playerNameFields = createPlayerNameFields(4)
 
@@ -86,9 +90,17 @@ class GUI @Inject() (controller: ControllerInterface)
         children = playerNameFields ++ Seq(multipleKniffelCheckBox, confirmButton)
         padding = Insets(20)
         alignment = Pos.Center
+        maxWidth = screenBounds.width / 2 // Set the max width to one third of the screen width
       }
 
-      pane.children = vbox
+      val hbox = new HBox {
+        children = Seq(vbox)
+        alignment = Pos.Center
+        maxHeight = screenBounds.height / 2
+      }
+
+      StackPane.setAlignment(hbox, Pos.Center)
+      pane.children = hbox
       content = pane
     }
   }
@@ -99,11 +111,16 @@ class GUI @Inject() (controller: ControllerInterface)
 
       val pane = new StackPane() {
         id = "main-pane"
+        style = "-fx-background-image: url('file:src/main/resources/background.png'); -fx-background-size: cover; -fx-background-position: center;"
+        prefWidth = screenBounds.width
+        prefHeight = screenBounds.height
       }
 
       tableView = new TableView[(String, String)]() {
         id = "score-table"
         onMouseClicked = _ => handleCategorySelection()
+        prefHeight = 400
+        prefWidth = 600
       }
 
       rollButton = new Button("Roll Dice") {
@@ -145,6 +162,7 @@ class GUI @Inject() (controller: ControllerInterface)
         alignment = Pos.Center
       }
 
+      StackPane.setAlignment(outerVBox, Pos.Center)
       pane.children = outerVBox
       content = pane
 

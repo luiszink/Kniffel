@@ -93,7 +93,7 @@
 
 #dice-results-label {
     -fx-font-size: 16px;
-    -fx-text-fill: #333;
+    -fx-text-fill: #cfcfcf;
 }
 
 #score-table {
@@ -116,7 +116,6 @@
 }
 
 #player-name-pane {
-    -fx-background-color: rgba(255, 255, 255, 0.8); /* optional: semi-transparent white background */
     -fx-padding: 20px;
     -fx-background-radius: 10px;
 }
