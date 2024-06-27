@@ -18,6 +18,8 @@ import scalafx.scene.control.CheckBox
 import scalafx.scene.control.TextField
 import java.nio.file.Paths
 import com.google.inject.Inject
+import scalafx.scene.paint.Color
+import scalafx.scene.text.Font
 
 class GUI @Inject() (controller: ControllerInterface)
     extends JFXApp3
@@ -50,7 +52,7 @@ class GUI @Inject() (controller: ControllerInterface)
 
       stage = new JFXApp3.PrimaryStage {
         title = "Kniffel"
-        resizable = true
+        resizable = false
         scene = playerNameScene(screenBounds)
       }
 
@@ -62,19 +64,26 @@ class GUI @Inject() (controller: ControllerInterface)
 
   def playerNameScene(screenBounds: javafx.geometry.Rectangle2D): Scene = {
     new Scene(screenBounds.width, screenBounds.height) {
-      val pane = new StackPane()
+      stylesheets.add("file:src/main/resources/style.css")
+      val pane = new StackPane() {
+        id = "main-pane"
+      }
       playerNameFields = createPlayerNameFields(4)
 
-      val confirmButton = new Button("Confirm")
+      val confirmButton = new Button("Confirm") {
+        id = "confirm-button"
+        tooltip = "Click to confirm player names"
+      }
       confirmButton.onAction = _ => handlePlayerNames()
 
-      // Checkbox für mehrere Kniffel
-      multipleKniffelCheckBox = new CheckBox("Erlaube mehrere Kniffel")
-      multipleKniffelCheckBox.selected = false
+      multipleKniffelCheckBox = new CheckBox("Erlaube mehrere Kniffel") {
+        selected = false
+        id = "kniffel-checkbox"
+      }
 
       val vbox = new VBox(10) {
-        children =
-          playerNameFields ++ Seq(multipleKniffelCheckBox, confirmButton)
+        id = "player-name-pane"
+        children = playerNameFields ++ Seq(multipleKniffelCheckBox, confirmButton)
         padding = Insets(20)
         alignment = Pos.Center
       }
@@ -86,19 +95,32 @@ class GUI @Inject() (controller: ControllerInterface)
 
   def mainGameScene(screenBounds: javafx.geometry.Rectangle2D): Scene = {
     new Scene(screenBounds.width, screenBounds.height) {
+      stylesheets.add("file:src/main/resources/style.css")
 
-      val pane = new StackPane()
+      val pane = new StackPane() {
+        id = "main-pane"
+      }
 
-      tableView = new TableView[(String, String)]()
-      tableView.onMouseClicked = _ => handleCategorySelection()
+      tableView = new TableView[(String, String)]() {
+        id = "score-table"
+        onMouseClicked = _ => handleCategorySelection()
+      }
 
-      rollButton = new Button("Roll Dice")
+      rollButton = new Button("Roll Dice") {
+        id = "roll-button"
+        tooltip = "Click to roll the dice"
+      }
       rollButton.onAction = _ => rollDice()
 
-      updateCategoryButton = new Button("Update Category")
+      updateCategoryButton = new Button("Update Category") {
+        id = "update-category-button"
+        tooltip = "Click to update the selected category"
+      }
       updateCategoryButton.onAction = _ => updateSelectedCategory()
 
-      diceResultsLabel = new Label("Dice Results: ")
+      diceResultsLabel = new Label("Dice Results: ") {
+        id = "dice-results-label"
+      }
 
       diceImageViews = createDiceImageViews(5)
 
@@ -126,14 +148,16 @@ class GUI @Inject() (controller: ControllerInterface)
       pane.children = outerVBox
       content = pane
 
-      // Hier wird die Methode updateDiceResults() aufgerufen, um die Würfel zu aktualisieren
       updateDiceResults()
     }
   }
 
   def createPlayerNameFields(count: Int): Seq[TextField] = {
     (1 to count).map { i =>
-      new TextField { promptText = s"Player $i Name" }
+      new TextField {
+        promptText = s"Player $i Name"
+        id = s"player-$i-name-field"
+      }
     }
   }
 
@@ -143,6 +167,7 @@ class GUI @Inject() (controller: ControllerInterface)
         fitHeight = 50
         fitWidth = 50
         onMouseClicked = _ => toggleDiceSelection(i)
+        id = s"dice-image-$i"
       }
     }
   }
