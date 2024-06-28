@@ -47,7 +47,11 @@ class Controller @Inject() (
         notifyObservers(KniffelEvent.PrintDice)
         setState(new UpdateState())
         repetitions = 2
-      case n if n > 0 => notifyObservers(KniffelEvent.PrintDice)
+        notifyObservers(
+          KniffelEvent.DisableRollButton
+        )
+      case n if n > 0 =>
+        notifyObservers(KniffelEvent.PrintDice)
     }
   }
 
@@ -66,7 +70,7 @@ class Controller @Inject() (
     setState(new RollingState())
     notifyObservers(KniffelEvent.PrintScoreCard)
     notifyObservers(KniffelEvent.PrintDice)
-    notifyObservers(KniffelEvent.NextPlayer) // Notify GUI to reset selected dice
+    notifyObservers(KniffelEvent.NextPlayer)
   }
 
   def setScoreUpdater(userInput: String): Unit = {
@@ -81,11 +85,14 @@ class Controller @Inject() (
     player.scoreCard.isComplete match {
       case true =>
         player.scoreCard.calculateTotalScore()
-        println(s"${player.name}'s total score: ${player.scoreCard.categories("totalScore").getOrElse(0)}")
+        println(
+          s"${player.name}'s total score: ${player.scoreCard.categories("totalScore").getOrElse(0)}"
+        )
       case false =>
     }
     saveCurrentState() // Speichern des aktuellen Zustands
     nextPlayer()
+    notifyObservers(KniffelEvent.EnableRollButton)
   }
 
   def setState(state: StateInterface): Unit = {
@@ -98,12 +105,13 @@ class Controller @Inject() (
         undoManager.undoStep
         previousDice match {
           case Some(pdice) => dice = pdice
-          case None => // Do nothing
+          case None        => // Do nothing
         }
         setState(new UpdateState())
         currentPlayerIndex match {
           case 0 => currentPlayerIndex = players.length - 1
-          case _ => currentPlayerIndex = (currentPlayerIndex - 1) % players.length
+          case _ =>
+            currentPlayerIndex = (currentPlayerIndex - 1) % players.length
         }
         notifyObservers(KniffelEvent.PrintScoreCard)
         notifyObservers(KniffelEvent.PrintDiceUndo)

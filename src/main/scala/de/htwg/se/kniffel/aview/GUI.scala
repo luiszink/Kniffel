@@ -49,11 +49,13 @@ class GUI @Inject() (controller: ControllerInterface)
   override def update(event: KniffelEvent.Value): Unit = {
     Platform.runLater {
       event match {
-        case KniffelEvent.PrintScoreCard => scorecard()
-        case KniffelEvent.PlayerAdded    => scorecard()
-        case KniffelEvent.PrintDice      => updateDiceResults()
-        case KniffelEvent.NextPlayer     => resetSelectedDice()
-        case _                           => println("")
+        case KniffelEvent.PrintScoreCard    => scorecard()
+        case KniffelEvent.PlayerAdded       => scorecard()
+        case KniffelEvent.PrintDice         => updateDiceResults()
+        case KniffelEvent.NextPlayer        => resetSelectedDice()
+        case KniffelEvent.DisableRollButton => rollButton.disable = true
+        case KniffelEvent.EnableRollButton  => rollButton.disable = false
+        case _                              => println("")
       }
     }
   }
@@ -182,6 +184,7 @@ class GUI @Inject() (controller: ControllerInterface)
         tooltip = "Click to roll the dice"
       }
       rollButton.onAction = _ => rollDice()
+      rollButton.disable = false // Ensure the button is enabled initially
 
       updateCategoryButton = new Button("Update Category") {
         id = "update-category-button"
@@ -207,11 +210,11 @@ class GUI @Inject() (controller: ControllerInterface)
       diceImageViews(0).layoutX = 65
       diceImageViews(0).layoutY = 20
 
-      diceImageViews(1).layoutX = 130 
+      diceImageViews(1).layoutX = 130
       diceImageViews(1).layoutY = 60
 
       diceImageViews(2).layoutX = 60
-      diceImageViews(2).layoutY = 124 
+      diceImageViews(2).layoutY = 124
 
       diceImageViews(3).layoutX = 0
       diceImageViews(3).layoutY = 60

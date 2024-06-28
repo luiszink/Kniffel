@@ -9,11 +9,14 @@ class Observable {
 
   def add(observer: Observer): Unit = observers = observer :: observers
 
-  def remove(observer: Observer): Unit = observers = observers.filterNot(o => o == observer)
+  def remove(observer: Observer): Unit = observers =
+    observers.filterNot(o => o == observer)
 
-  def notifyObservers(event: KniffelEvent.Value): Unit = observers.foreach(o => o.update(event))
+  def notifyObservers(event: KniffelEvent.Value): Unit =
+    observers.foreach(o => o.update(event))
 }
 
 object KniffelEvent extends Enumeration {
-  val PrintScoreCard, PlayerAdded, PrintDice, PrintDiceUndo, InvalidInput, NextPlayer = Value
+  val PrintScoreCard, PlayerAdded, PrintDice, PrintDiceUndo, InvalidInput,
+      NextPlayer, DisableRollButton, EnableRollButton = Value
 }
