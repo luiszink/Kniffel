@@ -23,7 +23,7 @@ class Controller @Inject() (
   private var players: List[PlayerInterface] = List()
   private var currentPlayerIndex: Int = 0
   private var scoreUpdater: ScoreUpdaterInterface = new StandardScoreUpdater
-  private var currentState: StateInterface = new RollingState() // Initial state
+  private var currentState: StateInterface = new RollingState()
   private val undoManager = new UndoManager
 
   private val fileIoJson: FileIoInterface = jsonProvider.get()
