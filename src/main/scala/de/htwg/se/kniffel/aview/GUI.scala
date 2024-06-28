@@ -199,16 +199,32 @@ class GUI @Inject() (controller: ControllerInterface)
         style = "-fx-font-size: 18px;" // Adjust the font size as needed
       }
 
-      val diceBox = new HBox(10) {
-        children = diceImageViews
-        padding = Insets(20)
-        alignment = Pos.Center
+      val dicePane = new Pane() {
+        prefHeight = 200
+        prefWidth = 200
       }
+
+      diceImageViews(0).layoutX = 65
+      diceImageViews(0).layoutY = 20
+
+      diceImageViews(1).layoutX = 130 
+      diceImageViews(1).layoutY = 60
+
+      diceImageViews(2).layoutX = 60
+      diceImageViews(2).layoutY = 124 
+
+      diceImageViews(3).layoutX = 0
+      diceImageViews(3).layoutY = 60
+
+      diceImageViews(4).layoutX = 125
+      diceImageViews(4).layoutY = 134
+
+      dicePane.children.addAll(diceImageViews.map(_.delegate): _*)
 
       val controlBox = new VBox(10) {
         children = Seq(
           repetitionsLabel,
-          diceBox,
+          dicePane,
           rollButton,
           updateCategoryButton
         )
