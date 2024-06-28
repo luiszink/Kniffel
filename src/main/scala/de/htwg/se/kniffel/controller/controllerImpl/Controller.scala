@@ -46,10 +46,7 @@ class Controller @Inject() (
       case 0 =>
         notifyObservers(KniffelEvent.PrintDice)
         setState(new UpdateState())
-        repetitions = 2
-        notifyObservers(
-          KniffelEvent.DisableRollButton
-        )
+        notifyObservers(KniffelEvent.DisableRollButton)
       case n if n > 0 =>
         notifyObservers(KniffelEvent.PrintDice)
     }
@@ -58,7 +55,7 @@ class Controller @Inject() (
   def addPlayer(name: String): Unit = {
     val player: PlayerInterface = Player(name)
     players = players :+ player
-    saveCurrentState() // Speichern des aktuellen Zustands
+    saveCurrentState()
     notifyObservers(KniffelEvent.PlayerAdded)
   }
 
@@ -75,6 +72,7 @@ class Controller @Inject() (
 
   def setScoreUpdater(userInput: String): Unit = {
     scoreUpdater = ScoreUpdaterFactory.createScoreUpdater(userInput)
+    notifyObservers(KniffelEvent.MultiKniffel)
   }
 
   def updateScore(category: String): Unit = {
@@ -90,7 +88,8 @@ class Controller @Inject() (
         )
       case false =>
     }
-    saveCurrentState() // Speichern des aktuellen Zustands
+    repetitions = 2
+    saveCurrentState()
     nextPlayer()
     notifyObservers(KniffelEvent.EnableRollButton)
   }

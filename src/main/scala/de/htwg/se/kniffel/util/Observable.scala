@@ -18,5 +18,5 @@ class Observable {
 
 object KniffelEvent extends Enumeration {
   val PrintScoreCard, PlayerAdded, PrintDice, PrintDiceUndo, InvalidInput,
-      NextPlayer, DisableRollButton, EnableRollButton = Value
+      NextPlayer, DisableRollButton, EnableRollButton, MultiKniffel = Value
 }

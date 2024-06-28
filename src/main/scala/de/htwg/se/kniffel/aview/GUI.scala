@@ -51,6 +51,7 @@ class GUI @Inject() (controller: ControllerInterface)
       event match {
         case KniffelEvent.PrintScoreCard    => scorecard()
         case KniffelEvent.PlayerAdded       => scorecard()
+        case KniffelEvent.MultiKniffel      => startSync()
         case KniffelEvent.PrintDice         => updateDiceResults()
         case KniffelEvent.NextPlayer        => resetSelectedDice()
         case KniffelEvent.DisableRollButton => rollButton.disable = true
@@ -274,15 +275,18 @@ class GUI @Inject() (controller: ControllerInterface)
     }
   }
 
+  def startSync(): Unit = {
+    val screenBounds = Screen.primary.visualBounds
+    stage.scene = gameScene(screenBounds)
+    scorecard()
+  }
+
   def handlePlayerNames(): Unit = {
     val names = playerNameFields.map(_.text.value.trim).filter(_.nonEmpty)
     names.foreach(controller.addPlayer)
     val multipleKniffelAllowed = multipleKniffelCheckBox.selected.value
     val scoreUpdaterType = if (multipleKniffelAllowed) "y" else "n"
     controller.setScoreUpdater(scoreUpdaterType)
-
-    val screenBounds = Screen.primary.visualBounds
-    stage.scene = gameScene(screenBounds)
   }
 
   def handleCategorySelection(): Unit = {
