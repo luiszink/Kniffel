@@ -38,13 +38,13 @@ class GUI @Inject() (controller: ControllerInterface)
 
   var tableView: TableView[(String, String)] = uninitialized
   var rollButton: Button = uninitialized
-  var diceResultsLabel: Label = uninitialized
   var diceImageViews: Seq[ImageView] = uninitialized
   var updateCategoryButton: Button = uninitialized
   var selectedCategory: String = ""
   var playerNameFields: Seq[TextField] = uninitialized
   var selectedDiceIndices: Set[Int] = Set()
   var multipleKniffelCheckBox: CheckBox = uninitialized
+  var repetitionsLabel: Label = uninitialized
 
   override def update(event: KniffelEvent.Value): Unit = {
     Platform.runLater {
@@ -101,7 +101,7 @@ class GUI @Inject() (controller: ControllerInterface)
 
       // Title Label
       val titleLabel = new Label("Kniffel") {
-        style = "-fx-font-size: 24px; -fx-font-weight: bold;"
+        style = "-fx-font-size: 36px; -fx-font-weight: bold;"
       }
 
       val titleBox = new HBox {
@@ -189,24 +189,35 @@ class GUI @Inject() (controller: ControllerInterface)
       }
       updateCategoryButton.onAction = _ => updateSelectedCategory()
 
-      diceResultsLabel = new Label("Dice Results: ") {
-        id = "dice-results-label"
-      }
-
       diceImageViews = createDiceImageViews(5)
 
-      val diceBox = new VBox(10) {
+      // Repetitions Label
+      repetitionsLabel = new Label(
+        s"Remaining Rolls: ${controller.repetitions}"
+      ) {
+        id = "repetitions-label"
+        style = "-fx-font-size: 18px;" // Adjust the font size as needed
+      }
+
+      val diceBox = new HBox(10) {
+        children = diceImageViews
+        padding = Insets(20)
+        alignment = Pos.Center
+      }
+
+      val controlBox = new VBox(10) {
         children = Seq(
+          repetitionsLabel,
+          diceBox,
           rollButton,
-          updateCategoryButton,
-          diceResultsLabel
-        ) ++ diceImageViews
+          updateCategoryButton
+        )
         padding = Insets(20)
         alignment = Pos.Center
       }
 
       val hbox = new HBox(20) {
-        children = Seq(tableView, diceBox)
+        children = Seq(tableView, controlBox)
         padding = Insets(20)
         alignment = Pos.Center
       }
@@ -224,15 +235,6 @@ class GUI @Inject() (controller: ControllerInterface)
     }
   }
 
-  def createPlayerNameFields(count: Int): Seq[TextField] = {
-    (1 to count).map { i =>
-      new TextField {
-        promptText = s"Player $i Name"
-        id = s"player-$i-name-field"
-      }
-    }
-  }
-
   def createDiceImageViews(count: Int): Seq[ImageView] = {
     (1 to count).map { i =>
       new ImageView {
@@ -240,6 +242,15 @@ class GUI @Inject() (controller: ControllerInterface)
         fitWidth = 50
         onMouseClicked = _ => toggleDiceSelection(i)
         id = s"dice-image-$i"
+      }
+    }
+  }
+
+  def createPlayerNameFields(count: Int): Seq[TextField] = {
+    (1 to count).map { i =>
+      new TextField {
+        promptText = s"Player $i Name"
+        id = s"player-$i-name-field"
       }
     }
   }
@@ -344,7 +355,7 @@ class GUI @Inject() (controller: ControllerInterface)
 
   def updateDiceResults(): Unit = {
     val diceResults = controller.getDice
-    diceResultsLabel.text = s"Dice Results: ${diceResults.mkString(", ")}"
+    repetitionsLabel.text = s"Remaining Rolls: ${controller.repetitions}"
     diceImageViews.zipWithIndex.foreach { case (imageView, index) =>
       val result = diceResults(index)
       imageView.image = new Image(getDiceImagePath(result))
