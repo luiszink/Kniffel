@@ -6,6 +6,7 @@ import scalafx.application.JFXApp3
 import scalafx.scene.Scene
 import scalafx.scene.layout.{Pane, VBox, HBox, StackPane, Priority, BorderPane}
 import scalafx.scene.control.{TableView, TableColumn, Button, Label, Menu, MenuBar, MenuItem}
+import scalafx.scene.control.{TableView, TableColumn, Button, Label}
 import scalafx.beans.property.StringProperty
 import scalafx.collections.ObservableBuffer
 import scalafx.application.Platform
@@ -20,8 +21,10 @@ import java.nio.file.Paths
 import com.google.inject.Inject
 import scalafx.scene.paint.Color
 import scalafx.scene.text.Font
+import scalafx.scene.layout.AnchorPane
 
-class GUI @Inject() (controller: ControllerInterface) extends JFXApp3 with Observer {
+class GUI @Inject() (controller: ControllerInterface) extends JFXApp3
+with Observer {
   controller.add(this)
 
   var tableView: TableView[(String, String)] = uninitialized
@@ -40,7 +43,6 @@ class GUI @Inject() (controller: ControllerInterface) extends JFXApp3 with Obser
       case KniffelEvent.PlayerAdded    => scorecard()
       case KniffelEvent.PrintDice      => updateDiceResults()
       case KniffelEvent.NextPlayer     => resetSelectedDice()
-      case KniffelEvent.PrintDiceUndo  => updateDiceResults() // Neue Methode hinzufügen
       case _                           => println("")
     })
   }
@@ -71,7 +73,8 @@ class GUI @Inject() (controller: ControllerInterface) extends JFXApp3 with Obser
 
       val pane = new StackPane() {
         id = "main-pane"
-        style = "-fx-background-image: url('file:src/main/resources/background1.png'); -fx-background-size: cover; -fx-background-position: center;"
+        style =
+          "-fx-background-image: url('file:src/main/resources/background1.png'); -fx-background-size: cover; -fx-background-position: center;"
         prefWidth = screenBounds.width
         prefHeight = screenBounds.height
       }
@@ -135,7 +138,8 @@ class GUI @Inject() (controller: ControllerInterface) extends JFXApp3 with Obser
 
       val pane = new BorderPane() {
         id = "main-pane"
-        style = "-fx-background-image: url('file:src/main/resources/background1.png'); -fx-background-size: cover; -fx-background-position: center;"
+        style =
+          "-fx-background-image: url('file:src/main/resources/background1.png'); -fx-background-size: cover; -fx-background-position: center;"
         prefWidth = screenBounds.width
         prefHeight = screenBounds.height
       }
@@ -333,7 +337,8 @@ class GUI @Inject() (controller: ControllerInterface) extends JFXApp3 with Obser
       if (selectedDiceIndices.contains(index + 1)) {
         imageView.fitHeight = 60
         imageView.fitWidth = 60
-        imageView.style = "-fx-effect: dropshadow(three-pass-box, rgba(0, 255, 0, 0.8), 10, 0, 0, 0);"
+        imageView.style =
+          "-fx-effect: dropshadow(three-pass-box, rgba(0, 255, 0, 0.8), 10, 0, 0, 0);"
       } else {
         imageView.fitHeight = 50
         imageView.fitWidth = 50
