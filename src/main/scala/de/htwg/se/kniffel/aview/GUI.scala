@@ -5,7 +5,15 @@ import de.htwg.se.kniffel.util.{Observer, KniffelEvent}
 import scalafx.application.JFXApp3
 import scalafx.scene.Scene
 import scalafx.scene.layout.{Pane, VBox, HBox, StackPane, Priority, BorderPane}
-import scalafx.scene.control.{TableView, TableColumn, Button, Label, Menu, MenuBar, MenuItem}
+import scalafx.scene.control.{
+  TableView,
+  TableColumn,
+  Button,
+  Label,
+  Menu,
+  MenuBar,
+  MenuItem
+}
 import scalafx.scene.control.{TableView, TableColumn, Button, Label}
 import scalafx.beans.property.StringProperty
 import scalafx.collections.ObservableBuffer
@@ -23,8 +31,9 @@ import scalafx.scene.paint.Color
 import scalafx.scene.text.Font
 import scalafx.scene.layout.AnchorPane
 
-class GUI @Inject() (controller: ControllerInterface) extends JFXApp3
-with Observer {
+class GUI @Inject() (controller: ControllerInterface)
+    extends JFXApp3
+    with Observer {
   controller.add(this)
 
   var tableView: TableView[(String, String)] = uninitialized
@@ -38,13 +47,15 @@ with Observer {
   var multipleKniffelCheckBox: CheckBox = uninitialized
 
   override def update(event: KniffelEvent.Value): Unit = {
-    Platform.runLater(event match {
-      case KniffelEvent.PrintScoreCard => scorecard()
-      case KniffelEvent.PlayerAdded    => scorecard()
-      case KniffelEvent.PrintDice      => updateDiceResults()
-      case KniffelEvent.NextPlayer     => resetSelectedDice()
-      case _                           => println("")
-    })
+    Platform.runLater {
+      event match {
+        case KniffelEvent.PrintScoreCard => scorecard()
+        case KniffelEvent.PlayerAdded    => scorecard()
+        case KniffelEvent.PrintDice      => updateDiceResults()
+        case KniffelEvent.NextPlayer     => resetSelectedDice()
+        case _                           => println("")
+      }
+    }
   }
 
   override def start(): Unit = {
@@ -58,7 +69,7 @@ with Observer {
           controller.saveCurrentState() // Speichern des aktuellen Zustands
           sys.exit(0)
         }
-        scene = playerNameScene(screenBounds)
+        scene = startScene(screenBounds)
       }
 
     } catch {
@@ -67,7 +78,7 @@ with Observer {
     }
   }
 
-  def playerNameScene(screenBounds: javafx.geometry.Rectangle2D): Scene = {
+  def startScene(screenBounds: javafx.geometry.Rectangle2D): Scene = {
     new Scene(screenBounds.width, screenBounds.height) {
       stylesheets.add("file:src/main/resources/style.css")
 
@@ -132,7 +143,7 @@ with Observer {
     }
   }
 
-  def mainGameScene(screenBounds: javafx.geometry.Rectangle2D): Scene = {
+  def gameScene(screenBounds: javafx.geometry.Rectangle2D): Scene = {
     new Scene(screenBounds.width, screenBounds.height) {
       stylesheets.add("file:src/main/resources/style.css")
 
@@ -148,7 +159,7 @@ with Observer {
         id = "score-table"
         onMouseClicked = _ => handleCategorySelection()
         prefHeight = 400
-        prefWidth = 600
+        prefWidth = 400
       }
 
       // Menüleiste mit den drei Strichen und Dropdown-Menü
@@ -241,7 +252,7 @@ with Observer {
     controller.setScoreUpdater(scoreUpdaterType)
 
     val screenBounds = Screen.primary.visualBounds
-    stage.scene = mainGameScene(screenBounds)
+    stage.scene = gameScene(screenBounds)
   }
 
   def handleCategorySelection(): Unit = {
@@ -249,49 +260,52 @@ with Observer {
   }
 
   def scorecard(): Unit = {
-    tableView.columns.clear()
-    val score = controller.getCurrentPlayer.scoreCard
-    val players = controller.getPlayers
-    val categoryColumn =
-      new TableColumn[(String, String), String]("Category") {
-        cellValueFactory = { cellData =>
-          new StringProperty(this, "category", cellData.value._1)
+    if (tableView != null) {
+      tableView.columns.clear()
+      val score = controller.getCurrentPlayer.scoreCard
+      val players = controller.getPlayers
+      val categoryColumn =
+        new TableColumn[(String, String), String]("Category") {
+          cellValueFactory = { cellData =>
+            new StringProperty(this, "category", cellData.value._1)
+          }
+        }
+
+      val playerColumns: List[
+        javafx.scene.control.TableColumn[(String, String), String]
+      ] = controller.getPlayers.map { player =>
+        new TableColumn[(String, String), String](player.name) {
+          cellValueFactory = { cellData =>
+            val category = cellData.value._1
+            val score = controller.getPlayers
+              .find(_.name == player.name)
+              .flatMap(_.scoreCard.categories.get(category))
+              .map(p => if p.isDefined then p.get.toString() else "-")
+            new StringProperty(
+              this,
+              "score",
+              score.getOrElse("-")
+            )
+          }
         }
       }
 
-    val playerColumns: List[
-      javafx.scene.control.TableColumn[(String, String), String]
-    ] = controller.getPlayers.map { player =>
-      new TableColumn[(String, String), String](player.name) {
-        cellValueFactory = { cellData =>
-          val category = cellData.value._1
-          val score = controller.getPlayers
-            .find(_.name == player.name)
-            .flatMap(_.scoreCard.categories.get(category))
-            .map(p => if p.isDefined then p.get.toString() else "-")
-          new StringProperty(
-            this,
-            "score",
-            score.getOrElse("-")
-          )
-        }
-      }
+      tableView.columns ++= List(categoryColumn)
+      tableView.columns ++= playerColumns
+
+      val allCategories =
+        controller.getPlayers.flatMap(_.scoreCard.categories.keys).distinct
+      val scoreCardEntries: ObservableBuffer[(String, String)] =
+        ObservableBuffer(
+          allCategories.map { category =>
+            category -> controller.getPlayers.head.scoreCard.categories
+              .getOrElse(category, "-")
+              .toString
+          }: _*
+        )
+
+      tableView.items = scoreCardEntries
     }
-
-    tableView.columns ++= List(categoryColumn)
-    tableView.columns ++= playerColumns
-
-    val allCategories =
-      controller.getPlayers.flatMap(_.scoreCard.categories.keys).distinct
-    val scoreCardEntries: ObservableBuffer[(String, String)] = ObservableBuffer(
-      allCategories.map { category =>
-        category -> controller.getPlayers.head.scoreCard.categories
-          .getOrElse(category, "-")
-          .toString
-      }: _*
-    )
-
-    tableView.items = scoreCardEntries
   }
 
   def rollDice(): Unit = {

@@ -10,6 +10,17 @@ class TUI @Inject() (controller: ControllerInterface) extends Observer {
 
   controller.add(this)
 
+  override def update(event: KniffelEvent.Value): Unit = {
+    event match {
+      case KniffelEvent.PrintDice      => println(printDice())
+      case KniffelEvent.PrintDiceUndo  => println(printDiceUndo())
+      case KniffelEvent.PrintScoreCard => println(printScoreCard())
+      case KniffelEvent.PlayerAdded    => println("")
+      case KniffelEvent.InvalidInput   => println("Invalid input! Please try again.")
+      case _                           => println("")
+    }
+  }
+  
   def addPlayers(): Unit = {
     println("Enter player names (comma-separated):")
     val input = StdIn.readLine()
@@ -59,17 +70,6 @@ class TUI @Inject() (controller: ControllerInterface) extends Observer {
           val input = StdIn.readLine()
           controller.handleInput(input)
       }
-    }
-  }
-
-  override def update(event: KniffelEvent.Value): Unit = {
-    event match {
-      case KniffelEvent.PrintDice      => println(printDice())
-      case KniffelEvent.PrintDiceUndo  => println(printDiceUndo())
-      case KniffelEvent.PrintScoreCard => println(printScoreCard())
-      case KniffelEvent.PlayerAdded    => println("playerSync TUI")
-      case KniffelEvent.InvalidInput   => println("Invalid input! Please try again.")
-      case _                           => println("Tui update")
     }
   }
 
