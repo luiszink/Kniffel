@@ -68,7 +68,7 @@ class TUI @Inject() (controller: ControllerInterface) extends Observer {
       case KniffelEvent.PrintScoreCard => println(printScoreCard())
       case KniffelEvent.PlayerAdded    => println("")
       case KniffelEvent.InvalidInput   => println("Invalid input! Please try again.")
-      case _ => println("")
+      case _                           => println("Tui update")
     }
   }
 
