@@ -7,6 +7,7 @@ import scala.util.{Try, Success, Failure}
 import com.google.inject.Inject
 
 class TUI @Inject() (controller: ControllerInterface) extends Observer {
+
   controller.add(this)
 
   def addPlayers(): Unit = {
@@ -66,7 +67,7 @@ class TUI @Inject() (controller: ControllerInterface) extends Observer {
       case KniffelEvent.PrintDice      => println(printDice())
       case KniffelEvent.PrintDiceUndo  => println(printDiceUndo())
       case KniffelEvent.PrintScoreCard => println(printScoreCard())
-      case KniffelEvent.PlayerAdded    => println("")
+      case KniffelEvent.PlayerAdded    => println("playerSync TUI")
       case KniffelEvent.InvalidInput   => println("Invalid input! Please try again.")
       case _                           => println("Tui update")
     }
