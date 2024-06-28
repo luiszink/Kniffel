@@ -4,11 +4,11 @@ import scala.io.StdIn
 import de.htwg.se.kniffel.controller.ControllerInterface
 import de.htwg.se.kniffel.util.{Observer, KniffelEvent}
 import scala.util.{Try, Success, Failure}
-import de.htwg.se.kniffel.util.{Observer, KniffelEvent}
 import com.google.inject.Inject
 
 class TUI @Inject() (controller: ControllerInterface) extends Observer {
 
+  controller.add(this)
 
   def addPlayers(): Unit = {
     println("Enter player names (comma-separated):")
@@ -47,7 +47,7 @@ class TUI @Inject() (controller: ControllerInterface) extends Observer {
     var running = true
     while (running) {
       controller.getCurrentState.name match {
-        case "UpdateState" => 
+        case "UpdateState" =>
           printScoreCard()
           println("Enter category (e.g., One, Fullhouse...!):")
           val input = StdIn.readLine()
@@ -64,12 +64,12 @@ class TUI @Inject() (controller: ControllerInterface) extends Observer {
 
   override def update(event: KniffelEvent.Value): Unit = {
     event match {
-      case KniffelEvent.PrintDice       => println(printDice())
-      case KniffelEvent.PrintDiceUndo   => println(printDiceUndo())
-      case KniffelEvent.PrintScoreCard  => println(printScoreCard())
-      case KniffelEvent.PlayerAdded     => println("") 
-      case KniffelEvent.InvalidInput    => println("Invalid input! Please try again.")
-      case _                            => println("")
+      case KniffelEvent.PrintDice      => println(printDice())
+      case KniffelEvent.PrintDiceUndo  => println(printDiceUndo())
+      case KniffelEvent.PrintScoreCard => println(printScoreCard())
+      case KniffelEvent.PlayerAdded    => println("playerSync TUI")
+      case KniffelEvent.InvalidInput   => println("Invalid input! Please try again.")
+      case _                           => println("Tui update")
     }
   }
 
@@ -78,7 +78,6 @@ class TUI @Inject() (controller: ControllerInterface) extends Observer {
     val horizontalLine = "+" + List.fill(diceValues.length)("---").mkString("+") + "+"
     val diceIconsLine = "|" + diceValues.map(value => s" $value ").mkString("|") + "|"
     val numCounter = " " + diceValues.indices.map(index => s" ${index + 1} ").mkString(" ") + " "
-
     s"Current Player: ${controller.getCurrentPlayer}\n$horizontalLine\n$diceIconsLine\n$horizontalLine\n$numCounter\n"
   }
 
@@ -87,14 +86,13 @@ class TUI @Inject() (controller: ControllerInterface) extends Observer {
     val horizontalLine = "+" + List.fill(diceValues.length)("---").mkString("+") + "+"
     val diceIconsLine = "|" + diceValues.map(value => s" $value ").mkString("|") + "|"
     val numCounter = " " + diceValues.indices.map(index => s" ${index + 1} ").mkString(" ") + " "
-
     s"Current Player: ${controller.getCurrentPlayer}\n$horizontalLine\n$diceIconsLine\n$horizontalLine\n$numCounter\n"
   }
 
   def printScoreCard() = {
     val currentPlayer = controller.getCurrentPlayer
-    val scoreCard = currentPlayer.scoreCard.categories.map {
-      case (category, score) => s"$category: ${score.getOrElse("_")}"
+    val scoreCard = currentPlayer.scoreCard.categories.map { case (category, score) =>
+      s"$category: ${score.getOrElse("_")}"
     }.mkString("\n")
     s"\nCurrent Player: ${currentPlayer.name}\nScoreCard:\n$scoreCard\n"
   }

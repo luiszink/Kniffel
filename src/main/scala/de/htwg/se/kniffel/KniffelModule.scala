@@ -39,7 +39,5 @@ class KniffelModule extends AbstractModule {
     }
 
     bind(classOf[ControllerInterface]).toInstance(new Controller(jsonProvider, xmlProvider))
-    bind(classOf[GUI]).toInstance(new GUI(new Controller(jsonProvider, xmlProvider))) // Beispiel-Injektion
-    bind(classOf[TUI]).toInstance(new TUI(new Controller(jsonProvider, xmlProvider))) // Beispiel-Injektion
   }
 }

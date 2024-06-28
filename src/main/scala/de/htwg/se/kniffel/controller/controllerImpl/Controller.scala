@@ -12,9 +12,10 @@ import de.htwg.se.kniffel.model.fileIoComponents.fileIoXmlImpl.FileIoXmlImpl
 import com.google.inject.{Inject, Provider}
 
 class Controller @Inject() (
-  jsonProvider: Provider[FileIoJsonImpl],
-  xmlProvider: Provider[FileIoXmlImpl]
-) extends Observable with ControllerInterface {
+    jsonProvider: Provider[FileIoJsonImpl],
+    xmlProvider: Provider[FileIoXmlImpl]
+) extends Observable
+    with ControllerInterface {
 
   var repetitions = 2
   private var dice: DiceInterface = Dice(List.fill(5)(Dice.rollDice()))
@@ -22,7 +23,7 @@ class Controller @Inject() (
   private var players: List[PlayerInterface] = List()
   private var currentPlayerIndex: Int = 0
   private var scoreUpdater: ScoreUpdaterInterface = new StandardScoreUpdater
-  private var currentState: StateInterface = new RollingState()  // Initial state
+  private var currentState: StateInterface = new RollingState() // Initial state
   private val undoManager = new UndoManager
 
   private val fileIoJson: FileIoInterface = jsonProvider.get()
