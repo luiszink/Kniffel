@@ -1,0 +1,24 @@
+<players>
+    <player>
+        <name>michi</name>
+        <scoreCard>
+            <category name="one">1</category>
+            <category name="two"></category>
+            <category name="three"></category>
+            <category name="four"></category>
+            <category name="five"></category>
+            <category name="six"></category>
+            <category name="bonus"></category>
+            <category name="upperSectionScore"></category>
+            <category name="threeofakind"></category>
+            <category name="fourofakind"></category>
+            <category name="fullhouse"></category>
+            <category name="smallstraight"></category>
+            <category name="largestraight"></category>
+            <category name="kniffel"></category>
+            <category name="chance"></category>
+            <category name="lowerSectionScore"></category>
+            <category name="totalScore"></category>
+        </scoreCard>
+    </player>
+</players>

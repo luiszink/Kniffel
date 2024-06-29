@@ -1,58 +1,100 @@
 package de.htwg.se.kniffel.aview
 
 import scala.io.StdIn
-import scala.util.Random
-import de.htwg.se.kniffel.model.Dice
-import de.htwg.se.kniffel.util.Observer
-import de.htwg.se.kniffel.controller.Controller
+import de.htwg.se.kniffel.controller.ControllerInterface
+import de.htwg.se.kniffel.util.{Observer, KniffelEvent}
+import scala.util.{Try, Success, Failure}
+import com.google.inject.Inject
 
-class TUI(controller: Controller) extends Observer {
+class TUI @Inject() (controller: ControllerInterface) extends Observer {
 
-  // add to subscribers
   controller.add(this)
 
-  override def update: Unit = {
-     println(printGame())
-  }
-
-  def printGame() = {
-    val diceValues: List[Int] = controller.getDice
-    val horizontalLine =
-      "+" + List.fill(diceValues.length)("---").mkString("+") + "+"
-    val diceIconsLine =
-      "|" + diceValues.map(value => s" $value ").mkString("|") + "|"
-    val numCounter = " " + diceValues.indices
-      .map(index => s" ${index + 1} ")
-      .mkString(" ") + " "
-
-    s"$horizontalLine\n$diceIconsLine\n$horizontalLine\n$numCounter"
-  }
-
-  def input(): Option[List[Int]] = {
-    // Start the game and display the final dice values
-    println(
-      s"Enter the indices of the dice you want to keep (e.g., 1 3 5), or type 'f' to end (${controller.repetitions} remaining):"
-    )
-    val input = StdIn.readLine()
-
-    if (input.toLowerCase == "f") {
-      println("Ending the game...")
-      None
-    } else {
-      Option(input.split(" ").map(_.toInt).toList)
+  override def update(event: KniffelEvent.Value): Unit = {
+    event match {
+      case KniffelEvent.PrintDice      => println(printDice())
+      case KniffelEvent.PrintDiceUndo  => println(printDiceUndo())
+      case KniffelEvent.PrintScoreCard => println(printScoreCard())
+      case KniffelEvent.MultiKniffel   => println("TUI update MultiKniffel")
+      //case KniffelEvent.PlayerAdded    => println(printAllPlayers())
+      case KniffelEvent.InvalidInput   => println("Invalid input! Please try again.")
+      case _                           => println("")
     }
   }
-  var running = true
   
+  def addPlayers(): Unit = {
+    println("Enter player names (comma-separated):")
+    val input = StdIn.readLine()
+    Try {
+      val names = input.split(",").map(_.trim)
+      if (names.isEmpty || names.exists(_.isEmpty)) {
+        throw new IllegalArgumentException("Invalid input! Please enter at least one name, separated by commas.")
+      }
+      names.foreach(controller.addPlayer)
+    } match {
+      case Success(_) =>
+      case Failure(_) =>
+        println("Invalid input! Please try again.")
+        addPlayers()
+    }
+  }
+
+  def selectScoreUpdater(): Unit = {
+    println("Do you want to allow multiple Kniffel? (y/n)")
+    val input = StdIn.readLine()
+    Try {
+      controller.setScoreUpdater(input)
+    } match {
+      case Success(_) =>
+      case Failure(_) =>
+        println("Invalid input! Please try again.")
+        selectScoreUpdater()
+    }
+  }
+
   def run() = {
-    println(printGame())
+    addPlayers()
+    selectScoreUpdater()
+    println(printDice())
+    var running = true
     while (running) {
-      input() match {
-        case Some(value) => {
-          controller.keepDice(value)
-        }
-        case None => running = false
+      controller.getCurrentState.name match {
+        case "UpdateState" =>
+          printScoreCard()
+          println("Enter category (e.g., One, Fullhouse...!):")
+          val input = StdIn.readLine()
+          controller.handleInput(input)
+          printDice()
+        case _ =>
+          printDice()
+          println(s"Enter the indices of the dice you want to keep (e.g., 1 3 5), or Enter category (e.g., One, Fullhouse...) (${controller.repetitions} remaining), or 'undo' to undo last score update:")
+          val input = StdIn.readLine()
+          controller.handleInput(input)
       }
     }
+  }
+
+  def printDiceUndo() = {
+    val diceValues: List[Int] = controller.getPreviousDice
+    val horizontalLine = "+" + List.fill(diceValues.length)("---").mkString("+") + "+"
+    val diceIconsLine = "|" + diceValues.map(value => s" $value ").mkString("|") + "|"
+    val numCounter = " " + diceValues.indices.map(index => s" ${index + 1} ").mkString(" ") + " "
+    s"Current Player: ${controller.getCurrentPlayer}\n$horizontalLine\n$diceIconsLine\n$horizontalLine\n$numCounter\n"
+  }
+
+  def printDice() = {
+    val diceValues: List[Int] = controller.getDice
+    val horizontalLine = "+" + List.fill(diceValues.length)("---").mkString("+") + "+"
+    val diceIconsLine = "|" + diceValues.map(value => s" $value ").mkString("|") + "|"
+    val numCounter = " " + diceValues.indices.map(index => s" ${index + 1} ").mkString(" ") + " "
+    s"Current Player: ${controller.getCurrentPlayer}\n$horizontalLine\n$diceIconsLine\n$horizontalLine\n$numCounter\n"
+  }
+
+  def printScoreCard() = {
+    val currentPlayer = controller.getCurrentPlayer
+    val scoreCard = currentPlayer.scoreCard.categories.map { case (category, score) =>
+      s"$category: ${score.getOrElse("_")}"
+    }.mkString("\n")
+    s"\nCurrent Player: ${currentPlayer.name}\nScoreCard:\n$scoreCard\n"
   }
 }
