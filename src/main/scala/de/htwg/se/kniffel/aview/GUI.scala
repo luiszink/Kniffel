@@ -139,8 +139,8 @@ class GUI @Inject() (controller: ControllerInterface)
       }
       val menu = new Menu("") {
         val homeImage = new ImageView(new Image("file:src/main/resources/home.png")) {
-          fitHeight = 24
-          fitWidth = 24
+          fitHeight = 40
+          fitWidth = 40
         }
         graphic = homeImage
       }
