@@ -1,6 +1,29 @@
 {
   "players" : [ {
-    "name" : "michi",
+    "name" : "Luis",
+    "scoreCard" : {
+      "categories" : {
+        "two" : null,
+        "kniffel" : null,
+        "lowerSectionScore" : null,
+        "five" : null,
+        "fourofakind" : null,
+        "upperSectionScore" : null,
+        "four" : null,
+        "bonus" : null,
+        "three" : null,
+        "smallstraight" : null,
+        "threeofakind" : null,
+        "fullhouse" : 25,
+        "six" : null,
+        "totalScore" : null,
+        "chance" : null,
+        "largestraight" : null,
+        "one" : null
+      }
+    }
+  }, {
+    "name" : "Luis",
     "scoreCard" : {
       "categories" : {
         "two" : null,
@@ -19,7 +42,7 @@
         "totalScore" : null,
         "chance" : null,
         "largestraight" : null,
-        "one" : 1
+        "one" : null
       }
     }
   } ]
