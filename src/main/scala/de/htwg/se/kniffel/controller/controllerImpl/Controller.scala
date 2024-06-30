@@ -23,7 +23,7 @@ class Controller @Inject() (
   private var players: List[PlayerInterface] = List()
   private var currentPlayerIndex: Int = 0
   private var scoreUpdater: ScoreUpdaterInterface = new StandardScoreUpdater
-  private var currentState: StateInterface = new RollingState() // Initial state
+  private var currentState: StateInterface = new RollingState()
   private val undoManager = new UndoManager
 
   private val fileIoJson: FileIoInterface = jsonProvider.get()
@@ -46,31 +46,51 @@ class Controller @Inject() (
       case 0 =>
         notifyObservers(KniffelEvent.PrintDice)
         setState(new UpdateState())
-        repetitions = 2
-      case n if n > 0 => notifyObservers(KniffelEvent.PrintDice)
+        notifyObservers(KniffelEvent.DisableRollButton)
+      case n if n > 0 =>
+        notifyObservers(KniffelEvent.PrintDice)
     }
+  }
+
+  // Neue Methode um den Gewinner zu ermitteln
+  def getWinner: String = {
+    val winner = players.maxBy(_.getTotalScore)
+    winner.name
+  }
+
+  // Neue Methode um die Endergebnisse zu erhalten
+  def getFinalScores: List[String] = {
+    players.map(player => s"${player.name}: ${player.getTotalScore}")
   }
 
   def addPlayer(name: String): Unit = {
     val player: PlayerInterface = Player(name)
     players = players :+ player
-    saveCurrentState() // Speichern des aktuellen Zustands
+    saveCurrentState()
     notifyObservers(KniffelEvent.PlayerAdded)
+  }
+
+  def checkGameEnd(): Unit = {
+    if (true/*players.forall(_.scoreCard.isComplete)*/) {
+      notifyObservers(KniffelEvent.GameEnded)
+    }
   }
 
   def nextPlayer(): Unit = {
     previousDice = Some(dice)
     currentPlayerIndex = (currentPlayerIndex + 1) % players.length
+    checkGameEnd()
     repetitions = 2
     dice = new Dice(List.fill(5)(Dice.rollDice()))
     setState(new RollingState())
     notifyObservers(KniffelEvent.PrintScoreCard)
     notifyObservers(KniffelEvent.PrintDice)
-    notifyObservers(KniffelEvent.NextPlayer) // Notify GUI to reset selected dice
+    notifyObservers(KniffelEvent.NextPlayer)
   }
 
   def setScoreUpdater(userInput: String): Unit = {
     scoreUpdater = ScoreUpdaterFactory.createScoreUpdater(userInput)
+    notifyObservers(KniffelEvent.MultiKniffel)
   }
 
   def updateScore(category: String): Unit = {
@@ -81,11 +101,15 @@ class Controller @Inject() (
     player.scoreCard.isComplete match {
       case true =>
         player.scoreCard.calculateTotalScore()
-        println(s"${player.name}'s total score: ${player.scoreCard.categories("totalScore").getOrElse(0)}")
+        println(
+          s"${player.name}'s total score: ${player.scoreCard.categories("totalScore").getOrElse(0)}"
+        )
       case false =>
     }
-    saveCurrentState() // Speichern des aktuellen Zustands
+    repetitions = 2
+    saveCurrentState()
     nextPlayer()
+    notifyObservers(KniffelEvent.EnableRollButton)
   }
 
   def setState(state: StateInterface): Unit = {
@@ -98,12 +122,13 @@ class Controller @Inject() (
         undoManager.undoStep
         previousDice match {
           case Some(pdice) => dice = pdice
-          case None => // Do nothing
+          case None        => // Do nothing
         }
         setState(new UpdateState())
         currentPlayerIndex match {
           case 0 => currentPlayerIndex = players.length - 1
-          case _ => currentPlayerIndex = (currentPlayerIndex - 1) % players.length
+          case _ =>
+            currentPlayerIndex = (currentPlayerIndex - 1) % players.length
         }
         notifyObservers(KniffelEvent.PrintScoreCard)
         notifyObservers(KniffelEvent.PrintDiceUndo)
