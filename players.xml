@@ -8,17 +8,17 @@
             <category name="four"></category>
             <category name="five"></category>
             <category name="six"></category>
-            <category name="bonus"></category>
-            <category name="upperSectionScore"></category>
+            <category name="bonus">0</category>
+            <category name="upperSectionScore">0</category>
             <category name="threeofakind"></category>
             <category name="fourofakind"></category>
             <category name="fullhouse"></category>
             <category name="smallstraight"></category>
             <category name="largestraight"></category>
-            <category name="kniffel"></category>
+            <category name="kniffel">0</category>
             <category name="chance"></category>
-            <category name="lowerSectionScore"></category>
-            <category name="totalScore"></category>
+            <category name="lowerSectionScore">0</category>
+            <category name="totalScore">0</category>
         </scoreCard>
     </player>
 </players>

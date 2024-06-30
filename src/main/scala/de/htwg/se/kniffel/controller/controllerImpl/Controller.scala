@@ -52,6 +52,17 @@ class Controller @Inject() (
     }
   }
 
+  // Neue Methode um den Gewinner zu ermitteln
+  def getWinner: String = {
+    val winner = players.maxBy(_.getTotalScore)
+    winner.name
+  }
+
+  // Neue Methode um die Endergebnisse zu erhalten
+  def getFinalScores: List[String] = {
+    players.map(player => s"${player.name}: ${player.getTotalScore}")
+  }
+
   def addPlayer(name: String): Unit = {
     val player: PlayerInterface = Player(name)
     players = players :+ player
@@ -59,9 +70,16 @@ class Controller @Inject() (
     notifyObservers(KniffelEvent.PlayerAdded)
   }
 
+  def checkGameEnd(): Unit = {
+    if (true/*players.forall(_.scoreCard.isComplete)*/) {
+      notifyObservers(KniffelEvent.GameEnded)
+    }
+  }
+
   def nextPlayer(): Unit = {
     previousDice = Some(dice)
     currentPlayerIndex = (currentPlayerIndex + 1) % players.length
+    checkGameEnd()
     repetitions = 2
     dice = new Dice(List.fill(5)(Dice.rollDice()))
     setState(new RollingState())

@@ -6,7 +6,7 @@ import scalafx.application.JFXApp3
 import scalafx.scene.Scene
 import scalafx.scene.layout.{Pane, VBox, HBox, StackPane, Priority, BorderPane}
 import scalafx.scene.control._
-import scalafx.beans.property.StringProperty
+import scalafx.beans.property.{StringProperty, IntegerProperty}
 import scalafx.collections.ObservableBuffer
 import scalafx.application.Platform
 import scalafx.stage.Screen
@@ -49,6 +49,7 @@ class GUI @Inject() (controller: ControllerInterface)
         case KniffelEvent.NextPlayer        => resetSelectedDice()
         case KniffelEvent.DisableRollButton => rollButton.disable = true
         case KniffelEvent.EnableRollButton  => rollButton.disable = false
+        case KniffelEvent.GameEnded         => showEndScene()
         case _                              => println("")
       }
     }
@@ -240,6 +241,50 @@ class GUI @Inject() (controller: ControllerInterface)
     }
   }
 
+  def showEndScene(): Unit = {
+    val screenBounds = scalafx.stage.Screen.primary.visualBounds
+    val sortedResults = controller.getPlayers
+      .map(player => (player.name, player.getTotalScore))
+      .sortBy(-_._2) // Sortieren nach Punktzahl absteigend
+
+    val endScene = new Scene(screenBounds.width, screenBounds.height) {
+      stylesheets.add("file:src/main/resources/style.css")
+      val pane = new BorderPane() {
+        id = "end-scene-pane"
+        prefWidth = screenBounds.width
+        prefHeight = screenBounds.height
+      }
+
+      val resultBox = new VBox {
+        alignment = Pos.Center
+        spacing = 20
+        children = Seq(
+          new Label("Spiel beendet!") {
+            id = "end-scene-label-title"
+          },
+          new Label(s"Gewinner: ${sortedResults.head._1}") { // Der erste Spieler in der sortierten Liste ist der Gewinner
+            id = "end-scene-label-winner"
+          },
+          new Label("Endergebnisse:") {
+            id = "end-scene-label-results"
+          },
+          new ListView[String] {
+            id = "end-scene-list-view"
+            items = ObservableBuffer(sortedResults.map { case (name, score) => s"$name: $score" }*)
+            prefWidth = 200 // Weitere Reduzierung der Breite der ListView
+            prefHeight = 150 // Reduzierung der Höhe der ListView
+          },
+          new Button("Beenden") {
+            id = "end-scene-button"
+            onAction = _ => Platform.exit()
+          }
+        )
+      }
+      pane.center = resultBox
+      content = pane
+    }
+    stage.scene = endScene
+  }
 
   def createDiceImageViews(count: Int): Seq[ImageView] = {
     (1 to count).map { i =>

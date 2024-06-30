@@ -1,145 +1,155 @@
 /* Global Variables */
-    .root {
-        -primary-color: #4CAF50;
-        -secondary-color: #416ac3;
-        -primary-text-color: #000000;
-        -secondary-text-color: #ffffff;
-        -odd-row-color: #e0ffe0;
-        -even-row-color: #b3ffb3;
-        -selected-row-color: #235f25;
-    }
+.root {
+    -primary-color: #4CAF50;
+    -secondary-color: #416ac3;
+    -primary-text-color: #000000;
+    -secondary-text-color: #ffffff;
+    -odd-row-color: #e0ffe0;
+    -even-row-color: #b3ffb3;
+    -selected-row-color: #235f25;
+}
 
-/* Table Layout */
-    #score-table {
-        -fx-border-color: -primary-color;
-        -fx-border-width: 5px;
+/* Table Layouts */
+
+    /* Score Table */
+        #score-table {
+            -fx-border-color: -primary-color;
+            -fx-border-width: 5px;
+            -fx-border-radius: 5px;
+            -fx-background-color: transparent;
+            -fx-padding: 0;
+        }
+
+        #score-table .column-header .label {
+            -fx-background-color: -primary-color;
+            -fx-border-color: transparent;
+            -fx-background-radius: 0;
+            -fx-padding: 0;
+        }
+
+        .table-row-cell:odd {
+            -fx-background-color: -odd-row-color;
+        }
+
+        .table-row-cell:even {
+            -fx-background-color: -even-row-color;
+        }
+
+        /* Bonus-, Ergebnis-, Upper- und Lower-Section-Zeilen */
+        .table-row-cell.bonus,
+        .table-row-cell.total,
+        .table-row-cell.lowerSection,
+        .table-row-cell.upperSection {
+            -fx-background-color: -primary-color;
+            -fx-text-fill: -secondary-text-color;
+        }
+
+        /* Entfernen der ausgewählten Farbe für Bonus-, Ergebnis-, Upper- und Lower-Section-Zeilen */
+        .table-row-cell.bonus:selected,
+        .table-row-cell.total:selected,
+        .table-row-cell.lowerSection:selected,
+        .table-row-cell.upperSection:selected {
+            -fx-background-color: -primary-color !important;
+            -fx-text-fill: -primary-text-color !important;
+        }
+
+        #score-table .column-header-background {
+            -fx-background-insets: 0; /* Hintergrund-Einfügung auf 0 setzen */
+            -fx-padding: 0; /* Padding entfernen */
+            -fx-border-insets: 0; /* Rand-Einfügung auf 0 setzen */
+        }
+
+        #score-table .column-header {
+            -fx-border-width: 0; /* Randbreite auf 0 setzen */
+            -fx-padding: 0; /* Padding entfernen */
+            -fx-background-insets: 0; /* Hintergrund-Einfügung auf 0 setzen */
+        }
+
+        #score-table .table-cell {
+            -fx-border-width: 0; /* Randbreite auf 0 setzen */
+            -fx-padding: 0; /* Padding entfernen */
+            -fx-background-insets: 0; /* Hintergrund-Einfügung auf 0 setzen */
+        }
+
+        #score-table .table-row-cell {
+            -fx-border-width: 0; /* Randbreite auf 0 setzen */
+            -fx-padding: 0; /* Padding entfernen */
+        }
+
+        #score-table .table-row-cell:selected {
+                -fx-background-color: -selected-row-color; /* Hintergrund-Einfügung auf 0 setzen */
+        }
+
+   /* Winner ListView */
+        #end-scene-list-view {
+            -fx-border-color: -primary-color;
+            -fx-border-width: 5px;
+            -fx-border-radius: 5px;
+            -fx-background-color: transparent;
+            -fx-padding: 0;
+            -fx-max-width: 200px;
+            -fx-pref-height: 150px;
+        }
+
+        #end-scene-list-view .list-cell:odd {
+            -fx-background-color: -odd-row-color;
+        }
+
+        #end-scene-list-view .list-cell:even {
+            -fx-background-color: -even-row-color;
+        }
+
+
+/* Buttons */
+    #confirm-button {
+        -fx-background-color: -primary-color;
+        -fx-text-fill: -primary-text-color;
+        -fx-font-size: 14px;
+        -fx-padding: 10px 20px;
         -fx-border-radius: 5px;
-        -fx-background-color: transparent;
-        -fx-padding: 0;
+        -fx-background-radius: 5px;
+        -fx-cursor: hand;
+        -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 10, 0, 0, 0);
+        -fx-scale-x: 1;
+        -fx-scale-y: 1;
+        -fx-transition: -fx-scale-x 0.2s, -fx-scale-y 0.2s;
     }
 
-    #score-table .column-header-background {
-        -fx-background-color: -primary-color;
-        -fx-border-color: transparent;
-        -fx-border-width: 0;
+    #confirm-button:hover {
+        -fx-scale-x: 1.1;
+        -fx-scale-y: 1.1;
     }
 
-    #score-table .column-header .label {
-        -fx-background-color: -primary-color;
-        -fx-border-color: transparent;
-        -fx-background-radius: 0;
-        -fx-padding: 0;
+    #roll-button, #update-category-button {
+        -fx-background-color: -secondary-color;
+        -fx-text-fill: -secondary-text-color;
+        -fx-font-size: 14px;
+        -fx-padding: 10px 20px;
+        -fx-border-radius: 5px;
+        -fx-background-radius: 5px;
+        -fx-cursor: hand;
+        -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 10, 0, 0, 0);
+        -fx-scale-x: 1;
+        -fx-scale-y: 1;
+        -fx-transition: -fx-scale-x 0.2s, -fx-scale-y 0.2s;
     }
 
-    .table-row-cell:odd {
-        -fx-background-color: -odd-row-color;
+    #roll-button:hover, #update-category-button:hover, #end-scene-button:hover {
+        -fx-scale-x: 1.1;
+        -fx-scale-y: 1.1;
     }
 
-    .table-row-cell:even {
-        -fx-background-color: -even-row-color;
-    }
-
-    .table-row-cell:selected {
-        -fx-background-color: -selected-row-color;
-    }
-
-    /* Bonus-, Ergebnis-, Upper- und Lower-Section-Zeilen */
-    .table-row-cell.bonus,
-    .table-row-cell.total,
-    .table-row-cell.lowerSection,
-    .table-row-cell.upperSection {
+    #end-scene-button {
         -fx-background-color: -primary-color;
         -fx-text-fill: -secondary-text-color;
-    }
-    /* Entfernen der ausgewählten Farbe für Bonus-, Ergebnis-, Upper- und Lower-Section-Zeilen */
-    .table-row-cell.bonus:selected,
-    .table-row-cell.total:selected,
-    .table-row-cell.lowerSection:selected,
-    .table-row-cell.upperSection:selected {
-        -fx-background-color: -primary-color !important;
-        -fx-text-fill: -primary-text-color !important;
+        -fx-font-size: 14px;
+        -fx-padding: 10px 20px;
+        -fx-border-radius: 5px;
+        -fx-background-radius: 5px;
+        -fx-cursor: hand;
+        -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 10, 0, 0, 0);
     }
 
-    /* Entfernen der inneren Ränder und Abstände */
-    #score-table .column-header .label {
-        -fx-padding: 0; /* Entfernen des Padding */
-    }
-
-    #score-table .column-header-background {
-        -fx-background-insets: 0; /* Hintergrund-Einfügung auf 0 setzen */
-        -fx-padding: 0; /* Padding entfernen */
-        -fx-border-insets: 0; /* Rand-Einfügung auf 0 setzen */
-    }
-
-    #score-table .column-header {
-        -fx-border-width: 0; /* Randbreite auf 0 setzen */
-        -fx-padding: 0; /* Padding entfernen */
-        -fx-background-insets: 0; /* Hintergrund-Einfügung auf 0 setzen */
-    }
-
-    #score-table .table-cell {
-        -fx-border-width: 0; /* Randbreite auf 0 setzen */
-        -fx-padding: 0; /* Padding entfernen */
-        -fx-background-insets: 0; /* Hintergrund-Einfügung auf 0 setzen */
-    }
-
-    #score-table .table-row-cell {
-        -fx-border-width: 0; /* Randbreite auf 0 setzen */
-        -fx-padding: 0; /* Padding entfernen */
-    }
-
-    #score-table .table-row-cell:selected {
-        -fx-background-color: -selected-row-color; /* Hintergrund-Einfügung auf 0 setzen */
-    }
-
-#confirm-button {
-    -fx-background-color: -primary-color;
-    -fx-text-fill: -primary-text-color;
-    -fx-font-size: 14px;
-    -fx-padding: 10px 20px;
-    -fx-border-radius: 5px;
-    -fx-background-radius: 5px;
-    -fx-cursor: hand;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 10, 0, 0, 0);
-    -fx-scale-x: 1;
-    -fx-scale-y: 1;
-    -fx-transition: -fx-scale-x 0.2s, -fx-scale-y 0.2s;
-}
-
-#confirm-button:hover {
-    -fx-scale-x: 1.1;
-    -fx-scale-y: 1.1;
-}
-
-#kniffel-checkbox {
-    -fx-font-size: 14px;
-}
-
-#roll-button, #update-category-button {
-    -fx-background-color: -secondary-color;
-    -fx-text-fill: -secondary-text-color;
-    -fx-font-size: 14px;
-    -fx-padding: 10px 20px;
-    -fx-border-radius: 5px;
-    -fx-background-radius: 5px;
-    -fx-cursor: hand;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 10, 0, 0, 0);
-    -fx-scale-x: 1;
-    -fx-scale-y: 1;
-    -fx-transition: -fx-scale-x 0.2s, -fx-scale-y 0.2s;
-}
-
-#roll-button:hover, #update-category-button:hover {
-    -fx-scale-x: 1.1;
-    -fx-scale-y: 1.1;
-}
-
-#player-1-name-field, #player-2-name-field, #player-3-name-field, #player-4-name-field {
-    -fx-font-size: 14px;
-    -fx-padding: 10px;
-    -fx-border-radius: 5px;
-    -fx-background-radius: 5px;
-}
 
 /* Label */
     #title-Label {
@@ -151,13 +161,27 @@
 
     #repetitions-label, #kniffel-label {
         -fx-font-size: 18px;
-        -fx-text-fill: -text-color;
+        -fx-text-fill: -primary-text-color;
     }
 
-    #kniffel-label {
-        -fx-font-size: 18px;
-        -fx-text-fill: -text-color;
+    #end-scene-label-title {
+        -fx-font-size: 36px;
+        -fx-font-weight: bold;
+        -fx-text-fill: -primary-color;
+        -fx-effect: dropshadow(gaussian, black, 10, 0.5, 0, 0);
     }
+
+    #end-scene-label-winner {
+        -fx-font-size: 24px;
+        -fx-font-weight: bold;
+        -fx-text-fill: -secondary-text-color;
+    }
+    
+    #end-scene-label-results {
+        -fx-font-size: 20px;
+        -fx-text-fill: -secondary-text-color;
+    }
+
 
 /* Panes */
     #main-pane {
@@ -176,6 +200,13 @@
         -fx-background-radius: 20px; /* Mehr Abrundungen an den Ecken */
         -fx-background-insets: 10px; /* Teilweise Abdeckung des Hintergrunds */
     }
+
+    #end-scene-pane {
+        -fx-background-image: url("file:src/main/resources/background1.png");
+        -fx-background-size: cover;
+        -fx-background-position: center;
+    }
+
 
 /* Menüleiste */
     .menu-bar {
@@ -204,4 +235,16 @@
     .context-menu .menu-item {
         -fx-background-insets: 0;
         -fx-border-insets: 0;
+    }
+
+/* Others */
+    #kniffel-checkbox {
+        -fx-font-size: 14px;
+    }
+
+    #player-1-name-field, #player-2-name-field, #player-3-name-field, #player-4-name-field {
+        -fx-font-size: 14px;
+        -fx-padding: 10px;
+        -fx-border-radius: 5px;
+        -fx-background-radius: 5px;
     }
