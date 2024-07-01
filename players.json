@@ -1,0 +1,26 @@
+{
+  "players" : [ {
+    "name" : "Los",
+    "scoreCard" : {
+      "categories" : {
+        "two" : 2,
+        "kniffel" : 0,
+        "lowerSectionScore" : 98,
+        "five" : 15,
+        "fourofakind" : 28,
+        "upperSectionScore" : 61,
+        "four" : 16,
+        "bonus" : 0,
+        "three" : 9,
+        "smallstraight" : 30,
+        "threeofakind" : 20,
+        "fullhouse" : 0,
+        "six" : 18,
+        "totalScore" : 159,
+        "chance" : 20,
+        "largestraight" : 0,
+        "one" : 1
+      }
+    }
+  } ]
+}

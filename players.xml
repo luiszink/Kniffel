@@ -1,0 +1,24 @@
+<players>
+    <player>
+        <name>Los</name>
+        <scoreCard>
+            <category name="one">1</category>
+            <category name="two">2</category>
+            <category name="three">9</category>
+            <category name="four">16</category>
+            <category name="five">15</category>
+            <category name="six">18</category>
+            <category name="bonus">0</category>
+            <category name="upperSectionScore">61</category>
+            <category name="threeofakind">20</category>
+            <category name="fourofakind">28</category>
+            <category name="fullhouse">0</category>
+            <category name="smallstraight">30</category>
+            <category name="largestraight">0</category>
+            <category name="kniffel">0</category>
+            <category name="chance">20</category>
+            <category name="lowerSectionScore">98</category>
+            <category name="totalScore">159</category>
+        </scoreCard>
+    </player>
+</players>
