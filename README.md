@@ -2,14 +2,15 @@
 [![Coverage Status](https://coveralls.io/repos/github/luiszink/Kniffel/badge.svg?branch=develope)](https://coveralls.io/github/luiszink/Kniffel?branch=develope)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/luiszink/Kniffel/main.yml?branch=develope)](https://github.com/luiszink/Kniffel/actions)
 
-![Kniffel Logo](file-XW6xgB2tJqVFC6ZpOuXgYSVZ)
 
 Welcome to Kniffel - the digital adaptation of the classic dice game! This project, developed as part of a Software Engineering course, brings the excitement and strategy of Kniffel to your computer screen.
+
 
 ## Features
 ### Not yet implemented
 1. **Highscore Table:** Compare your scores with friends and see who ranks highest.
 2. **Customizable Color Layouts:** Personalize the game with different color themes to suit your style.
+
 
 ## Installation
 
@@ -41,6 +42,7 @@ To install and run Kniffel, ensure you have the following prerequisites:
     sbt run
     ```
 
+
 ## How to Play
 
 Kniffel is a dice game where the objective is to score the highest points by rolling five dice to make certain combinations. 
@@ -56,10 +58,10 @@ Kniffel is a dice game where the objective is to score the highest points by rol
 
 4. **Winning:** The player with the highest score at the end of all rounds wins the game.
 
-## Contribution
-**Note:** Currently, we are not accepting contributions as the project is still under development for educational purposes at HTWG Konstanz.
+
 
 ## Contact
-For questions, feedback, or support, please contact us at [your.email@htwg-konstanz.de](mailto:your.email@htwg-konstanz.de).
+For questions, feedback, or support, please contact us at [your.email@htwg-konstanz.de](mailto:lu121zin@htwg-konstanz.de).
 
-Enjoy the game! 🎲🏆
+
+Enjoy the game! 🎲🏆🎲
