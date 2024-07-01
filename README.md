@@ -47,12 +47,12 @@ Kniffel is a dice game where the objective is to score the highest points by rol
 
 1. **Setup:** Enter the names of the players.
 
-    ![Player Setup](main/resources/ImageReadMe/start.png)
+    ![Player Setup](src/main/resources/ImageReadMe/start.png)
 
 2. **Rolling:** Each player gets up to three rolls per turn to make their best combination.
 3. **Scoring:** Points are awarded based on the combinations made, with specific values for each combination (e.g., Full House, Four of a Kind, etc.).
 
-    ![Game Interface](main/resources/ImageReadMe/game.png)
+    ![Game Interface](src/main/resources/ImageReadMe/game.png)
 
 4. **Winning:** The player with the highest score at the end of all rounds wins the game.
 
