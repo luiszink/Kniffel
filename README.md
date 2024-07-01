@@ -61,7 +61,7 @@ Kniffel is a dice game where the objective is to score the highest points by rol
 
 
 ## Contact
-For questions, feedback, or support, please contact us at [your.email@htwg-konstanz.de](mailto:lu121zin@htwg-konstanz.de).
+For questions, feedback, or support, please contact us at [lu121zin@htwg-konstanz.de](mailto:lu121zin@htwg-konstanz.de).
 
 
 Enjoy the game! 🎲🏆🎲
