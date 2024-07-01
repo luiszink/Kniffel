@@ -21,8 +21,9 @@ import com.google.inject.Inject
 import scalafx.scene.paint.Color
 import scalafx.scene.text.Font
 import scalafx.scene.layout.AnchorPane
-import scalafx.scene.image.Image
-import scalafx.scene.image.ImageView
+import scala.util.Random
+import java.util.{Timer, TimerTask}
+
 
 class GUI @Inject() (controller: ControllerInterface)
     extends JFXApp3
@@ -335,19 +336,41 @@ class GUI @Inject() (controller: ControllerInterface)
       val totalWidth = 400 // Gesamtbreite der Tabelle
       val columnWidth = totalWidth / (numPlayers + 1) // +1 für die Kategorie-Spalte
 
+      // Mapping von internen Kategorienamen zu benutzerfreundlichen Namen
+    val categoryNameMapping: Map[String, String] = Map(
+      "one" -> "Einsen",
+      "two" -> "Zweien",
+      "three" -> "Dreien",
+      "four" -> "Vieren",
+      "five" -> "Fünfen",
+      "six" -> "Sechsen",
+      "bonus" -> "Bonus",
+      "upperSectionScore" -> "Obere Abschnitt Punktzahl",
+      "threeofakind" -> "Dreierpasch",
+      "fourofakind" -> "Viererpasch",
+      "fullhouse" -> "Full House",
+      "smallstraight" -> "Kleine Straße",
+      "largestraight" -> "Große Straße",
+      "kniffel" -> "Kniffel",
+      "chance" -> "Chance",
+      "lowerSectionScore" -> "Untere Abschnitt Punktzahl",
+      "totalScore" -> "Gesamtpunktzahl"
+    )
+
+
       // Konfigurieren der Kategorie-Spalte
       val categoryColumn = new TableColumn[(String, String), String]("Category") {
         cellValueFactory = { cellData =>
-          new StringProperty(this, "category", cellData.value._1)
+          val internalCategoryName = cellData.value._1
+          val friendlyCategoryName = categoryNameMapping.getOrElse(internalCategoryName, internalCategoryName)
+          new StringProperty(this, "category", friendlyCategoryName)
         }
         minWidth = columnWidth
         maxWidth = columnWidth
       }
 
       // Konfigurieren der Spieler-Spalten
-      val playerColumns: List[
-        javafx.scene.control.TableColumn[(String, String), String]
-      ] = players.map { player =>
+      val playerColumns: List[javafx.scene.control.TableColumn[(String, String), String]] = players.map { player =>
         new TableColumn[(String, String), String](player.name) {
           cellValueFactory = { cellData =>
             val category = cellData.value._1
@@ -355,11 +378,7 @@ class GUI @Inject() (controller: ControllerInterface)
               .find(_.name == player.name)
               .flatMap(_.scoreCard.categories.get(category))
               .map(p => if p.isDefined then p.get.toString() else "-")
-            new StringProperty(
-              this,
-              "score",
-              score.getOrElse("-")
-            )
+            new StringProperty(this, "score", score.getOrElse("-"))
           }
           minWidth = columnWidth
           maxWidth = columnWidth
@@ -369,8 +388,7 @@ class GUI @Inject() (controller: ControllerInterface)
       tableView.columns ++= List(categoryColumn)
       tableView.columns ++= playerColumns
 
-      val allCategories =
-        controller.getPlayers.flatMap(_.scoreCard.categories.keys).distinct
+      val allCategories = controller.getPlayers.flatMap(_.scoreCard.categories.keys).distinct
       val scoreCardEntries: ObservableBuffer[(String, String)] = ObservableBuffer(
         allCategories.map { category =>
           category -> controller.getPlayers.head.scoreCard.categories
@@ -408,11 +426,40 @@ class GUI @Inject() (controller: ControllerInterface)
 
 
   def rollDice(): Unit = {
-    val keptDiceIndices = selectedDiceIndices.toList
-    controller.keepDice(keptDiceIndices)
-    if (controller.repetitions == 0) {
-      rollButton.disable = true
+    rollButton.disable = true
+    val animationDuration = 1000 // Dauer der Animation in Millisekunden
+    val animationInterval = 100 // Intervall zwischen den Bildern in Millisekunden
+
+    val timer = new Timer()
+    val startTime = System.currentTimeMillis()
+
+    // TimerTask, um die Bilder regelmäßig zu ändern
+    val task = new TimerTask {
+      override def run(): Unit = {
+        if (System.currentTimeMillis() - startTime >= animationDuration) {
+          // Animation beenden und finale Würfelergebnisse anzeigen
+          timer.cancel()
+          Platform.runLater {
+            val keptDiceIndices = selectedDiceIndices.toList
+            controller.keepDice(keptDiceIndices)
+            updateDiceResults()
+            rollButton.disable = controller.repetitions == 0
+          }
+        } else {
+          // Zufällige Würfelbilder für nicht ausgewählte Würfel anzeigen
+          Platform.runLater {
+            diceImageViews.zipWithIndex.foreach { case (imageView, index) =>
+              if (!selectedDiceIndices.contains(index + 1)) {
+                val randomValue = Random.nextInt(6) + 1
+                imageView.image = new Image(getDiceImagePath(randomValue))
+              }
+            }
+          }
+        }
+      }
     }
+    // Timer starten
+    timer.scheduleAtFixedRate(task, 0, animationInterval)
   }
 
   def updateSelectedCategory(): Unit = {

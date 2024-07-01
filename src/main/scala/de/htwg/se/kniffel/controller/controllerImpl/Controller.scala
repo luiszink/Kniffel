@@ -71,7 +71,7 @@ class Controller @Inject() (
   }
 
   def checkGameEnd(): Unit = {
-    if (true/*players.forall(_.scoreCard.isComplete)*/) {
+    if (players.forall(_.scoreCard.isComplete)) {
       notifyObservers(KniffelEvent.GameEnded)
     }
   }

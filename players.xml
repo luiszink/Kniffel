@@ -1,24 +1,24 @@
 <players>
     <player>
-        <name>Luis</name>
+        <name>Los</name>
         <scoreCard>
-            <category name="one"></category>
-            <category name="two"></category>
-            <category name="three"></category>
-            <category name="four"></category>
-            <category name="five"></category>
-            <category name="six"></category>
+            <category name="one">1</category>
+            <category name="two">2</category>
+            <category name="three">9</category>
+            <category name="four">16</category>
+            <category name="five">15</category>
+            <category name="six">18</category>
             <category name="bonus">0</category>
-            <category name="upperSectionScore">0</category>
-            <category name="threeofakind"></category>
-            <category name="fourofakind"></category>
-            <category name="fullhouse"></category>
-            <category name="smallstraight"></category>
-            <category name="largestraight"></category>
+            <category name="upperSectionScore">61</category>
+            <category name="threeofakind">20</category>
+            <category name="fourofakind">28</category>
+            <category name="fullhouse">0</category>
+            <category name="smallstraight">30</category>
+            <category name="largestraight">0</category>
             <category name="kniffel">0</category>
-            <category name="chance"></category>
-            <category name="lowerSectionScore">0</category>
-            <category name="totalScore">0</category>
+            <category name="chance">20</category>
+            <category name="lowerSectionScore">98</category>
+            <category name="totalScore">159</category>
         </scoreCard>
     </player>
 </players>
