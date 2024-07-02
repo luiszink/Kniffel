@@ -214,7 +214,7 @@ class GUI @Inject() (controller: ControllerInterface)
       diceImageViews(4).layoutX = 125
       diceImageViews(4).layoutY = 134
 
-      dicePane.children.addAll(diceImageViews.map(_.delegate): _*)
+      dicePane.children.addAll(diceImageViews.map(_.delegate)*)
 
       val controlBox = new VBox(10) {
         children = Seq(
@@ -331,7 +331,7 @@ class GUI @Inject() (controller: ControllerInterface)
             category -> controller.getPlayers.head.scoreCard.categories
               .getOrElse(category, "-")
               .toString
-          }: _*
+          }*
         )
 
       tableView.items = scoreCardEntries
