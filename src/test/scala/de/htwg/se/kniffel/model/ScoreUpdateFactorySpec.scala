@@ -1,93 +1,142 @@
-package de.htwg.se.kniffel.model
+package de.htwg.se.kniffel.model.modelImpl
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import org.scalatest.flatspec.AnyFlatSpec
-import org.scalatest.matchers.should.Matchers
-import de.htwg.se.kniffel.model.Player
-
+import de.htwg.se.kniffel.model.modelImpl.ScoreUpdaterFactory
+import de.htwg.se.kniffel.model.scoreUpdaterImpl.{StandardScoreUpdater, MultiKniffelScoreUpdater}
+import de.htwg.se.kniffel.model.modelImpl.{Player, ScoreCard}
 
 class ScoreUpdaterFactorySpec extends AnyWordSpec with Matchers {
 
   "A ScoreUpdaterFactory" should {
 
-    "return a StandardScoreUpdater for 'y'" in {
-      val scoreUpdater = ScoreUpdaterFactory.createScoreUpdater("y")
-      scoreUpdater shouldBe a[StandardScoreUpdater]
+    "create a StandardScoreUpdater when input is 'y'" in {
+      val updater = ScoreUpdaterFactory.createScoreUpdater("y")
+      updater shouldBe a[StandardScoreUpdater]
     }
 
-    "return a SpecialScoreUpdater for 'n'" in {
-      val scoreUpdater = ScoreUpdaterFactory.createScoreUpdater("n")
-      scoreUpdater shouldBe a[SpecialScoreUpdater]
+    "create a MultiKniffelScoreUpdater when input is 'n'" in {
+      val updater = ScoreUpdaterFactory.createScoreUpdater("n")
+      updater shouldBe a[MultiKniffelScoreUpdater]
+    }
+
+    "create a StandardScoreUpdater when input is 'standard'" in {
+      val updater = ScoreUpdaterFactory.createScoreUpdater("standard")
+      updater shouldBe a[StandardScoreUpdater]
     }
 
     "throw an IllegalArgumentException for invalid input" in {
-      assertThrows[IllegalArgumentException] {
+      an[IllegalArgumentException] should be thrownBy {
         ScoreUpdaterFactory.createScoreUpdater("invalid")
       }
     }
   }
-}
 
-  class StandardScoreUpdaterSpec extends AnyWordSpec with Matchers {
+  "A StandardScoreUpdater" should {
 
-      "not update a category if it is already filled" in {
-        val player = Player("TestPlayer")
-        val scoreCard = ScoreCard()
-        player.scoreCard.categories = scoreCard.categories.clone()
-        val updater = new StandardScoreUpdater()
+    "update the score correctly for a valid category" in {
+      val player = Player("TestPlayer", ScoreCard())
+      val updater = new StandardScoreUpdater
+      val dice = List(1, 1, 1, 2, 3)
+      updater.updateScore(player, "one", dice)
+      player.scoreCard.categories("one") shouldEqual Some(3)
+    }
 
-        // Fill a category first
-        player.scoreCard.categories("one") = Some(5)
+    "update the score correctly for all categories" in {
+      val player = Player("TestPlayer", ScoreCard())
+      val updater = new StandardScoreUpdater
 
-        // Try to update the filled category
-        updater.updateScore(player, "one", List(1, 1, 1, 1, 1))
+      val testCases = Map(
+        "two" -> (List(1, 2, 2, 4, 5), 4),
+        "three" -> (List(3, 3, 3, 4, 5), 9),
+        "four" -> (List(4, 4, 4, 4, 5), 16),
+        "five" -> (List(5, 5, 5, 5, 5), 25),
+        "six" -> (List(6, 6, 6, 6, 6), 30),
+        "threeofakind" -> (List(3, 3, 3, 4, 5), 18),
+        "fourofakind" -> (List(4, 4, 4, 4, 5), 21),
+        "fullhouse" -> (List(3, 3, 3, 5, 5), 25),
+        "smallstraight" -> (List(1, 2, 3, 4, 6), 30),
+        "largestraight" -> (List(2, 3, 4, 5, 6), 40),
+        "chance" -> (List(1, 2, 3, 4, 5), 15),
+        "kniffel" -> (List(6, 6, 6, 6, 6), 50)
+      )
 
-        // Check if the category remains unchanged
-        player.scoreCard.categories("one").get should be (5)
+      for ((category, (dice, expectedScore)) <- testCases) {
+        updater.updateScore(player, category, dice)
+        player.scoreCard.categories(category) shouldEqual Some(expectedScore)
       }
+    }
 
-      "throw an IllegalArgumentException for an invalid category" in {
-        val player = Player("TestPlayer")
-        val scoreCard = ScoreCard()
-        player.scoreCard.categories = scoreCard.categories.clone()
-        val updater = new StandardScoreUpdater()
-
-        // Try to update with an invalid category
-        assertThrows[IllegalArgumentException] {
-          updater.updateScore(player, "invalidCategory", List(1, 2, 3, 4, 5))
+    "not update the score for an invalid category" in {
+      val player = Player("TestPlayer", ScoreCard())
+      val updater = new StandardScoreUpdater
+      val dice = List(1, 1, 1, 2, 3)
+      an[IllegalArgumentException] should be thrownBy {
+        updater.updateScore(player, "invalid", dice)
       }
+    }
+
+    "not update the score if the category is already filled" in {
+      val player = Player("TestPlayer", ScoreCard())
+      player.scoreCard.categories.update("one", Some(3))
+      val updater = new StandardScoreUpdater
+      val dice = List(1, 1, 1, 2, 3)
+      updater.updateScore(player, "one", dice)
+      player.scoreCard.categories("one") shouldEqual Some(3) // Score should remain unchanged
     }
   }
-class SpecialScoreUpdaterSpec extends AnyWordSpec with Matchers {
 
+  "A MultiKniffelScoreUpdater" should {
 
-    "not update a category if it is already filled" in {
-      val player = Player("TestPlayer")
-      val scoreCard = ScoreCard()
-      player.scoreCard.categories = scoreCard.categories.clone()
-      val updater = new SpecialScoreUpdater()
-
-      // Fill a category first
-      player.scoreCard.categories("one") = Some(5)
-
-      // Try to update the filled category
-      updater.updateScore(player, "one", List(1, 1, 1, 1, 1))
-
-      // Check if the category remains unchanged
-      player.scoreCard.categories("one").get should be (5)
+    "update the score correctly for a valid category" in {
+      val player = Player("TestPlayer", ScoreCard())
+      val updater = new MultiKniffelScoreUpdater
+      val dice = List(1, 1, 1, 2, 3)
+      updater.updateScore(player, "one", dice)
+      player.scoreCard.categories("one") shouldEqual Some(3)
     }
 
-    "throw an IllegalArgumentException for an invalid category" in {
-      val player = Player("TestPlayer")
-      val scoreCard = ScoreCard()
-      player.scoreCard.categories = scoreCard.categories.clone()
-      val updater = new SpecialScoreUpdater()
+    "update the score correctly for all categories" in {
+      val player = Player("TestPlayer", ScoreCard())
+      val updater = new MultiKniffelScoreUpdater
 
-      // Try to update with an invalid category
-      assertThrows[IllegalArgumentException] {
-        updater.updateScore(player, "invalidCategory", List(1, 2, 3, 4, 5))
-      
+      val testCases = Map(
+        "two" -> (List(1, 2, 2, 4, 5), 4),
+        "three" -> (List(3, 3, 3, 4, 5), 9),
+        "four" -> (List(4, 4, 4, 4, 5), 16),
+        "five" -> (List(5, 5, 5, 5, 5), 25),
+        "six" -> (List(6, 6, 6, 6, 6), 30),
+        "threeofakind" -> (List(3, 3, 3, 4, 5), 18),
+        "fourofakind" -> (List(4, 4, 4, 4, 5), 21),
+        "fullhouse" -> (List(3, 3, 3, 5, 5), 25),
+        "smallstraight" -> (List(1, 2, 3, 4, 6), 30),
+        "largestraight" -> (List(2, 3, 4, 5, 6), 40),
+        "chance" -> (List(1, 2, 3, 4, 5), 15),
+        "kniffel" -> (List(6, 6, 6, 6, 6), 50)
+      )
+
+      for ((category, (dice, expectedScore)) <- testCases) {
+        updater.updateScore(player, category, dice)
+        player.scoreCard.categories(category) shouldEqual Some(expectedScore)
+      }
+    }
+
+    "not update the score for an invalid category" in {
+      val player = Player("TestPlayer", ScoreCard())
+      val updater = new MultiKniffelScoreUpdater
+      val dice = List(1, 1, 1, 2, 3)
+      an[IllegalArgumentException] should be thrownBy {
+        updater.updateScore(player, "invalid", dice)
+      }
+    }
+
+    "not update the score if the category is already filled" in {
+      val player = Player("TestPlayer", ScoreCard())
+      player.scoreCard.categories.update("one", Some(3))
+      val updater = new MultiKniffelScoreUpdater
+      val dice = List(1, 1, 1, 2, 3)
+      updater.updateScore(player, "one", dice)
+      player.scoreCard.categories("one") shouldEqual Some(3) // Score should remain unchanged
     }
   }
 }
