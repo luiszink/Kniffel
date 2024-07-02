@@ -18,7 +18,11 @@ lazy val root = project
       "com.typesafe.play" %% "play-json" % "2.10.0-RC5",
       "org.scalatestplus" %% "mockito-3-4" % "3.2.10.0" % "test"
     ),
-
+    Compile / mainClass := Some("de.htwg.se.kniffel.KniffelApp"),
+    assembly / assemblyMergeStrategy := {
+      case PathList("META-INF", xs @ _*) => MergeStrategy.discard
+      case x => MergeStrategy.first
+    },
     libraryDependencies ++= {
       // Determine OS version of JavaFX binaries
       lazy val osName = System.getProperty("os.name") match {
