@@ -1,7 +1,10 @@
-package de.htwg.se.kniffel.model
+package de.htwg.se.kniffel.model.modelImpl
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import de.htwg.se.kniffel.model.modelImpl.ScoreUpdaterFactory
+import de.htwg.se.kniffel.model.scoreUpdaterImpl.{StandardScoreUpdater, MultiKniffelScoreUpdater}
+import de.htwg.se.kniffel.model.modelImpl.{Player, ScoreCard}
 
 class ScoreUpdaterFactorySpec extends AnyWordSpec with Matchers {
 
@@ -12,9 +15,9 @@ class ScoreUpdaterFactorySpec extends AnyWordSpec with Matchers {
       updater shouldBe a[StandardScoreUpdater]
     }
 
-    "create a SpecialScoreUpdater when input is 'n'" in {
+    "create a MultiKniffelScoreUpdater when input is 'n'" in {
       val updater = ScoreUpdaterFactory.createScoreUpdater("n")
-      updater shouldBe a[SpecialScoreUpdater]
+      updater shouldBe a[MultiKniffelScoreUpdater]
     }
 
     "create a StandardScoreUpdater when input is 'standard'" in {
@@ -83,11 +86,11 @@ class ScoreUpdaterFactorySpec extends AnyWordSpec with Matchers {
     }
   }
 
-  "A SpecialScoreUpdater" should {
+  "A MultiKniffelScoreUpdater" should {
 
     "update the score correctly for a valid category" in {
       val player = Player("TestPlayer", ScoreCard())
-      val updater = new SpecialScoreUpdater
+      val updater = new MultiKniffelScoreUpdater
       val dice = List(1, 1, 1, 2, 3)
       updater.updateScore(player, "one", dice)
       player.scoreCard.categories("one") shouldEqual Some(3)
@@ -95,7 +98,7 @@ class ScoreUpdaterFactorySpec extends AnyWordSpec with Matchers {
 
     "update the score correctly for all categories" in {
       val player = Player("TestPlayer", ScoreCard())
-      val updater = new SpecialScoreUpdater
+      val updater = new MultiKniffelScoreUpdater
 
       val testCases = Map(
         "two" -> (List(1, 2, 2, 4, 5), 4),
@@ -120,7 +123,7 @@ class ScoreUpdaterFactorySpec extends AnyWordSpec with Matchers {
 
     "not update the score for an invalid category" in {
       val player = Player("TestPlayer", ScoreCard())
-      val updater = new SpecialScoreUpdater
+      val updater = new MultiKniffelScoreUpdater
       val dice = List(1, 1, 1, 2, 3)
       an[IllegalArgumentException] should be thrownBy {
         updater.updateScore(player, "invalid", dice)
@@ -130,7 +133,7 @@ class ScoreUpdaterFactorySpec extends AnyWordSpec with Matchers {
     "not update the score if the category is already filled" in {
       val player = Player("TestPlayer", ScoreCard())
       player.scoreCard.categories.update("one", Some(3))
-      val updater = new SpecialScoreUpdater
+      val updater = new MultiKniffelScoreUpdater
       val dice = List(1, 1, 1, 2, 3)
       updater.updateScore(player, "one", dice)
       player.scoreCard.categories("one") shouldEqual Some(3) // Score should remain unchanged
