@@ -1,13 +1,15 @@
 package de.htwg.se.kniffel.controller
 
-import de.htwg.se.kniffel.model._
+import de.htwg.se.kniffel.model.modelImpl.{Player, ScoreCard}
+import de.htwg.se.kniffel.util._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import de.htwg.se.kniffel.controller.controllerImpl.UpdateScoreCommand
 
 class UpdateScoreCommandSpec extends AnyWordSpec with Matchers {
 
   "An UpdateScoreCommand" should {
-    val player = Player("TestPlayer", ScoreCard())
+    val player = Player("TestPlayer")
 
     "calculate and update the score correctly when doStep is called" in {
       val dice = List(1, 1, 1, 4, 5)
@@ -21,7 +23,7 @@ class UpdateScoreCommandSpec extends AnyWordSpec with Matchers {
       val command = new UpdateScoreCommand(player, "one", dice)
       command.doStep
       command.undoStep
-      player.scoreCard.categories("one") shouldEqual Some(3)
+      player.scoreCard.categories("one") shouldEqual None
     }
 
     "redo the score update correctly when redoStep is called" in {
@@ -50,7 +52,7 @@ class UpdateScoreCommandSpec extends AnyWordSpec with Matchers {
       )
 
       for ((category, (dice, expectedScore)) <- testCases) {
-        val player = Player("TestPlayer", ScoreCard())
+        val player = Player("TestPlayer")
         val command = new UpdateScoreCommand(player, category, dice)
         command.doStep
         player.scoreCard.categories(category) shouldEqual Some(expectedScore)
@@ -58,7 +60,7 @@ class UpdateScoreCommandSpec extends AnyWordSpec with Matchers {
     }
 
     "throw an exception for an invalid category" in {
-      val player = Player("TestPlayer", ScoreCard())
+      val player = Player("TestPlayer")
       val dice = List(1, 1, 1, 4, 5)
       val invalidCommand = new UpdateScoreCommand(player, "invalid", dice)
       an [IllegalArgumentException] should be thrownBy invalidCommand.doStep

@@ -15,7 +15,8 @@ lazy val root = project
       "net.codingwell" %% "scala-guice" % "7.0.0",
       "com.google.inject" % "guice" % "5.0.1",
       "org.scala-lang.modules" %% "scala-xml" % "2.0.0",
-      "com.typesafe.play" %% "play-json" % "2.10.0-RC5"
+      "com.typesafe.play" %% "play-json" % "2.10.0-RC5",
+      "org.scalatestplus" %% "mockito-3-4" % "3.2.10.0" % "test"
     ),
 
     libraryDependencies ++= {
