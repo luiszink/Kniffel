@@ -14,6 +14,8 @@ import de.htwg.se.kniffel.model.PlayerInterface
 import scala.concurrent.{Future, Await, ExecutionContext}
 import scala.concurrent.duration.Duration
 
+import com.google.inject.{Guice, Injector, AbstractModule}
+
 object KniffelApp {
   def main(args: Array[String]): Unit = {
     val injector: Injector = Guice.createInjector(new KniffelModule)
@@ -21,11 +23,6 @@ object KniffelApp {
     val tui: TUI = injector.getInstance(classOf[TUI])
     val gui: GUI = injector.getInstance(classOf[GUI])
     val controller: ControllerInterface = injector.getInstance(classOf[ControllerInterface])
-
-    // Hinzufügen eines Shutdown-Hooks
-    sys.addShutdownHook {
-      controller.saveCurrentState()
-    }
 
     implicit val context: ExecutionContext = scala.concurrent.ExecutionContext.global
     val f = Future {

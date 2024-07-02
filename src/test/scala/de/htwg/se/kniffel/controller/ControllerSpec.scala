@@ -67,7 +67,7 @@ class ControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
       var notified = false
       val observer = new Observer {
         override def update(event: KniffelEvent.Value): Unit = {
-          if (event == KniffelEvent.PrintDice) notified = true
+          if (event == KniffelEvent.keepDice) notified = true
         }
       }
       controller.add(observer)

@@ -18,7 +18,7 @@ class ObservableSpec extends AnyWordSpec with Matchers {
       val observer = new TestObserver
 
       observable.add(observer)
-      observable.notifyObservers(KniffelEvent.PrintScoreCard)
+      observable.notifyObservers(KniffelEvent.updateScore)
 
       observer.notified shouldEqual true
     }
@@ -29,7 +29,7 @@ class ObservableSpec extends AnyWordSpec with Matchers {
 
       observable.add(observer)
       observable.remove(observer)
-      observable.notifyObservers(KniffelEvent.PrintScoreCard)
+      observable.notifyObservers(KniffelEvent.updateScore)
 
       observer.notified shouldEqual false
     }
@@ -41,7 +41,7 @@ class ObservableSpec extends AnyWordSpec with Matchers {
 
       observable.add(observer1)
       observable.add(observer2)
-      observable.notifyObservers(KniffelEvent.PrintScoreCard)
+      observable.notifyObservers(KniffelEvent.updateScore)
 
       observer1.notified shouldEqual true
       observer2.notified shouldEqual true
@@ -55,7 +55,7 @@ class ObservableSpec extends AnyWordSpec with Matchers {
       observable.add(observer1)
       observable.add(observer2)
       observable.remove(observer1)
-      observable.notifyObservers(KniffelEvent.PrintScoreCard)
+      observable.notifyObservers(KniffelEvent.updateScore)
 
       observer1.notified shouldEqual false
       observer2.notified shouldEqual true
