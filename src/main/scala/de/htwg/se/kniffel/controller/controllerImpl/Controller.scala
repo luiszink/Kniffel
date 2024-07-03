@@ -100,9 +100,6 @@ class Controller @Inject() (
     player.scoreCard.isComplete match {
       case true =>
         player.scoreCard.calculateTotalScore()
-        println(
-          s"${player.name}'s total score: ${player.scoreCard.categories("totalScore").getOrElse(0)}"
-        )
       case false =>
     }
     repetitions = 2

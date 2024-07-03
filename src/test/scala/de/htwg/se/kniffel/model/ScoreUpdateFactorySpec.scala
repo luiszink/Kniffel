@@ -2,7 +2,10 @@ package de.htwg.se.kniffel.model.modelImpl
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import de.htwg.se.kniffel.model.scoreUpdaterImpl.{StandardScoreUpdater, MultiKniffelScoreUpdater}
+import de.htwg.se.kniffel.model.scoreUpdaterImpl.{
+  StandardScoreUpdater,
+  MultiKniffelScoreUpdater
+}
 
 class ScoreUpdaterFactorySpec extends AnyWordSpec with Matchers {
 
@@ -132,6 +135,33 @@ class ScoreUpdaterFactorySpec extends AnyWordSpec with Matchers {
       an[IllegalArgumentException] should be thrownBy {
         updater.updateScore(player, "one", dice)
       }
+    }
+
+    "assign additional Kniffel points to a random empty category if kniffel category is already filled" in {
+      val player = Player("TestPlayer", ScoreCard())
+      val updater = new MultiKniffelScoreUpdater
+
+      // Fill the kniffel category
+      player.scoreCard.categories.update("kniffel", Some(50))
+
+      // Dice result that would normally go into kniffel category
+      val dice = List(6, 6, 6, 6, 6)
+
+      // Capture the initial empty categories excluding bonus and total scores
+      val emptyCategories =
+        player.scoreCard.categories.filter(_._2.isEmpty).keys.toList
+      val emptyCategoriesExcluding = emptyCategories.filterNot(cat =>
+        cat == "bonus" || cat == "uppersectionscore" || cat == "totalscore"
+      )
+
+      // Update the score
+      updater.updateScore(player, "kniffel", dice)
+
+      // Verify that an additional 50 points have been added to one of the empty categories
+      val updatedCategories = player.scoreCard.categories.filter {
+        case (k, v) => emptyCategoriesExcluding.contains(k) && v.contains(50)
+      }
+      updatedCategories should have size 1
     }
   }
 }

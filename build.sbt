@@ -1,5 +1,4 @@
 import org.scoverage.coveralls.Imports.CoverallsKeys._
-
 val scala3Version = "3.4.1"
 
 lazy val root = project
@@ -19,7 +18,7 @@ lazy val root = project
       "com.typesafe.play" %% "play-json" % "2.10.0-RC5",
       "org.scalatestplus" %% "mockito-3-4" % "3.2.10.0" % "test"
     ),
-    
+
     libraryDependencies ++= {
       // Determine OS version of JavaFX binaries
       lazy val osName = System.getProperty("os.name") match {
@@ -30,8 +29,5 @@ lazy val root = project
       }
       Seq("base", "controls", "fxml", "graphics", "media", "swing", "web")
         .map(m => "org.openjfx" % s"javafx-$m" % "16" classifier osName)
-    },
-    
-    // Exclude specific packages from coverage
-    coverageExcludedPackages := "de\\.htwg\\.se\\.kniffel\\.aview\\..*"
+    }
   )

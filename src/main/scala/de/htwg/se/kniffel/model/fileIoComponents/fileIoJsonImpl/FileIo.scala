@@ -1,9 +1,5 @@
 package de.htwg.se.kniffel.model.fileIoComponents.fileIoJsonImpl
 
-import com.google.inject.Guice
-import com.google.inject.name.Names
-import net.codingwell.scalaguice.InjectorExtensions._
-import de.htwg.se.kniffel.KniffelModule
 import de.htwg.se.kniffel.model.fileIoComponents.FileIoInterface
 import de.htwg.se.kniffel.model.{PlayerInterface, ScoreCardInterface}
 import de.htwg.se.kniffel.model.modelImpl.{Player, ScoreCard}
