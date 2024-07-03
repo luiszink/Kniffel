@@ -93,11 +93,19 @@ class ControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
       controller.addPlayer(
         "Player1"
       ) // Sicherstellen, dass mindestens ein Spieler vorhanden ist
+
+      // Case 1: previousDice is defined
       val diceValues = controller.getDice
       controller.nextPlayer()
       controller.getPreviousDice shouldEqual diceValues
-    }
 
+      // Case 2: previousDice is None
+      val newController = new Controller(jsonProvider, xmlProvider)
+      newController.addPlayer(
+        "Player1"
+      ) // Sicherstellen, dass mindestens ein Spieler vorhanden ist
+      newController.getPreviousDice shouldEqual List()
+    }
     "handle state transitions correctly" in {
       val controller = new Controller(jsonProvider, xmlProvider)
       controller.setState(new RollingState())
@@ -202,15 +210,29 @@ class ControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
     }
 
     "update score and calculate total score correctly" in {
-      val newController = new Controller(jsonProvider, xmlProvider)
-      newController.addPlayer("Player1")
-      newController.rollDice()
-      newController.updateScore("one")
-      val player = newController.getCurrentPlayer
-      player.scoreCard.calculateTotalScore()
-      println(
-        s"${player.name}'s total score: ${player.scoreCard.categories("totalScore").getOrElse(0)}"
-      )
+      val controller = new Controller(jsonProvider, xmlProvider)
+      controller.addPlayer("Player1")
+
+      // Mocking the score categories to ensure isComplete returns true
+      val player = controller.getCurrentPlayer
+      player.scoreCard.categories.keys.foreach { key =>
+        if (
+          key != "totalScore" && key != "bonus" && key != "upperSectionScore" && key != "lowerSectionScore"
+        ) {
+          player.scoreCard.categories.update(key, Some(5))
+        }
+      }
+
+      controller.rollDice()
+      controller.updateScore("one")
+
+      // Capturing the console output
+      val outCapture = new ByteArrayOutputStream()
+      Console.withOut(new PrintStream(outCapture)) {
+        player.scoreCard.calculateTotalScore()
+      }
+
+      // Verify total score is calculated
       player.scoreCard.categories("totalScore") should not be empty
     }
 
