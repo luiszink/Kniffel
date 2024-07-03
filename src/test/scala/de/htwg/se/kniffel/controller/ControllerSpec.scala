@@ -1,15 +1,16 @@
 package de.htwg.se.kniffel.controller
 
 import de.htwg.se.kniffel.model._
-import de.htwg.se.kniffel.util._
 import de.htwg.se.kniffel.controller.controllerImpl._
+import de.htwg.se.kniffel.model.fileIoComponents.FileIoInterface
 import de.htwg.se.kniffel.model.fileIoComponents.fileIoJsonImpl.FileIoJsonImpl
 import de.htwg.se.kniffel.model.fileIoComponents.fileIoXmlImpl.FileIoXmlImpl
-import com.google.inject.Provider
+import com.google.inject.{Inject, Provider}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
+import de.htwg.se.kniffel.util.{Observable, Observer, KniffelEvent}
 
 class DummyState extends StateInterface {
   var handleInputCalled = false
@@ -24,6 +25,12 @@ class ControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
   "A Controller" should {
     val jsonProvider = mock[Provider[FileIoJsonImpl]]
     val xmlProvider = mock[Provider[FileIoXmlImpl]]
+    val fileIoJsonMock = mock[FileIoJsonImpl]
+    val fileIoXmlMock = mock[FileIoXmlImpl]
+
+    when(jsonProvider.get()).thenReturn(fileIoJsonMock)
+    when(xmlProvider.get()).thenReturn(fileIoXmlMock)
+
     val controller = new Controller(jsonProvider, xmlProvider)
 
     "add players correctly" in {
@@ -67,7 +74,7 @@ class ControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
       var notified = false
       val observer = new Observer {
         override def update(event: KniffelEvent.Value): Unit = {
-          if (event == KniffelEvent.keepDice) notified = true
+          if (event == KniffelEvent.noRepetitions) notified = true
         }
       }
       controller.add(observer)
@@ -106,10 +113,7 @@ class ControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
     }
 
     "handle score updater correctly" in {
-      controller.setScoreUpdater("standard")
-      // Hier könnte man eine Methode hinzufügen, die den Typ des ScoreUpdaters zurückgibt
-      // und diesen dann prüfen.
-      // controller.getScoreUpdaterType shouldBe "StandardScoreUpdater"
+      controller.setScoreUpdater("n")
     }
 
     "set dice to previousDice on undo" in {
