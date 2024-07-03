@@ -94,8 +94,9 @@ class Controller @Inject() (
   def updateScore(category: String): Unit = {
     val player = getCurrentPlayer
     val dice = getDice
-    scoreUpdater.updateScore(player, category, dice)
-    undoManager.doStep(new UpdateScoreCommand(player, category, dice))
+    val prevDice = previousDice.getOrElse(this.dice)
+    val command = new UpdateScoreCommand(player, category, dice, prevDice)
+    undoManager.doStep(command)
     player.scoreCard.isComplete match {
       case true =>
         player.scoreCard.calculateTotalScore()
@@ -118,16 +119,6 @@ class Controller @Inject() (
     Try {
       if (input.toLowerCase == "undo") {
         undoManager.undoStep
-        previousDice match {
-          case Some(pdice) => dice = pdice
-          case None        => // Do nothing
-        }
-        setState(new UpdateState())
-        currentPlayerIndex match {
-          case 0 => currentPlayerIndex = players.length - 1
-          case _ =>
-            currentPlayerIndex = (currentPlayerIndex - 1) % players.length
-        }
         notifyObservers(KniffelEvent.Undo)
       } else {
         currentState.handleInput(input, this)

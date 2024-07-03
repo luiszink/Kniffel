@@ -4,11 +4,13 @@ import de.htwg.se.kniffel.model._
 import de.htwg.se.kniffel.util._
 import de.htwg.se.kniffel.model.modelImpl._
 
-class UpdateScoreCommand(player: PlayerInterface, category: String, dice: List[Int]) extends Command {
-
+class UpdateScoreCommand(player: PlayerInterface, category: String, dice: List[Int], previousDice: DiceInterface) extends Command {
+  
   private var previousScore: Option[Int] = player.scoreCard.categories.getOrElse(category.toLowerCase, None)
   private var newScore: Option[Int] = None
-
+  private var previousDiceState: DiceInterface = previousDice
+  private var currentDiceState: DiceInterface = Dice(dice)
+  
   override def doStep: Unit = {
     val strategy: ScoringStrategyInterface = category.toLowerCase match {
       case "one" => Ones
@@ -33,9 +35,12 @@ class UpdateScoreCommand(player: PlayerInterface, category: String, dice: List[I
 
   override def undoStep: Unit = {
     player.scoreCard.categories.update(category.toLowerCase, previousScore)
+    // Würfel zurücksetzen
+    player.asInstanceOf[Player].setDice(previousDiceState)
   }
 
   override def redoStep: Unit = {
     player.scoreCard.categories.update(category.toLowerCase, newScore)
+    player.asInstanceOf[Player].setDice(currentDiceState)
   }
 }
