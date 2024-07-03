@@ -18,4 +18,6 @@ trait ControllerInterface extends Observable {
   def setState(state: StateInterface): Unit
   def handleInput(input: String): Unit
   def saveCurrentState(): Unit
+  def getWinner: String
+  def getFinalScores: List[String]
 }

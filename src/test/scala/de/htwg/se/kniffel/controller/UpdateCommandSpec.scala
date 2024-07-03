@@ -1,32 +1,28 @@
 package de.htwg.se.kniffel.controller
 
-import de.htwg.se.kniffel.model._
+import de.htwg.se.kniffel.model.modelImpl.{Player, Dice, ScoreCard}
+import de.htwg.se.kniffel.util._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import de.htwg.se.kniffel.controller.controllerImpl.UpdateScoreCommand
 
 class UpdateScoreCommandSpec extends AnyWordSpec with Matchers {
 
   "An UpdateScoreCommand" should {
-    val player = Player("TestPlayer", ScoreCard())
+    val player = Player("TestPlayer")
 
     "calculate and update the score correctly when doStep is called" in {
       val dice = List(1, 1, 1, 4, 5)
-      val command = new UpdateScoreCommand(player, "one", dice)
+      val previousDice = Dice(List(1, 2, 3, 4, 5))
+      val command = new UpdateScoreCommand(player, "one", dice, previousDice)
       command.doStep
-      player.scoreCard.categories("one") shouldEqual Some(3)
-    }
-
-    "restore the previous score when undoStep is called" in {
-      val dice = List(1, 1, 1, 4, 5)
-      val command = new UpdateScoreCommand(player, "one", dice)
-      command.doStep
-      command.undoStep
       player.scoreCard.categories("one") shouldEqual Some(3)
     }
 
     "redo the score update correctly when redoStep is called" in {
       val dice = List(1, 1, 1, 4, 5)
-      val command = new UpdateScoreCommand(player, "one", dice)
+      val previousDice = Dice(List(1, 2, 3, 4, 5))
+      val command = new UpdateScoreCommand(player, "one", dice, previousDice)
       command.doStep
       command.undoStep
       command.redoStep
@@ -50,17 +46,19 @@ class UpdateScoreCommandSpec extends AnyWordSpec with Matchers {
       )
 
       for ((category, (dice, expectedScore)) <- testCases) {
-        val player = Player("TestPlayer", ScoreCard())
-        val command = new UpdateScoreCommand(player, category, dice)
+        val player = Player("TestPlayer")
+        val previousDice = Dice(List(1, 2, 3, 4, 5))
+        val command = new UpdateScoreCommand(player, category, dice, previousDice)
         command.doStep
         player.scoreCard.categories(category) shouldEqual Some(expectedScore)
       }
     }
 
     "throw an exception for an invalid category" in {
-      val player = Player("TestPlayer", ScoreCard())
+      val player = Player("TestPlayer")
       val dice = List(1, 1, 1, 4, 5)
-      val invalidCommand = new UpdateScoreCommand(player, "invalid", dice)
+      val previousDice = Dice(List(1, 2, 3, 4, 5))
+      val invalidCommand = new UpdateScoreCommand(player, "invalid", dice, previousDice)
       an [IllegalArgumentException] should be thrownBy invalidCommand.doStep
     }
   }

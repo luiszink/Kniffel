@@ -34,7 +34,7 @@ class FileIoJsonImpl extends FileIoInterface {
     val file = new File("players.json")
     val pw = new PrintWriter(file)
     pw.write(Json.prettyPrint(playersToJson(players)))
-    pw.close
+    pw.close()
   }
 
   implicit val scoreCardWrites: Writes[ScoreCardInterface] = new Writes[ScoreCardInterface] {
@@ -57,7 +57,7 @@ class FileIoJsonImpl extends FileIoInterface {
     val categories = (json \ "categories").as[Map[String, JsValue]].map {
       case (k, v) => k -> v.asOpt[Int]
     }
-    JsSuccess(new ScoreCard(scala.collection.mutable.LinkedHashMap(categories.toSeq: _*)))
+    JsSuccess(new ScoreCard(scala.collection.mutable.LinkedHashMap(categories.toSeq*)))
   }
 
   implicit val playerReads: Reads[PlayerInterface] = (json: JsValue) => {

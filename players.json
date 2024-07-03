@@ -1,26 +1,3 @@
 {
-  "players" : [ {
-    "name" : "michi",
-    "scoreCard" : {
-      "categories" : {
-        "two" : null,
-        "kniffel" : null,
-        "lowerSectionScore" : null,
-        "five" : null,
-        "fourofakind" : null,
-        "upperSectionScore" : null,
-        "four" : null,
-        "bonus" : null,
-        "three" : null,
-        "smallstraight" : null,
-        "threeofakind" : null,
-        "fullhouse" : null,
-        "six" : null,
-        "totalScore" : null,
-        "chance" : null,
-        "largestraight" : null,
-        "one" : 1
-      }
-    }
-  } ]
+  "players" : [ ]
 }
