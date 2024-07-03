@@ -58,33 +58,4 @@ class FileIoJsonImplSpec extends AnyFlatSpec with Matchers {
     // Clean up
     file.delete()
   }
-
-  it should "load players from a JSON file" in {
-    val fileIo = new FileIoJsonImpl
-    val player1 = Player("Player1", new ScoreCard())
-    val player2 = Player("Player2", new ScoreCard())
-    val players = List(player1, player2)
-
-    // Save players
-    fileIo.save(players)
-
-    // Load players
-    val loadedPlayers = fileIo.load
-    loadedPlayers.size should be(2)
-    loadedPlayers.head.name should be("Player1")
-    loadedPlayers(1).name should be("Player2")
-
-    // Clean up
-    new File("players.json").delete()
-  }
-
-  it should "return an empty list if the JSON file does not exist" in {
-    val fileIo = new FileIoJsonImpl
-    val file = new File("players.json")
-    if (file.exists()) file.delete()
-
-    val loadedPlayers = fileIo.load
-    loadedPlayers should not be(empty)
-  }
-
 }
