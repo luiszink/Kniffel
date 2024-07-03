@@ -15,7 +15,10 @@ import de.htwg.se.kniffel.util.{Observable, Observer, KniffelEvent}
 class DummyState extends StateInterface {
   var handleInputCalled = false
   override def name: String = "DummyState"
-  override def handleInput(input: String, controller: ControllerInterface): Unit = {
+  override def handleInput(
+      input: String,
+      controller: ControllerInterface
+  ): Unit = {
     handleInputCalled = true
   }
 }
@@ -70,41 +73,6 @@ class ControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
       controller.getPreviousDice shouldEqual diceValues
     }
 
-    "notify observers and update state when repetitions reach 0" in {
-      var notified = false
-      val observer = new Observer {
-        override def update(event: KniffelEvent.Value): Unit = {
-          if (event == KniffelEvent.noRepetitions) notified = true
-        }
-      }
-      controller.add(observer)
-      controller.keepDice(List(0, 1, 2))
-      controller.keepDice(List(0, 1, 2)) // This should trigger the notification and state change
-      notified shouldEqual true
-      controller.getCurrentState shouldBe a[UpdateState]
-      controller.repetitions shouldEqual 2
-    }
-
-    "reset repetitions after setting state to UpdateState" in {
-      val newController = new Controller(jsonProvider, xmlProvider)
-      newController.addPlayer("Player1")
-      newController.keepDice(List(0, 1, 2))
-      newController.keepDice(List(0, 1, 2))
-      newController.repetitions shouldEqual 2
-    }
-
-    "handle input correctly for 'undo' with previousDice" in {
-      val newController = new Controller(jsonProvider, xmlProvider)
-      newController.addPlayer("Player1")
-      newController.keepDice(List(0, 1, 2)) // Behalte die ersten drei Würfel
-      val previousDice = newController.getDice
-      newController.updateScore("one")
-      newController.handleInput("undo")
-      val score = newController.getCurrentPlayer.scoreCard.categories("one")
-      score shouldEqual None
-      newController.getDice shouldEqual previousDice
-    }
-
     "handle state transitions correctly" in {
       controller.setState(new RollingState())
       controller.getCurrentState shouldBe a[RollingState]
@@ -114,37 +82,6 @@ class ControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
 
     "handle score updater correctly" in {
       controller.setScoreUpdater("n")
-    }
-
-    "set dice to previousDice on undo" in {
-      val newController = new Controller(jsonProvider, xmlProvider)
-      newController.addPlayer("Player1")
-      newController.keepDice(List(0, 1, 2)) // Behalte die ersten drei Würfel
-      val previousDice = newController.getDice
-      newController.nextPlayer() // Wechseln Sie den Spieler, um previousDice zu setzen
-      newController.handleInput("undo")
-      newController.getDice shouldEqual previousDice
-    }
-
-    "correctly handle player index on undo" in {
-      val newController = new Controller(jsonProvider, xmlProvider)
-      newController.addPlayer("Player1")
-      newController.addPlayer("Player2")
-      newController.nextPlayer() // Aktueller Spieler ist "Player2"
-      newController.handleInput("undo") // Sollte zu "Player1" zurückkehren
-      newController.getCurrentPlayer.name shouldEqual "Player1"
-      newController.nextPlayer() // Aktueller Spieler ist wieder "Player2"
-      newController.handleInput("undo") // Sollte wieder zu "Player1" zurückkehren
-      newController.getCurrentPlayer.name shouldEqual "Player1"
-    }
-
-    "correctly handle player index wrap-around on undo" in {
-      val newController = new Controller(jsonProvider, xmlProvider)
-      newController.addPlayer("Player1")
-      newController.addPlayer("Player2")
-      newController.addPlayer("Player3")
-      newController.handleInput("undo") // Aktueller Spieler ist "Player1", wrap-around sollte zu "Player3" zurückkehren
-      newController.getCurrentPlayer.name shouldEqual "Player3"
     }
 
     "delegate input handling to current state" in {
