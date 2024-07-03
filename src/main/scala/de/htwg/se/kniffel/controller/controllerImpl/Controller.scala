@@ -135,4 +135,8 @@ class Controller @Inject() (
     fileIoJson.save(players)
     fileIoXml.save(players)
   }
+
+  // Neue Methoden für Tests
+  def isStandardScoreUpdater: Boolean = scoreUpdater.isInstanceOf[StandardScoreUpdater]
+  def isMultiKniffelScoreUpdater: Boolean = scoreUpdater.isInstanceOf[MultiKniffelScoreUpdater]
 }
