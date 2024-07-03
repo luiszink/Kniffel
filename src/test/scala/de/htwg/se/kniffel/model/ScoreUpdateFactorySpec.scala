@@ -2,26 +2,19 @@ package de.htwg.se.kniffel.model.modelImpl
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import de.htwg.se.kniffel.model.modelImpl.ScoreUpdaterFactory
 import de.htwg.se.kniffel.model.scoreUpdaterImpl.{StandardScoreUpdater, MultiKniffelScoreUpdater}
-import de.htwg.se.kniffel.model.modelImpl.{Player, ScoreCard}
 
 class ScoreUpdaterFactorySpec extends AnyWordSpec with Matchers {
 
   "A ScoreUpdaterFactory" should {
 
-    "create a StandardScoreUpdater when input is 'y'" in {
+    "create a MultiKniffelScoreUpdater when input is 'y'" in {
       val updater = ScoreUpdaterFactory.createScoreUpdater("y")
-      updater shouldBe a[StandardScoreUpdater]
-    }
-
-    "create a MultiKniffelScoreUpdater when input is 'n'" in {
-      val updater = ScoreUpdaterFactory.createScoreUpdater("n")
       updater shouldBe a[MultiKniffelScoreUpdater]
     }
 
-    "create a StandardScoreUpdater when input is 'standard'" in {
-      val updater = ScoreUpdaterFactory.createScoreUpdater("standard")
+    "create a StandardScoreUpdater when input is 'n'" in {
+      val updater = ScoreUpdaterFactory.createScoreUpdater("n")
       updater shouldBe a[StandardScoreUpdater]
     }
 
@@ -81,8 +74,9 @@ class ScoreUpdaterFactorySpec extends AnyWordSpec with Matchers {
       player.scoreCard.categories.update("one", Some(3))
       val updater = new StandardScoreUpdater
       val dice = List(1, 1, 1, 2, 3)
-      updater.updateScore(player, "one", dice)
-      player.scoreCard.categories("one") shouldEqual Some(3) // Score should remain unchanged
+      an[IllegalArgumentException] should be thrownBy {
+        updater.updateScore(player, "one", dice)
+      }
     }
   }
 
@@ -135,8 +129,9 @@ class ScoreUpdaterFactorySpec extends AnyWordSpec with Matchers {
       player.scoreCard.categories.update("one", Some(3))
       val updater = new MultiKniffelScoreUpdater
       val dice = List(1, 1, 1, 2, 3)
-      updater.updateScore(player, "one", dice)
-      player.scoreCard.categories("one") shouldEqual Some(3) // Score should remain unchanged
+      an[IllegalArgumentException] should be thrownBy {
+        updater.updateScore(player, "one", dice)
+      }
     }
   }
 }

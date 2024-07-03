@@ -7,7 +7,6 @@ import de.htwg.se.kniffel.model.modelImpl._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-// Dummy implementation of Controller
 class TestController extends ControllerInterface {
   var currentPlayer: PlayerInterface = Player("TestPlayer")
   var keptDice: List[Int] = List()
@@ -17,6 +16,7 @@ class TestController extends ControllerInterface {
   override def getCurrentPlayer: PlayerInterface = currentPlayer
   override def updateScore(category: String): Unit = {
     scoreUpdated = true
+    nextPlayer()
   }
   override def nextPlayer(): Unit = {
     playerChanged = true
