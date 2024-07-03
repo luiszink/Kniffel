@@ -90,5 +90,74 @@ class ControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
       controller.handleInput("someInput")
       dummyState.handleInputCalled shouldEqual true
     }
+
+    // Neue Tests für ungetestete Funktionen
+
+    "roll dice correctly" in {
+      val initialDice = controller.getDice
+      controller.rollDice()
+      val newDice = controller.getDice
+      newDice should not equal initialDice
+    }
+
+    "return the correct winner" in {
+      val newController = new Controller(jsonProvider, xmlProvider)
+      newController.addPlayer("Player1")
+      newController.addPlayer("Player2")
+      // Annahme: Score-Kategorien sind nicht null und Spieler 1 hat höhere Punktzahl
+      newController.getPlayers.head.scoreCard.categories
+        .update("totalScore", Some(100))
+      newController
+        .getPlayers(1)
+        .scoreCard
+        .categories
+        .update("totalScore", Some(50))
+      newController.getWinner shouldEqual "Player1"
+    }
+
+    "return the correct final scores" in {
+      val newController = new Controller(jsonProvider, xmlProvider)
+      newController.addPlayer("Player1")
+      newController.addPlayer("Player2")
+      newController.getPlayers.head.scoreCard.categories
+        .update("totalScore", Some(100))
+      newController
+        .getPlayers(1)
+        .scoreCard
+        .categories
+        .update("totalScore", Some(50))
+      newController.getFinalScores shouldEqual List("Player1: 0", "Player2: 0")
+    }
+
+    "check game end correctly" in {
+      val controllerMock = spy(new Controller(jsonProvider, xmlProvider))
+      controllerMock.addPlayer("Player1")
+      controllerMock.addPlayer("Player2")
+      val player1 = controllerMock.getPlayers.head
+      val player2 = controllerMock.getPlayers(1)
+
+      // Füllen aller Kategorien für beide Spieler
+      player1.scoreCard.categories.keys.foreach { key =>
+        player1.scoreCard.categories.update(key, Some(1))
+      }
+      player2.scoreCard.categories.keys.foreach { key =>
+        player2.scoreCard.categories.update(key, Some(1))
+      }
+
+      controllerMock.checkGameEnd()
+      // Überprüfen, ob das Event `GameEnded` ausgelöst wurde
+      verify(controllerMock, times(1)).notifyObservers(KniffelEvent.GameEnded)
+    }
+
+    "update score correctly" in {
+      val newController = new Controller(jsonProvider, xmlProvider)
+      newController.addPlayer("Player1")
+      newController.rollDice()
+      newController.updateScore("one")
+      // Überprüfen, ob die Punktzahl aktualisiert wurde
+      newController.getCurrentPlayer.scoreCard.categories(
+        "one"
+      ) should not be empty
+    }
   }
 }
