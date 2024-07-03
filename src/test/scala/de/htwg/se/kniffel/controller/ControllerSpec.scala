@@ -201,7 +201,18 @@ class ControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
       ) should not be empty
     }
 
-    
+    "update score and calculate total score correctly" in {
+      val newController = new Controller(jsonProvider, xmlProvider)
+      newController.addPlayer("Player1")
+      newController.rollDice()
+      newController.updateScore("one")
+      val player = newController.getCurrentPlayer
+      player.scoreCard.calculateTotalScore()
+      println(
+        s"${player.name}'s total score: ${player.scoreCard.categories("totalScore").getOrElse(0)}"
+      )
+      player.scoreCard.categories("totalScore") should not be empty
+    }
 
     "handle input and notify observers correctly" in {
       val controller = new Controller(jsonProvider, xmlProvider)
