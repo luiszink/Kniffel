@@ -24,7 +24,6 @@ import scalafx.scene.layout.AnchorPane
 import scala.util.Random
 import java.util.{Timer, TimerTask}
 
-
 class GUI @Inject() (controller: ControllerInterface)
     extends JFXApp3
     with Observer {
@@ -40,25 +39,34 @@ class GUI @Inject() (controller: ControllerInterface)
   var multipleKniffelCheckBox: CheckBox = uninitialized
   var repetitionsLabel: Label = uninitialized
 
+  // Neue Variablen für die Fenstergröße
+  val windowWidth: Double = 800
+  val windowHeight: Double = 600
+
   override def update(event: KniffelEvent.Value): Unit = {
     Platform.runLater {
       event match {
-        case KniffelEvent.PrintScoreCard    => scorecard()
         case KniffelEvent.PlayerAdded       => scorecard()
-        case KniffelEvent.MultiKniffel      => startSync()
-        case KniffelEvent.PrintDice         => updateDiceResults()
-        case KniffelEvent.NextPlayer        => resetSelectedDice()
-        case KniffelEvent.DisableRollButton => rollButton.disable = true
-        case KniffelEvent.EnableRollButton  => rollButton.disable = false
+        case KniffelEvent.keepDice          => updateDiceResults()
+        case KniffelEvent.Undo              =>
+          scorecard()
+        case KniffelEvent.setScoreUpdater   =>
+          startSync()
+          scorecard()
+        case KniffelEvent.NextPlayer        =>
+          scorecard()
+          updateDiceResults()
+          resetSelectedDice()
+          rollButton.disable = false
+        case KniffelEvent.noRepetitions     => rollButton.disable = true
         case KniffelEvent.GameEnded         => showEndScene()
-        case _                              => println("")
+        case _                              =>
       }
     }
   }
 
   override def start(): Unit = {
     try {
-      val screenBounds = Screen.primary.visualBounds
       stage = new JFXApp3.PrimaryStage {
         title = "Kniffel"
         resizable = true
@@ -66,7 +74,7 @@ class GUI @Inject() (controller: ControllerInterface)
           controller.saveCurrentState() // Speichern des aktuellen Zustands
           sys.exit(0)
         }
-        scene = startScene(screenBounds)
+        scene = startScene(windowWidth, windowHeight)
       }
     } catch {
       case e: Exception =>
@@ -74,20 +82,22 @@ class GUI @Inject() (controller: ControllerInterface)
     }
   }
 
-  def startScene(screenBounds: javafx.geometry.Rectangle2D): Scene = {
-    new Scene(screenBounds.width, screenBounds.height) {
+  def startScene(width: Double, height: Double): Scene = {
+    new Scene(width, height) {
       stylesheets.add("file:src/main/resources/style.css")
       val pane = new StackPane() {
         id = "main-pane"
-        prefWidth = screenBounds.width
-        prefHeight = screenBounds.height
+        prefWidth = windowWidth
+        prefHeight = windowHeight
       }
       playerNameFields = createPlayerNameFields(4)
       val confirmButton = new Button("Confirm") { id = "confirm-button" }
       confirmButton.onAction = _ => handlePlayerNames()
 
       // Checkbox für mehrere Kniffel
-      multipleKniffelCheckBox = new CheckBox("Erlaube mehrere Kniffel") { id = "kniffel-label" }
+      multipleKniffelCheckBox = new CheckBox("Erlaube mehrere Kniffel") {
+        id = "kniffel-label"
+      }
       multipleKniffelCheckBox.selected = false
 
       // Title Label
@@ -126,21 +136,23 @@ class GUI @Inject() (controller: ControllerInterface)
     }
   }
 
-  def gameScene(screenBounds: javafx.geometry.Rectangle2D): Scene = {
-    new Scene(screenBounds.width, screenBounds.height) {
+  def gameScene(width: Double, height: Double): Scene = {
+    new Scene(width, height) {
       stylesheets.add("file:src/main/resources/style.css")
       val pane = new BorderPane() {
         id = "main-pane"
-        prefWidth = screenBounds.width
-        prefHeight = screenBounds.height
+        prefWidth = windowWidth
+        prefHeight = windowHeight
       }
 
       // Menüleiste hinzufügen
       val menuBar = new MenuBar() {
-        prefWidth = screenBounds.width // Breitere Menüleiste
+        prefWidth = GUI.this.windowWidth       
       }
       val menu = new Menu("") {
-        val homeImage = new ImageView(new Image("file:src/main/resources/home.png")) {
+        val homeImage = new ImageView(
+          new Image("file:src/main/resources/home.png")
+        ) {
           fitHeight = 40
           fitWidth = 40
         }
@@ -159,7 +171,7 @@ class GUI @Inject() (controller: ControllerInterface)
         controller.handleInput("undo")
         updateDiceResults()
       }
-      backMenuItem.onAction = _ => stage.scene = startScene(screenBounds)
+      backMenuItem.onAction = _ => stage.scene = startScene(GUI.this.windowWidth, GUI.this.windowHeight)
       exitMenuItem.onAction = _ => Platform.exit()
 
       tableView = new TableView[(String, String)]() {
@@ -212,7 +224,7 @@ class GUI @Inject() (controller: ControllerInterface)
       diceImageViews(4).layoutX = 125
       diceImageViews(4).layoutY = 134
 
-      dicePane.children.addAll(diceImageViews.map(_.delegate): _*)
+      dicePane.children.addAll(diceImageViews.map(_.delegate)*)
 
       val controlBox = new VBox(10) {
         id = "game-field"
@@ -248,12 +260,12 @@ class GUI @Inject() (controller: ControllerInterface)
       .map(player => (player.name, player.getTotalScore))
       .sortBy(-_._2) // Sortieren nach Punktzahl absteigend
 
-    val endScene = new Scene(screenBounds.width, screenBounds.height) {
+    val endScene = new Scene(windowWidth, windowHeight) {
       stylesheets.add("file:src/main/resources/style.css")
       val pane = new BorderPane() {
         id = "end-scene-pane"
-        prefWidth = screenBounds.width
-        prefHeight = screenBounds.height
+        prefWidth = windowWidth
+        prefHeight = windowHeight
       }
 
       val resultBox = new VBox {
@@ -271,7 +283,9 @@ class GUI @Inject() (controller: ControllerInterface)
           },
           new ListView[String] {
             id = "end-scene-list-view"
-            items = ObservableBuffer(sortedResults.map { case (name, score) => s"$name: $score" }*)
+            items = ObservableBuffer(sortedResults.map { case (name, score) =>
+              s"$name: $score"
+            }*)
             prefWidth = 200 // Weitere Reduzierung der Breite der ListView
             prefHeight = 150 // Reduzierung der Höhe der ListView
           },
@@ -308,9 +322,7 @@ class GUI @Inject() (controller: ControllerInterface)
   }
 
   def startSync(): Unit = {
-    val screenBounds = Screen.primary.visualBounds
-    stage.scene = gameScene(screenBounds)
-    scorecard()
+    stage.scene = gameScene(windowWidth, windowHeight)
   }
 
   def handlePlayerNames(): Unit = {
@@ -334,68 +346,76 @@ class GUI @Inject() (controller: ControllerInterface)
       // Berechne die Breite der Spalten basierend auf der Anzahl der Spieler
       val numPlayers = players.size
       val totalWidth = 400 // Gesamtbreite der Tabelle
-      val columnWidth = totalWidth / (numPlayers + 1) // +1 für die Kategorie-Spalte
+      val columnWidth =
+        totalWidth / (numPlayers + 1) // +1 für die Kategorie-Spalte
 
       // Mapping von internen Kategorienamen zu benutzerfreundlichen Namen
-    val categoryNameMapping: Map[String, String] = Map(
-      "one" -> "Einsen",
-      "two" -> "Zweien",
-      "three" -> "Dreien",
-      "four" -> "Vieren",
-      "five" -> "Fünfen",
-      "six" -> "Sechsen",
-      "bonus" -> "Bonus",
-      "upperSectionScore" -> "Obere Abschnitt Punktzahl",
-      "threeofakind" -> "Dreierpasch",
-      "fourofakind" -> "Viererpasch",
-      "fullhouse" -> "Full House",
-      "smallstraight" -> "Kleine Straße",
-      "largestraight" -> "Große Straße",
-      "kniffel" -> "Kniffel",
-      "chance" -> "Chance",
-      "lowerSectionScore" -> "Untere Abschnitt Punktzahl",
-      "totalScore" -> "Gesamtpunktzahl"
-    )
-
+      val categoryNameMapping: Map[String, String] = Map(
+        "one" -> "Einsen",
+        "two" -> "Zweien",
+        "three" -> "Dreien",
+        "four" -> "Vieren",
+        "five" -> "Fünfen",
+        "six" -> "Sechsen",
+        "bonus" -> "Bonus",
+        "upperSectionScore" -> "Obere Abschnitt Punktzahl",
+        "threeofakind" -> "Dreierpasch",
+        "fourofakind" -> "Viererpasch",
+        "fullhouse" -> "Full House",
+        "smallstraight" -> "Kleine Straße",
+        "largestraight" -> "Große Straße",
+        "kniffel" -> "Kniffel",
+        "chance" -> "Chance",
+        "lowerSectionScore" -> "Untere Abschnitt Punktzahl",
+        "totalScore" -> "Gesamtpunktzahl"
+      )
 
       // Konfigurieren der Kategorie-Spalte
-      val categoryColumn = new TableColumn[(String, String), String]("Category") {
-        cellValueFactory = { cellData =>
-          val internalCategoryName = cellData.value._1
-          val friendlyCategoryName = categoryNameMapping.getOrElse(internalCategoryName, internalCategoryName)
-          new StringProperty(this, "category", friendlyCategoryName)
-        }
-        minWidth = columnWidth
-        maxWidth = columnWidth
-      }
-
-      // Konfigurieren der Spieler-Spalten
-      val playerColumns: List[javafx.scene.control.TableColumn[(String, String), String]] = players.map { player =>
-        new TableColumn[(String, String), String](player.name) {
+      val categoryColumn =
+        new TableColumn[(String, String), String]("Category") {
           cellValueFactory = { cellData =>
-            val category = cellData.value._1
-            val score = players
-              .find(_.name == player.name)
-              .flatMap(_.scoreCard.categories.get(category))
-              .map(p => if p.isDefined then p.get.toString() else "-")
-            new StringProperty(this, "score", score.getOrElse("-"))
+            val internalCategoryName = cellData.value._1
+            val friendlyCategoryName = categoryNameMapping.getOrElse(
+              internalCategoryName,
+              internalCategoryName
+            )
+            new StringProperty(this, "category", friendlyCategoryName)
           }
           minWidth = columnWidth
           maxWidth = columnWidth
         }
-      }
+
+      // Konfigurieren der Spieler-Spalten
+      val playerColumns
+          : List[javafx.scene.control.TableColumn[(String, String), String]] =
+        players.map { player =>
+          new TableColumn[(String, String), String](player.name) {
+            cellValueFactory = { cellData =>
+              val category = cellData.value._1
+              val score = players
+                .find(_.name == player.name)
+                .flatMap(_.scoreCard.categories.get(category))
+                .map(p => if p.isDefined then p.get.toString() else "-")
+              new StringProperty(this, "score", score.getOrElse("-"))
+            }
+            minWidth = columnWidth
+            maxWidth = columnWidth
+          }
+        }
 
       tableView.columns ++= List(categoryColumn)
       tableView.columns ++= playerColumns
 
-      val allCategories = controller.getPlayers.flatMap(_.scoreCard.categories.keys).distinct
-      val scoreCardEntries: ObservableBuffer[(String, String)] = ObservableBuffer(
-        allCategories.map { category =>
-          category -> controller.getPlayers.head.scoreCard.categories
-            .getOrElse(category, "-")
-            .toString
-        }: _*
-      )
+      val allCategories =
+        controller.getPlayers.flatMap(_.scoreCard.categories.keys).distinct
+      val scoreCardEntries: ObservableBuffer[(String, String)] =
+        ObservableBuffer(
+          allCategories.map { category =>
+            category -> controller.getPlayers.head.scoreCard.categories
+              .getOrElse(category, "-")
+              .toString
+          }*
+        )
 
       // Wenden Sie die CSS-Klassen auf die Bonus-, Ergebnis-, Upper- und Lower-Section-Zeilen an
       tableView.rowFactory = _ => {
@@ -403,7 +423,12 @@ class GUI @Inject() (controller: ControllerInterface)
           item.onChange { (_, _, newValue) =>
             if (newValue != null) {
               val category = newValue._1
-              styleClass --= Seq("bonus", "total", "upperSection", "lowerSection")
+              styleClass --= Seq(
+                "bonus",
+                "total",
+                "upperSection",
+                "lowerSection"
+              )
               if (category == "bonus") {
                 styleClass += "bonus"
               } else if (category == "totalScore") {
@@ -424,11 +449,11 @@ class GUI @Inject() (controller: ControllerInterface)
     }
   }
 
-
   def rollDice(): Unit = {
     rollButton.disable = true
     val animationDuration = 1000 // Dauer der Animation in Millisekunden
-    val animationInterval = 100 // Intervall zwischen den Bildern in Millisekunden
+    val animationInterval =
+      100 // Intervall zwischen den Bildern in Millisekunden
 
     val timer = new Timer()
     val startTime = System.currentTimeMillis()

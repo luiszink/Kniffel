@@ -158,34 +158,91 @@ class ScoringStrategyTest extends AnyFlatSpec with Matchers {
     Kniffel.calculateScore(List()) should be(0)
   }
 
-  "ScoreCalculator" should "calculate the score based on the given strategy" in {
-    ScoreCalculator.calculateScore(List(1, 1, 2, 3, 1), Ones) should be(3)
-    ScoreCalculator.calculateScore(List(2, 2, 2, 3, 4), Twos) should be(6)
-    ScoreCalculator.calculateScore(List(3, 3, 3, 4, 5), Threes) should be(9)
-    ScoreCalculator.calculateScore(List(4, 4, 4, 4, 5), Fours) should be(16)
-    ScoreCalculator.calculateScore(List(5, 5, 5, 4, 1), Fives) should be(15)
-    ScoreCalculator.calculateScore(List(6, 6, 6, 4, 1), Sixes) should be(18)
-    ScoreCalculator.calculateScore(List(1, 1, 1, 2, 2), ThreeTimes) should be(7)
-    ScoreCalculator.calculateScore(List(1, 1, 1, 1, 2), FourTimes) should be(6)
-    ScoreCalculator.calculateScore(List(1, 1, 2, 2, 2), FullHouse) should be(25)
-    ScoreCalculator.calculateScore(List(1, 2, 3, 4, 6), SmallStraight) should be(30)
-    ScoreCalculator.calculateScore(List(1, 2, 3, 4, 5), LargeStraight) should be(40)
-    ScoreCalculator.calculateScore(List(1, 2, 3, 4, 6), Chance) should be(16)
-    ScoreCalculator.calculateScore(List(3, 3, 3, 3, 3), Kniffel) should be(50)
+  "A ScoreCard" should "calculate the upper section score correctly" in {
+    val scoreCard = new ScoreCard()
+    scoreCard.categories.update("one", Some(3))
+    scoreCard.categories.update("two", Some(6))
+    scoreCard.categories.update("three", Some(9))
+    scoreCard.categories.update("four", Some(12))
+    scoreCard.categories.update("five", Some(15))
+    scoreCard.categories.update("six", Some(18))
+    scoreCard.calculateUpperSectionScore()
+    scoreCard.categories("upperSectionScore") should be(Some(63))
   }
 
-  it should "return 0 if no dice are rolled" in {
-    ScoreCalculator.calculateScore(List(), Ones) should be(0)
+  it should "calculate the lower section score correctly" in {
+    val scoreCard = new ScoreCard()
+    scoreCard.categories.update("threeofakind", Some(18))
+    scoreCard.categories.update("fourofakind", Some(24))
+    scoreCard.categories.update("fullhouse", Some(25))
+    scoreCard.categories.update("smallstraight", Some(30))
+    scoreCard.categories.update("largestraight", Some(40))
+    scoreCard.categories.update("kniffel", Some(50))
+    scoreCard.categories.update("chance", Some(20))
+    scoreCard.calculateLowerSectionScore()
+    scoreCard.categories("lowerSectionScore") should be(Some(207))
   }
 
-  it should "return 0 if the strategy returns 0" in {
-    ScoreCalculator.calculateScore(List(1, 2, 3, 4, 5), Kniffel) should be(0)
+  it should "calculate the bonus correctly when upper section score is 63 or more" in {
+    val scoreCard = new ScoreCard()
+    scoreCard.categories.update("one", Some(3))
+    scoreCard.categories.update("two", Some(6))
+    scoreCard.categories.update("three", Some(9))
+    scoreCard.categories.update("four", Some(12))
+    scoreCard.categories.update("five", Some(15))
+    scoreCard.categories.update("six", Some(18))
+    scoreCard.calculateBonus()
+    scoreCard.categories("bonus") should be(Some(35))
   }
 
-  it should "delegate the calculation to the provided strategy" in {
-    val customStrategy = new ScoringStrategyInterface {
-      override def calculateScore(dice: List[Int]): Int = dice.sum * 2
-    }
-    ScoreCalculator.calculateScore(List(1, 2, 3, 4, 5), customStrategy) should be(30)
+  it should "not calculate the bonus when upper section score is less than 63" in {
+    val scoreCard = new ScoreCard()
+    scoreCard.categories.update("one", Some(1))
+    scoreCard.categories.update("two", Some(2))
+    scoreCard.categories.update("three", Some(3))
+    scoreCard.categories.update("four", Some(4))
+    scoreCard.categories.update("five", Some(5))
+    scoreCard.categories.update("six", Some(6))
+    scoreCard.calculateBonus()
+    scoreCard.categories("bonus") should be(Some(0))
+  }
+
+  it should "calculate the total score correctly" in {
+    val scoreCard = new ScoreCard()
+    scoreCard.categories.update("one", Some(3))
+    scoreCard.categories.update("two", Some(6))
+    scoreCard.categories.update("three", Some(9))
+    scoreCard.categories.update("four", Some(12))
+    scoreCard.categories.update("five", Some(15))
+    scoreCard.categories.update("six", Some(18))
+    scoreCard.categories.update("threeofakind", Some(18))
+    scoreCard.categories.update("fourofakind", Some(24))
+    scoreCard.categories.update("fullhouse", Some(25))
+    scoreCard.categories.update("smallstraight", Some(30))
+    scoreCard.categories.update("largestraight", Some(40))
+    scoreCard.categories.update("kniffel", Some(50))
+    scoreCard.categories.update("chance", Some(20))
+    scoreCard.calculateTotalScore()
+    scoreCard.categories("totalScore") should be(Some(305))
+  }
+
+  it should "calculate the total score correctly with bonus" in {
+    val scoreCard = new ScoreCard()
+    scoreCard.categories.update("one", Some(3))
+    scoreCard.categories.update("two", Some(6))
+    scoreCard.categories.update("three", Some(9))
+    scoreCard.categories.update("four", Some(12))
+    scoreCard.categories.update("five", Some(15))
+    scoreCard.categories.update("six", Some(18))
+    scoreCard.categories.update("threeofakind", Some(18))
+    scoreCard.categories.update("fourofakind", Some(24))
+    scoreCard.categories.update("fullhouse", Some(25))
+    scoreCard.categories.update("smallstraight", Some(30))
+    scoreCard.categories.update("largestraight", Some(40))
+    scoreCard.categories.update("kniffel", Some(50))
+    scoreCard.categories.update("chance", Some(20))
+    scoreCard.calculateTotalScore()
+    scoreCard.categories("totalScore") should be(Some(305))
+    scoreCard.categories("bonus") should be(Some(35))
   }
 }

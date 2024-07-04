@@ -1,37 +1,14 @@
 package de.htwg.se.kniffel.model.fileIoComponents.fileIoJsonImpl
 
-import de.htwg.se.kniffel.model.fileIoComponents.FileIoInterface
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import de.htwg.se.kniffel.model.{PlayerInterface, ScoreCardInterface}
 import de.htwg.se.kniffel.model.modelImpl.{Player, ScoreCard}
 import play.api.libs.json._
-
-import scala.io.Source
 import java.io.{File, PrintWriter}
+import scala.io.Source
 
-class FileIoJsonImpl extends FileIoInterface {
-
-  override def load: List[PlayerInterface] = {
-    val file = new File("players.json")
-    if (file.exists) {
-      val source: String = Source.fromFile(file).getLines.mkString
-      val json: JsValue = Json.parse(source)
-      val players = (json \ "players").as[List[JsValue]]
-      players.map { playerJson =>
-        val name = (playerJson \ "name").as[String]
-        val scoreCard = (playerJson \ "scoreCard").as[ScoreCardInterface]
-        Player(name, scoreCard)
-      }
-    } else {
-      List()
-    }
-  }
-
-  override def save(players: List[PlayerInterface]): Unit = {
-    val file = new File("players.json")
-    val pw = new PrintWriter(file)
-    pw.write(Json.prettyPrint(playersToJson(players)))
-    pw.close()
-  }
+class FileIoJsonImplSpec extends AnyFlatSpec with Matchers {
 
   implicit val scoreCardWrites: Writes[ScoreCardInterface] = new Writes[ScoreCardInterface] {
     def writes(scoreCard: ScoreCardInterface): JsValue = Json.obj(
@@ -62,9 +39,23 @@ class FileIoJsonImpl extends FileIoInterface {
     JsSuccess(Player(name, scoreCard))
   }
 
-  def playersToJson(players: List[PlayerInterface]): JsValue = {
-    Json.obj(
-      "players" -> Json.toJson(players)
-    )
+  "FileIoJsonImpl" should "save players to a JSON file" in {
+    val fileIo = new FileIoJsonImpl
+    val player1 = Player("Player1", new ScoreCard())
+    val player2 = Player("Player2", new ScoreCard())
+    val players = List(player1, player2)
+
+    // Save players
+    fileIo.save(players)
+
+    // Verify file content
+    val file = new File("players.json")
+    file.exists() should be(true)
+    val source = Source.fromFile(file).getLines.mkString
+    val json = Json.parse(source)
+    (json \ "players").as[List[JsValue]].size should be(2)
+
+    // Clean up
+    file.delete()
   }
 }
