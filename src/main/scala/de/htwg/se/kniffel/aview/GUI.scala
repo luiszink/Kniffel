@@ -39,6 +39,10 @@ class GUI @Inject() (controller: ControllerInterface)
   var multipleKniffelCheckBox: CheckBox = uninitialized
   var repetitionsLabel: Label = uninitialized
 
+  // Neue Variablen für die Fenstergröße
+  val windowWidth: Double = 800
+  val windowHeight: Double = 600
+
   override def update(event: KniffelEvent.Value): Unit = {
     Platform.runLater {
       event match {
@@ -63,7 +67,6 @@ class GUI @Inject() (controller: ControllerInterface)
 
   override def start(): Unit = {
     try {
-      val screenBounds = Screen.primary.visualBounds
       stage = new JFXApp3.PrimaryStage {
         title = "Kniffel"
         resizable = true
@@ -71,7 +74,7 @@ class GUI @Inject() (controller: ControllerInterface)
           controller.saveCurrentState() // Speichern des aktuellen Zustands
           sys.exit(0)
         }
-        scene = startScene(screenBounds)
+        scene = startScene(windowWidth, windowHeight)
       }
     } catch {
       case e: Exception =>
@@ -79,13 +82,13 @@ class GUI @Inject() (controller: ControllerInterface)
     }
   }
 
-  def startScene(screenBounds: javafx.geometry.Rectangle2D): Scene = {
-    new Scene(screenBounds.width, screenBounds.height) {
+  def startScene(width: Double, height: Double): Scene = {
+    new Scene(width, height) {
       stylesheets.add("file:src/main/resources/style.css")
       val pane = new StackPane() {
         id = "main-pane"
-        prefWidth = screenBounds.width
-        prefHeight = screenBounds.height
+        prefWidth = windowWidth
+        prefHeight = windowHeight
       }
       playerNameFields = createPlayerNameFields(4)
       val confirmButton = new Button("Confirm") { id = "confirm-button" }
@@ -133,18 +136,18 @@ class GUI @Inject() (controller: ControllerInterface)
     }
   }
 
-  def gameScene(screenBounds: javafx.geometry.Rectangle2D): Scene = {
-    new Scene(screenBounds.width, screenBounds.height) {
+  def gameScene(width: Double, height: Double): Scene = {
+    new Scene(width, height) {
       stylesheets.add("file:src/main/resources/style.css")
       val pane = new BorderPane() {
         id = "main-pane"
-        prefWidth = screenBounds.width
-        prefHeight = screenBounds.height
+        prefWidth = windowWidth
+        prefHeight = windowHeight
       }
 
       // Menüleiste hinzufügen
       val menuBar = new MenuBar() {
-        prefWidth = screenBounds.width // Breitere Menüleiste
+        prefWidth = GUI.this.windowWidth       
       }
       val menu = new Menu("") {
         val homeImage = new ImageView(
@@ -168,7 +171,7 @@ class GUI @Inject() (controller: ControllerInterface)
         controller.handleInput("undo")
         updateDiceResults()
       }
-      backMenuItem.onAction = _ => stage.scene = startScene(screenBounds)
+      backMenuItem.onAction = _ => stage.scene = startScene(GUI.this.windowWidth, GUI.this.windowHeight)
       exitMenuItem.onAction = _ => Platform.exit()
 
       tableView = new TableView[(String, String)]() {
@@ -257,12 +260,12 @@ class GUI @Inject() (controller: ControllerInterface)
       .map(player => (player.name, player.getTotalScore))
       .sortBy(-_._2) // Sortieren nach Punktzahl absteigend
 
-    val endScene = new Scene(screenBounds.width, screenBounds.height) {
+    val endScene = new Scene(windowWidth, windowHeight) {
       stylesheets.add("file:src/main/resources/style.css")
       val pane = new BorderPane() {
         id = "end-scene-pane"
-        prefWidth = screenBounds.width
-        prefHeight = screenBounds.height
+        prefWidth = windowWidth
+        prefHeight = windowHeight
       }
 
       val resultBox = new VBox {
@@ -319,8 +322,7 @@ class GUI @Inject() (controller: ControllerInterface)
   }
 
   def startSync(): Unit = {
-    val screenBounds = Screen.primary.visualBounds
-    stage.scene = gameScene(screenBounds)
+    stage.scene = gameScene(windowWidth, windowHeight)
   }
 
   def handlePlayerNames(): Unit = {

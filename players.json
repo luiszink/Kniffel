@@ -1,3 +1,95 @@
 {
-  "players" : [ ]
+  "players" : [ {
+    "name" : "Luis",
+    "scoreCard" : {
+      "categories" : {
+        "two" : null,
+        "kniffel" : null,
+        "lowerSectionScore" : null,
+        "five" : null,
+        "fourofakind" : null,
+        "upperSectionScore" : null,
+        "four" : null,
+        "bonus" : null,
+        "three" : 9,
+        "smallstraight" : null,
+        "threeofakind" : null,
+        "fullhouse" : null,
+        "six" : null,
+        "totalScore" : null,
+        "chance" : null,
+        "largestraight" : null,
+        "one" : null
+      }
+    }
+  }, {
+    "name" : "Michi",
+    "scoreCard" : {
+      "categories" : {
+        "two" : null,
+        "kniffel" : null,
+        "lowerSectionScore" : null,
+        "five" : null,
+        "fourofakind" : null,
+        "upperSectionScore" : null,
+        "four" : null,
+        "bonus" : null,
+        "three" : 3,
+        "smallstraight" : null,
+        "threeofakind" : null,
+        "fullhouse" : null,
+        "six" : null,
+        "totalScore" : null,
+        "chance" : null,
+        "largestraight" : null,
+        "one" : null
+      }
+    }
+  }, {
+    "name" : "Luis",
+    "scoreCard" : {
+      "categories" : {
+        "two" : null,
+        "kniffel" : null,
+        "lowerSectionScore" : null,
+        "five" : null,
+        "fourofakind" : null,
+        "upperSectionScore" : null,
+        "four" : 12,
+        "bonus" : null,
+        "three" : null,
+        "smallstraight" : null,
+        "threeofakind" : null,
+        "fullhouse" : null,
+        "six" : null,
+        "totalScore" : null,
+        "chance" : null,
+        "largestraight" : null,
+        "one" : null
+      }
+    }
+  }, {
+    "name" : "akh",
+    "scoreCard" : {
+      "categories" : {
+        "two" : null,
+        "kniffel" : null,
+        "lowerSectionScore" : null,
+        "five" : null,
+        "fourofakind" : null,
+        "upperSectionScore" : null,
+        "four" : null,
+        "bonus" : null,
+        "three" : null,
+        "smallstraight" : null,
+        "threeofakind" : null,
+        "fullhouse" : null,
+        "six" : null,
+        "totalScore" : null,
+        "chance" : null,
+        "largestraight" : null,
+        "one" : null
+      }
+    }
+  } ]
 }
