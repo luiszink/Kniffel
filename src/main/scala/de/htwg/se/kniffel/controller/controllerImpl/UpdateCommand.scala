@@ -35,7 +35,6 @@ class UpdateScoreCommand(player: PlayerInterface, category: String, dice: List[I
 
   override def undoStep: Unit = {
     player.scoreCard.categories.update(category.toLowerCase, previousScore)
-    // Würfel zurücksetzen
     player.asInstanceOf[Player].setDice(previousDiceState)
   }
 
