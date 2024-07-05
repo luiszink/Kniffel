@@ -52,13 +52,11 @@ class Controller @Inject() (
     }
   }
 
-  // Neue Methode um den Gewinner zu ermitteln
   def getWinner: String = {
     val winner = players.maxBy(_.getTotalScore)
     winner.name
   }
 
-  // Neue Methode um die Endergebnisse zu erhalten
   def getFinalScores: List[String] = {
     players.map(player => s"${player.name}: ${player.getTotalScore}")
   }
@@ -127,13 +125,11 @@ class Controller @Inject() (
     }
   }
 
-  // Methode zum Speichern des aktuellen Zustands
   def saveCurrentState(): Unit = {
     fileIoJson.save(players)
     fileIoXml.save(players)
   }
 
-  // Neue Methoden für Tests
   def isStandardScoreUpdater: Boolean = scoreUpdater.isInstanceOf[StandardScoreUpdater]
   def isMultiKniffelScoreUpdater: Boolean = scoreUpdater.isInstanceOf[MultiKniffelScoreUpdater]
 }

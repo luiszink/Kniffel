@@ -26,7 +26,6 @@ class StandardScoreUpdater @Inject() extends ScoreUpdaterInterface {
       case _ => throw new IllegalArgumentException("Invalid category.")
     }
     val calculatedScore = ScoreCalculator.calculateScore(dice, strategy)
-    // it has to throw an error if the categorie is already filled
     currentPlayer.scoreCard.categories.get(category.toLowerCase) match {
       case Some(None) =>
         currentPlayer.scoreCard.categories.update(category.toLowerCase, Some(calculatedScore))

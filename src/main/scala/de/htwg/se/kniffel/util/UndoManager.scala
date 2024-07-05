@@ -7,7 +7,7 @@ class UndoManager extends UndoManagerInterface {
   def doStep(command: Command): Unit = {
     undoStack = command :: undoStack
     command.doStep
-    redoStack = Nil // Clear redo stack after a new command is done
+    redoStack = Nil
   }
 
   def undoStep: Unit = {

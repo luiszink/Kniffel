@@ -7,7 +7,6 @@ import de.htwg.se.kniffel.model.modelImpl._
 
 class MultiKniffelScoreUpdater @Inject() extends ScoreUpdaterInterface {
   override def updateScore(player: PlayerInterface, category: String, dice: List[Int]): Unit = {
-    // Logic for handling multiple Kniffel entries
     val currentPlayer = player
     val strategy: ScoringStrategyInterface = category.toLowerCase match {
       case "one" => Ones
@@ -31,7 +30,6 @@ class MultiKniffelScoreUpdater @Inject() extends ScoreUpdaterInterface {
         currentPlayer.scoreCard.categories.update(category.toLowerCase, Some(calculatedScore))
 
       case Some(Some(_)) if category.toLowerCase == "kniffel" =>
-        // Wenn die Kategorie "kniffel" bereits gefüllt ist, die 50 Punkte zufällig in eine andere leere Kategorie schreiben
         val emptyCategories = currentPlayer.scoreCard.categories.filter(_._2.isEmpty).keys.toList
         val emptyCategoriesExcluding = emptyCategories.filterNot(cat => cat == "bonus" || cat == "uppersectionscore" || cat == "totalscore")
         val randomCategory = emptyCategoriesExcluding(Random.nextInt(emptyCategoriesExcluding.size))
