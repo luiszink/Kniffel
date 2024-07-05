@@ -38,8 +38,6 @@ class GUI @Inject() (controller: ControllerInterface)
   var selectedDiceIndices: Set[Int] = Set()
   var multipleKniffelCheckBox: CheckBox = uninitialized
   var repetitionsLabel: Label = uninitialized
-
-  // Neue Variablen für die Fenstergröße
   val windowWidth: Double = 800
   val windowHeight: Double = 600
 
@@ -71,7 +69,7 @@ class GUI @Inject() (controller: ControllerInterface)
         title = "Kniffel"
         resizable = true
         onCloseRequest = _ => {
-          controller.saveCurrentState() // Speichern des aktuellen Zustands
+          controller.saveCurrentState()
           sys.exit(0)
         }
         scene = startScene(windowWidth, windowHeight)
@@ -94,13 +92,11 @@ class GUI @Inject() (controller: ControllerInterface)
       val confirmButton = new Button("Confirm") { id = "confirm-button" }
       confirmButton.onAction = _ => handlePlayerNames()
 
-      // Checkbox für mehrere Kniffel
       multipleKniffelCheckBox = new CheckBox("Erlaube mehrere Kniffel") {
         id = "kniffel-label"
       }
       multipleKniffelCheckBox.selected = false
 
-      // Title Label
       val titleLabel = new Label("Kniffel") { id = "title-Label" }
 
       val titleBox = new HBox {
@@ -145,7 +141,6 @@ class GUI @Inject() (controller: ControllerInterface)
         prefHeight = windowHeight
       }
 
-      // Menüleiste hinzufügen
       val menuBar = new MenuBar() {
         prefWidth = GUI.this.windowWidth       
       }
@@ -166,7 +161,6 @@ class GUI @Inject() (controller: ControllerInterface)
       menuBar.menus.add(menu)
       pane.top = menuBar
 
-      // Event-Handler für Menüeinträge
       undoMenuItem.onAction = _ => {
         controller.handleInput("undo")
         updateDiceResults()
@@ -187,9 +181,8 @@ class GUI @Inject() (controller: ControllerInterface)
         tooltip = "Click to roll the dice"
       }
 
-      // Event-Handler für Buttons
       rollButton.onAction = _ => rollDice()
-      rollButton.disable = false // Ensure the button is enabled initially
+      rollButton.disable = false
 
       updateCategoryButton = new Button("Update Category") {
         id = "update-category-button"
@@ -199,7 +192,6 @@ class GUI @Inject() (controller: ControllerInterface)
 
       diceImageViews = createDiceImageViews(5)
 
-      // Repetitions Label
       repetitionsLabel = new Label(
         s"Remaining Rolls: ${controller.repetitions}"
       ) { id = "repetitions-label" }
@@ -258,7 +250,7 @@ class GUI @Inject() (controller: ControllerInterface)
     val screenBounds = scalafx.stage.Screen.primary.visualBounds
     val sortedResults = controller.getPlayers
       .map(player => (player.name, player.getTotalScore))
-      .sortBy(-_._2) // Sortieren nach Punktzahl absteigend
+      .sortBy(-_._2)
 
     val endScene = new Scene(windowWidth, windowHeight) {
       stylesheets.add("file:src/main/resources/style.css")
@@ -275,7 +267,7 @@ class GUI @Inject() (controller: ControllerInterface)
           new Label("Spiel beendet!") {
             id = "end-scene-label-title"
           },
-          new Label(s"Gewinner: ${sortedResults.head._1}") { // Der erste Spieler in der sortierten Liste ist der Gewinner
+          new Label(s"Gewinner: ${sortedResults.head._1}") {
             id = "end-scene-label-winner"
           },
           new Label("Endergebnisse:") {
@@ -286,8 +278,8 @@ class GUI @Inject() (controller: ControllerInterface)
             items = ObservableBuffer(sortedResults.map { case (name, score) =>
               s"$name: $score"
             }*)
-            prefWidth = 200 // Weitere Reduzierung der Breite der ListView
-            prefHeight = 150 // Reduzierung der Höhe der ListView
+            prefWidth = 200
+            prefHeight = 150
           },
           new Button("Beenden") {
             id = "end-scene-button"
@@ -343,13 +335,11 @@ class GUI @Inject() (controller: ControllerInterface)
       val score = controller.getCurrentPlayer.scoreCard
       val players = controller.getPlayers
 
-      // Berechne die Breite der Spalten basierend auf der Anzahl der Spieler
       val numPlayers = players.size
-      val totalWidth = 400 // Gesamtbreite der Tabelle
+      val totalWidth = 400
       val columnWidth =
-        totalWidth / (numPlayers + 1) // +1 für die Kategorie-Spalte
+        totalWidth / (numPlayers + 1)
 
-      // Mapping von internen Kategorienamen zu benutzerfreundlichen Namen
       val categoryNameMapping: Map[String, String] = Map(
         "one" -> "Einsen",
         "two" -> "Zweien",
@@ -370,7 +360,6 @@ class GUI @Inject() (controller: ControllerInterface)
         "totalScore" -> "Gesamtpunktzahl"
       )
 
-      // Konfigurieren der Kategorie-Spalte
       val categoryColumn =
         new TableColumn[(String, String), String]("Category") {
           cellValueFactory = { cellData =>
@@ -385,7 +374,6 @@ class GUI @Inject() (controller: ControllerInterface)
           maxWidth = columnWidth
         }
 
-      // Konfigurieren der Spieler-Spalten
       val playerColumns
           : List[javafx.scene.control.TableColumn[(String, String), String]] =
         players.map { player =>
@@ -417,7 +405,6 @@ class GUI @Inject() (controller: ControllerInterface)
           }*
         )
 
-      // Wenden Sie die CSS-Klassen auf die Bonus-, Ergebnis-, Upper- und Lower-Section-Zeilen an
       tableView.rowFactory = _ => {
         new TableRow[(String, String)] {
           item.onChange { (_, _, newValue) =>
@@ -443,26 +430,21 @@ class GUI @Inject() (controller: ControllerInterface)
         }
       }
       tableView.items = scoreCardEntries
-
-      // Sicherstellen, dass die Spalten gleichmäßig verteilt sind
       tableView.columnResizePolicy = TableView.ConstrainedResizePolicy
     }
   }
 
   def rollDice(): Unit = {
     rollButton.disable = true
-    val animationDuration = 1000 // Dauer der Animation in Millisekunden
-    val animationInterval =
-      100 // Intervall zwischen den Bildern in Millisekunden
+    val animationDuration = 1000
+    val animationInterval = 100
 
     val timer = new Timer()
     val startTime = System.currentTimeMillis()
 
-    // TimerTask, um die Bilder regelmäßig zu ändern
     val task = new TimerTask {
       override def run(): Unit = {
         if (System.currentTimeMillis() - startTime >= animationDuration) {
-          // Animation beenden und finale Würfelergebnisse anzeigen
           timer.cancel()
           Platform.runLater {
             val keptDiceIndices = selectedDiceIndices.toList
@@ -471,7 +453,6 @@ class GUI @Inject() (controller: ControllerInterface)
             rollButton.disable = controller.repetitions == 0
           }
         } else {
-          // Zufällige Würfelbilder für nicht ausgewählte Würfel anzeigen
           Platform.runLater {
             diceImageViews.zipWithIndex.foreach { case (imageView, index) =>
               if (!selectedDiceIndices.contains(index + 1)) {
@@ -483,7 +464,6 @@ class GUI @Inject() (controller: ControllerInterface)
         }
       }
     }
-    // Timer starten
     timer.scheduleAtFixedRate(task, 0, animationInterval)
   }
 

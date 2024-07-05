@@ -18,6 +18,9 @@ import de.htwg.se.kniffel.model.fileIoComponents.FileIoInterface
 
 class KniffelModule extends AbstractModule {
   override def configure(): Unit = {
+    val jsonProvider = new Provider[FileIoJsonImpl] {override def get(): FileIoJsonImpl = new FileIoJsonImpl}
+    val xmlProvider = new Provider[FileIoXmlImpl] {override def get(): FileIoXmlImpl = new FileIoXmlImpl}
+    bind(classOf[ControllerInterface]).toInstance(new Controller(jsonProvider, xmlProvider))
     bind(classOf[StateInterface]).annotatedWith(Names.named("RollingState")).to(classOf[RollingState])
     bind(classOf[StateInterface]).annotatedWith(Names.named("UpdateState")).to(classOf[UpdateState])
     bind(classOf[DiceInterface]).to(classOf[Dice])
@@ -29,15 +32,5 @@ class KniffelModule extends AbstractModule {
     bind(new TypeLiteral[List[Int]]() {}).toInstance(List.empty[Int])
     bind(classOf[FileIoInterface]).annotatedWith(Names.named("json")).to(classOf[FileIoJsonImpl])
     bind(classOf[FileIoInterface]).annotatedWith(Names.named("xml")).to(classOf[FileIoXmlImpl])
-
-    // Provide Controller with json and xml providers
-    val jsonProvider = new Provider[FileIoJsonImpl] {
-      override def get(): FileIoJsonImpl = new FileIoJsonImpl
-    }
-    val xmlProvider = new Provider[FileIoXmlImpl] {
-      override def get(): FileIoXmlImpl = new FileIoXmlImpl
-    }
-
-    bind(classOf[ControllerInterface]).toInstance(new Controller(jsonProvider, xmlProvider))
   }
 }
